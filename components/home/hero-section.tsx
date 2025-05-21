@@ -1,0 +1,131 @@
+import { Locale } from "@/i18n.config";
+import Link from "next/link";
+import React from "react";
+import { Button } from "../ui";
+
+export function HeroSection({ lang }: { lang: Locale }) {
+  return (
+    <section className="container mx-auto px-4 py-16 lg:py-24 flex flex-col lg:flex-row items-center">
+      <div className="lg:w-1/2 mb-10 lg:mb-0">
+        <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
+          Welcome to
+          <br className="sm:hidden lg:block xl:hidden" />
+          <span className="bg-gradient-to-r from-orange-400 to-green-300 text-white px-4 parallelogram">
+            Nom Track
+          </span>{" "}
+          — Your Smart Calorie &amp; Macro Tracker
+        </h1>
+        <p className="text-lg mb-8 text-gray-700">
+          Take control of your nutrition with the help of AI. Nom Track is a
+          modern tool designed to make healthy eating easy, personalized, and
+          enjoyable.
+        </p>
+        <div className="flex flex-col sm:flex-row sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
+          <Button
+            asChild
+            className="px-6 py-3 cursor-pointer rounded-full bg-orange-300 text-white font-medium hover:bg-orange-400 transition-colors duration-300"
+          >
+            <Link href={`/${lang}/sign-in`}>Get Started</Link>
+          </Button>
+
+          <Button
+            asChild
+            className="px-6 py-3 cursor-pointer rounded-full border border-green-200 text-charcoal font-medium bg-inherit hover:bg-green-50 transition-colors  duration-300"
+          >
+            <Link href={`/${lang}/sign-in`}>Watch Demo</Link>
+          </Button>
+        </div>
+      </div>
+      <div className="lg:w-1/2 flex justify-center">
+        <div className="relative w-full md:w-md max-w-md">
+          <div className="relative bg-white rounded-3xl shadow-lg overflow-hidden">
+            <div className="bg-orange-400 bg-opacity-10 p-4">
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium text-gray-50">Todays Summary</h3>
+                <span className="text-sm text-gray-500">June 15</span>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="flex justify-between mb-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-orange-400">
+                    1,450
+                  </div>
+                  <div className="text-xs text-gray-500">calories</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-blue-500">120g</div>
+                  <div className="text-xs text-gray-500">protein</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-green-500">45g</div>
+                  <div className="text-xs text-gray-500">fats</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-yellow-500">160g</div>
+                  <div className="text-xs text-gray-500">carbs</div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="p-3 bg-gray-50 rounded-xl flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-green-200 hover:bg-green-300 cursor-pointer rounded-full flex items-center justify-center mr-3">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-medium">Breakfast</div>
+                      <div className="text-xs text-gray-500">
+                        Greek yogurt with berries
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium">320 cal</div>
+                </div>
+                <div className="p-3 bg-gray-50 rounded-xl flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-yellow-200 hover:bg-yellow-300 cursor-pointer rounded-full flex items-center justify-center mr-3">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-5 w-5 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                        ></path>
+                      </svg>
+                    </div>
+                    <div>
+                      <div className="font-medium">Lunch</div>
+                      <div className="text-xs text-gray-500">
+                        Chicken salad with avocado
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-sm font-medium">520 cal</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
