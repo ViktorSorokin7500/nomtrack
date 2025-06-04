@@ -145,3 +145,11 @@
 .group:hover .group-hover\:rotate-y-0 {
   transform: rotateY(0deg);
 }
+
+.progressRing {
+  transform: rotate(-90deg);
+}
+
+.progressRing circle {
+  transition: stroke-dashoffset 0.35s;
+}

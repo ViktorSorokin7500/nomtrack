@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { InputWithUnit } from "./input-with-unit";
-import { SettingCard } from "./setting-card";
+import { Card } from "../shared";
 
 interface NutritionTargets {
   calories: string;
@@ -47,7 +47,7 @@ export function NutritionTargetsForm() {
   };
 
   return (
-    <SettingCard>
+    <Card>
       <h2 className="text-xl font-semibold mb-6">Nutrition Targets</h2>
       <div className="flex border-b border-gray-200 mb-6">
         <button
@@ -220,6 +220,6 @@ export function NutritionTargetsForm() {
           </div>
         </div>
       )}
-    </SettingCard>
+    </Card>
   );
 }

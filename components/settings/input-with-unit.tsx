@@ -2,10 +2,12 @@ interface InputWithUnitProps {
   id: string;
   label: string;
   name: string;
-  value: string;
+  value: string | number;
   unit: string;
   placeholder?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  "aria-describedby"?: string;
 }
 
 export function InputWithUnit({
@@ -30,7 +32,7 @@ export function InputWithUnit({
           type="number"
           id={id}
           name={name}
-          value={value}
+          value={value.toString()}
           onChange={onChange}
           className="w-full px-4 py-3 rounded-l-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-200"
           placeholder={placeholder}

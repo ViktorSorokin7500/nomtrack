@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { SettingCard } from "./setting-card";
+import { Card } from "../shared";
 
 export function TelegramConnect() {
   const [isConnected, setIsConnected] = useState(false);
@@ -58,31 +58,48 @@ export function TelegramConnect() {
   };
 
   return (
-    <SettingCard>
+    <Card>
       <h2 className="text-xl font-semibold mb-6">Connect with Telegram Bot</h2>
       <p className="text-gray-600 mb-6">
         Connect your account with our Telegram bot to receive daily reminders,
         nutrition tips, and track your meals on the go.
       </p>
       <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center">
+        <div className="flex items-center gap-2">
           <svg
-            className="w-10 h-10 text-[#0088cc] mr-3"
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            x="0px"
+            y="0px"
+            width="60"
+            height="60"
+            viewBox="0 0 48 48"
           >
-            <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18.717-.691 3.246-1.278 6.009-.26 1.175-.545 2.335-.804 3.437-.362 1.527-.762 2.392-1.166 2.755-.4.36-.75.44-1.032.34-.288-.1-.539-.312-.75-.524-.389-.377-.695-.675-1.232-1.021-.627-.405-1.773-1.193-2.926-2.045-.9-.667-1.939-1.961-.09-3.307l.63-.567c.118-.105 2.277-2.051 2.317-2.093.05-.056.096-.135.054-.21-.042-.075-.125-.09-.19-.09-.104 0-1.832 1.074-5.189 3.222-.493.338-.941.504-1.344.495-.442-.01-1.29-.25-1.92-.456-.777-.256-1.395-.393-1.34-.831.028-.22.356-.447.983-.68 3.43-1.499 5.708-2.484 6.833-2.954 3.19-1.333 3.852-1.565 4.29-1.571.095-.001.308.023.445.138.084.07.15.164.177.273.042.171.028.353.016.529z" />
+            <path
+              fill="#29b6f6"
+              d="M24 4A20 20 0 1 0 24 44A20 20 0 1 0 24 4Z"
+            ></path>
+            <path
+              fill="#fff"
+              d="M33.95,15l-3.746,19.126c0,0-0.161,0.874-1.245,0.874c-0.576,0-0.873-0.274-0.873-0.274l-8.114-6.733 l-3.97-2.001l-5.095-1.355c0,0-0.907-0.262-0.907-1.012c0-0.625,0.933-0.923,0.933-0.923l21.316-8.468 c-0.001-0.001,0.651-0.235,1.126-0.234C33.667,14,34,14.125,34,14.5C34,14.75,33.95,15,33.95,15z"
+            ></path>
+            <path
+              fill="#b0bec5"
+              d="M23,30.505l-3.426,3.374c0,0-0.149,0.115-0.348,0.12c-0.069,0.002-0.143-0.009-0.219-0.043 l0.964-5.965L23,30.505z"
+            ></path>
+            <path
+              fill="#cfd8dc"
+              d="M29.897,18.196c-0.169-0.22-0.481-0.26-0.701-0.093L16,26c0,0,2.106,5.892,2.427,6.912 c0.322,1.021,0.58,1.045,0.58,1.045l0.964-5.965l9.832-9.096C30.023,18.729,30.064,18.416,29.897,18.196z"
+            ></path>
           </svg>
           <div>
-            <h3 className="font-medium">NutriFlow Bot</h3>
-            <p className="text-sm text-gray-500">@NutriFlow_Bot</p>
+            <h3 className="font-medium">NomTrack Bot</h3>
+            <p className="text-sm text-gray-500">@NomTrack_Bot</p>
           </div>
         </div>
         <button
           type="button"
           onClick={handleConnect}
-          className="px-6 py-3 bg-[#0088cc] text-white rounded-xl hover:bg-opacity-90 transition-colors"
+          className="px-6 py-3 bg-blue-500 hover:bg-blue-600 hover:shadow-lg cursor-pointer active:shadow-sm text-white rounded-xl hover:bg-opacity-90 transition-colors"
         >
           Connect
         </button>
@@ -125,12 +142,12 @@ export function TelegramConnect() {
               <button
                 type="button"
                 onClick={handleCloseModal}
-                className="text-gray-400 hover:text-gray-500"
+                className="text-gray-400 hover:text-gray-500 cursor-pointer"
                 aria-label="Close modal"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
+                  className="size-6"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -160,7 +177,7 @@ export function TelegramConnect() {
                   ref={(el) => {
                     inputRefs.current[index] = el; // Без возврата значения
                   }}
-                  className="w-12 h-12 text-center text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-apricot"
+                  className="w-12 h-12 text-center text-lg border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-200"
                   aria-label={`OTP digit ${index + 1}`}
                 />
               ))}
@@ -169,14 +186,14 @@ export function TelegramConnect() {
               <button
                 type="button"
                 onClick={handleResendOtp}
-                className="text-apricot hover:text-opacity-80 font-medium"
+                className="text-orange-400 font-medium"
               >
                 Resend Code
               </button>
               <button
                 type="button"
                 onClick={handleVerifyOtp}
-                className="px-6 py-3 bg-apricot text-white rounded-xl hover:bg-opacity-90 transition-colors"
+                className="px-6 py-3 bg-orange-400 hover:bg-orange-500 text-white cursor-pointer hover:shadow-lg active:shadow-sm active:bg-orange-400 rounded-xl hover:bg-opacity-90 transition-colors"
               >
                 Verify
               </button>
@@ -184,6 +201,6 @@ export function TelegramConnect() {
           </div>
         </div>
       )}
-    </SettingCard>
+    </Card>
   );
 }

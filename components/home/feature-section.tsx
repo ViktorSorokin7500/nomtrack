@@ -1,4 +1,3 @@
-// app/[lang]/FeatureSection.tsx
 import React from "react";
 import { FeatureCard } from "./feature-card";
 
