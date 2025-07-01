@@ -28,10 +28,6 @@ interface NutritionDashboardProps {
     }>;
     isPlanned?: boolean;
   }>;
-  aiMessages: Array<{
-    id: string;
-    text: string;
-  }>;
   lang: Locale;
 }
 
@@ -68,7 +64,7 @@ export function NutritionDashboard({
     <Card className="container mx-auto px-4 py-8 max-w-4xl">
       <header className="mb-8 text-center">
         <h1 className="text-3xl font-light text-gray-800 mb-2">
-          Daily Nutrition
+          Daily Nutritionss
         </h1>
         <p className="text-gray-500 font-light">
           Track your meals and nutrition intake
@@ -79,112 +75,6 @@ export function NutritionDashboard({
         <h2 className="text-xl font-light text-gray-700 mb-4">
           Daily Progress
         </h2>
-        {/* <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div>
-            <div className="flex justify-between items-baseline mb-1">
-              <span className="text-sm text-gray-500">Calories</span>
-              <div>
-                <span className="text-lg font-medium text-gray-800">
-                  {summaryData.calories.current}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {" "}
-                  / {summaryData.calories.target} kcal
-                </span>
-              </div>
-            </div>
-            <div className="h-2 bg-stone-100 overflow-hidden rounded-sm">
-              <div
-                className="h-full rounded-sm transition-all duration-500 bg-orange-200"
-                style={{
-                  width: `${
-                    (summaryData.calories.current /
-                      summaryData.calories.target) *
-                    100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between items-baseline mb-1">
-              <span className="text-sm text-gray-500">Protein</span>
-              <div>
-                <span className="text-lg font-medium text-gray-800">
-                  {summaryData.macros.protein.current}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {" "}
-                  / {summaryData.macros.protein.target}g
-                </span>
-              </div>
-            </div>
-            <div className="h-2 bg-stone-100 overflow-hidden rounded-sm">
-              <div
-                className="h-full rounded-sm transition-all duration-500 bg-green-300"
-                style={{
-                  width: `${
-                    (summaryData.macros.protein.current /
-                      summaryData.macros.protein.target) *
-                    100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between items-baseline mb-1">
-              <span className="text-sm text-gray-500">Fat</span>
-              <div>
-                <span className="text-lg font-medium text-gray-800">
-                  {summaryData.macros.fat.current}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {" "}
-                  / {summaryData.macros.fat.target}g
-                </span>
-              </div>
-            </div>
-            <div className="h-2 bg-stone-100 overflow-hidden rounded-sm">
-              <div
-                className="h-full rounded-sm transition-all duration-500 bg-yellow-200"
-                style={{
-                  width: `${
-                    (summaryData.macros.fat.current /
-                      summaryData.macros.fat.target) *
-                    100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          </div>
-          <div>
-            <div className="flex justify-between items-baseline mb-1">
-              <span className="text-sm text-gray-500">Carbs</span>
-              <div>
-                <span className="text-lg font-medium text-gray-800">
-                  {summaryData.macros.carbs.current}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {" "}
-                  / {summaryData.macros.carbs.target}g
-                </span>
-              </div>
-            </div>
-            <div className="h-2 bg-stone-100 overflow-hidden rounded-sm">
-              <div
-                className="h-full rounded-sm transition-all duration-500 bg-sky-200"
-                style={{
-                  width: `${
-                    (summaryData.macros.carbs.current /
-                      summaryData.macros.carbs.target) *
-                    100
-                  }%`,
-                }}
-              ></div>
-            </div>
-          </div>
-        </div> */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-medium text-stone-900">Summary</h2>
           <div className="text-sm text-gray-500">June 15, 2023</div>
@@ -280,13 +170,14 @@ export function NutritionDashboard({
               headerColor="bg-sky-200"
               isSnack
               onRemove={() => handleRemoveSnack(index)}
+              className="mb-4"
             />
           ))}
         </div>
         <div className="text-center">
           <button
             onClick={handleAddSnack}
-            className="bg-white border border-gray-200 hover:border-green-300 text-gray-700 px-6 py-3 rounded-lg font-medium focus:outline-none shadow-sm"
+            className="cursor-pointer bg-white border border-gray-200 hover:border-green-300 text-gray-700 px-6 py-3 rounded-lg font-medium focus:outline-none shadow-sm"
           >
             + Add Snack
           </button>

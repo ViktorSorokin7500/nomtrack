@@ -1,13 +1,9 @@
 "use client";
-import { Card } from "../shared";
 import { useEffect } from "react";
-import Chart from "chart.js/auto";
-import { DoughnutController, ArcElement, Legend, Tooltip } from "chart.js";
-import { MealCategory } from "./meal-category";
-import { Dish } from "./nutrition-archive";
+import { Card } from "../shared";
+import { BodyMeasurements } from "./body-measurements";
 
-// Регистрация компонентов Chart.js
-Chart.register(DoughnutController, ArcElement, Legend, Tooltip);
+// import { MealCategory } from "./meal-category";
 
 interface Day {
   date: string;
@@ -16,10 +12,11 @@ interface Day {
   protein: number;
   fats: number;
   carbs: number;
-  meals?: Array<{
-    type: string;
-    dishes: Dish[];
-  }>;
+  sugar: number;
+  water: number;
+  weight: number;
+  belly: number;
+  waist: number;
 }
 
 interface DailyDetailModalProps {
@@ -28,38 +25,22 @@ interface DailyDetailModalProps {
 }
 
 export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
-  const proteinGoal = 120; // Пример целевых значений
+  const proteinGoal = 120;
   const fatGoal = 70;
   const carbsGoal = 250;
+  const sugarGoal = 30;
+  const waterGoal = 3500;
 
   useEffect(() => {
-    const ctx = document.getElementById("macro-chart") as HTMLCanvasElement;
-    const chart = new Chart(ctx, {
-      type: "doughnut",
-      data: {
-        labels: ["protein", "fat", "carbs"],
-        datasets: [
-          {
-            data: [day.protein, day.fats, day.carbs],
-            backgroundColor: ["#3B82F6", "#F59E0B", "#10B981"],
-            borderWidth: 0,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: { position: "bottom" },
-        },
-      },
-    });
-
-    return () => chart.destroy();
-  }, [day]);
+    document.body.classList.add("overflow-hidden");
+    return () => {
+      document.body.classList.remove("overflow-hidden");
+    };
+  }, []);
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <Card className="w-full max-w-4xl p-6">
+    <div className="fixed inset-0 bg-orange-50 px-2 bg-opacity-50 flex items-center justify-center z-50 overflow-hidden">
+      <Card className="w-full max-w-4xl max-h-[98vh] overflow-y-auto p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
             {day.date}, {new Date(day.fullDate).getFullYear()}
@@ -67,7 +48,7 @@ export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700 text-2xl"
-            aria-label={"close"}
+            aria-label="close"
           >
             ×
           </button>
@@ -96,7 +77,13 @@ export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-blue-500 h-2 rounded-full"
-                    style={{ width: `${(day.protein / proteinGoal) * 100}%` }}
+                    style={{
+                      width: `${
+                        (proteinGoal > day.protein
+                          ? day.protein / proteinGoal
+                          : 1) * 100
+                      }%`,
+                    }}
                   />
                 </div>
                 <div className="text-xs text-gray-500 text-right mt-1">
@@ -111,7 +98,11 @@ export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-yellow-500 h-2 rounded-full"
-                    style={{ width: `${(day.fats / fatGoal) * 100}%` }}
+                    style={{
+                      width: `${
+                        (fatGoal > day.fats ? day.fats / fatGoal : 1) * 100
+                      }%`,
+                    }}
                   />
                 </div>
                 <div className="text-xs text-gray-500 text-right mt-1">
@@ -126,25 +117,67 @@ export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div
                     className="bg-green-500 h-2 rounded-full"
-                    style={{ width: `${(day.carbs / carbsGoal) * 100}%` }}
+                    style={{
+                      width: `${
+                        (carbsGoal > day.carbs ? day.carbs / carbsGoal : 0) *
+                        100
+                      }%`,
+                    }}
                   />
                 </div>
                 <div className="text-xs text-gray-500 text-right mt-1">
                   {Math.round((day.carbs / carbsGoal) * 100)}% ofDailyGoal
                 </div>
               </div>
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-gray-600">sugar</span>
+                  <span className="font-bold text-gray-800">{day.sugar}g</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-stone-400 h-2 rounded-full"
+                    style={{
+                      width: `${
+                        (sugarGoal > day.sugar ? day.sugar / sugarGoal : 1) *
+                        100
+                      }%`,
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-gray-500 text-right mt-1">
+                  {Math.round((day.sugar / sugarGoal) * 100)}% ofDailyGoal
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-1">
+                  <span className="text-gray-600">water</span>
+                  <span className="font-bold text-gray-800">{day.water}g</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-blue-400 h-2 rounded-full"
+                    style={{
+                      width: `${
+                        (waterGoal > day.water ? day.water / waterGoal : 1) *
+                        100
+                      }%`,
+                    }}
+                  />
+                </div>
+                <div className="text-xs text-gray-500 text-right mt-1">
+                  {Math.round((day.water / waterGoal) * 100)}% ofDailyGoal
+                </div>
+              </div>
             </div>
           </Card>
-          <Card className="p-5 lg:col-span-2">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              macroDistribution
-            </h3>
-            <div className="h-64">
-              <canvas id="macro-chart" />
-            </div>
-          </Card>
+          <BodyMeasurements
+            weight={day.weight}
+            belly={day.belly}
+            waist={day.waist}
+          />
         </div>
-        <div>
+        {/* <div>
           <h3 className="text-xl font-semibold text-gray-800 mb-4">meals</h3>
           <div className="space-y-4">
             {day.meals && day.meals.length > 0 ? (
@@ -152,7 +185,10 @@ export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
                 <MealCategory
                   key={index}
                   type={meal.type}
-                  dishes={meal.dishes}
+                  cal={meal.cal}
+                  protein={meal.protein}
+                  carbs={meal.carbs}
+                  fat={meal.fat}
                 />
               ))
             ) : (
@@ -161,7 +197,7 @@ export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
               </div>
             )}
           </div>
-        </div>
+        </div> */}
       </Card>
     </div>
   );

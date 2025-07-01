@@ -5,14 +5,24 @@ import {
   SummaryCard,
 } from "@/components/dashboard";
 import { Locale } from "@/i18n.config";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Dashboard({
   params,
 }: {
   params: Promise<{ lang: Locale }>;
 }) {
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
   const { lang } = await params;
-  console.log(params);
 
   // Хардкод даних для рефакторинга
   const summaryData = {
@@ -25,34 +35,14 @@ export default async function Dashboard({
     weightTracker: {
       currentWeight: 107.3,
       weightDifference: -2.7,
-      startDate: "17.05.2025",
+      startDate: "14.06.2025",
       history: [
-        { date: "28.05.2025", weight: 107.3, change: -0.2 },
-        { date: "27.05.2025", weight: 107.5, change: -0.3 },
-        { date: "26.05.2025", weight: 107.8, change: -0.2 },
-        { date: "25.05.2025", weight: 108.0, change: -0.2 },
-        { date: "24.05.2025", weight: 108.2, change: -0.3 },
-        { date: "23.05.2025", weight: 108.5, change: -0.2 },
-        { date: "22.05.2025", weight: 108.7, change: -0.3 },
-        { date: "21.05.2025", weight: 109.0, change: -0.2 },
-        { date: "20.05.2025", weight: 109.2, change: -0.3 },
-        { date: "19.05.2025", weight: 109.5, change: -0.3 },
-        { date: "18.05.2025", weight: 109.8, change: -0.2 },
-        { date: "17.05.2025", weight: 110.0, change: 0 },
+        { date: "16.06.2025", weight: 107.3, change: -0.2 },
+        { date: "15.06.2025", weight: 107.5, change: -0.3 },
+        { date: "14.06.2025", weight: 107.8, change: -0.2 },
       ],
     },
   };
-
-  const aiMessages = [
-    {
-      id: "1",
-      text: "Based on your recent protein intake, I recommend adding more lean protein sources to your lunch. This will help support your muscle gain goals.",
-    },
-    {
-      id: "2",
-      text: "Your water intake is below target today. Try to drink at least 500ml more before dinner.",
-    },
-  ];
 
   const foodLogData = [
     {
@@ -116,7 +106,7 @@ export default async function Dashboard({
   ];
 
   return (
-    <div className="bg-orange-50 p-8 min-h-screen">
+    <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
           <SummaryCard
@@ -124,13 +114,12 @@ export default async function Dashboard({
             macros={summaryData.macros}
             weightTracker={summaryData.weightTracker}
           />
-          <AICoachCard messages={aiMessages} />
+          <AICoachCard foodLogData={foodLogData} />
         </div>
         <div className="lg:col-span-2">
           <NutritionDashboard
             summaryData={summaryData}
             foodLogData={foodLogData}
-            aiMessages={aiMessages}
             lang={lang}
           />
         </div>

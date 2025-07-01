@@ -13,6 +13,7 @@ export default async function Home({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
+
   return (
     <>
       <div className="bg-orange-50">
@@ -27,12 +28,3 @@ export default async function Home({
     </>
   );
 }
-
-// Analyze the list of food and drinks for calories and macronutrients (proteins, fats, carbohydrates). Respond in JSON format as follows:
-// {
-//   "cal": number,
-//   "protein": number,
-//   "carbs": number,
-//   "fat": number,
-//   "dish": string // a short description of the food list provided (in the same language as the original list, without weights, just a list of items)
-// } Here is the list: ""

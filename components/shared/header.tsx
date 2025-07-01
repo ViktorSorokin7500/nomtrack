@@ -1,8 +1,8 @@
 import { Locale } from "@/i18n.config";
-import { SignedIn, SignedOut } from "@clerk/nextjs";
 import { NavLink } from "./nav-link";
+import { createClient } from "@/lib/supabase/server";
 import { LangSwitcher } from "./lang-switcher";
-import { UserButtonWrapper } from "./user-button-wrapper";
+import { Button } from "../ui";
 
 // async function getDictionary(lang: Locale) {
 //   const dictionary = await import(`@/dictionaries/${lang}.json`);
@@ -13,12 +13,19 @@ export async function Header({ lang }: { lang: Locale }) {
   // const dictionary = await getDictionary(lang);
   // const t = dictionary.header;
 
+  const supabase = createClient();
+
+  // Отримуємо дані про поточного користувача
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+
   return (
     <header>
       <nav className="container flex items-center justify-between py-4 px-2 lg:px-8 mx-auto">
         <div className="flex lg:flex-1 group">
           <NavLink
-            href={`/${lang}`}
+            href={user ? `/${lang}/dashboard` : `/${lang}`}
             className="flex items-center gap-1 lg:gap-2 shrink-0"
           >
             <svg
@@ -43,42 +50,40 @@ export async function Header({ lang }: { lang: Locale }) {
           </NavLink>
         </div>
 
-        <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
-          <SignedOut>
-            <NavLink href={`/${lang}#pricing`}>pricing</NavLink>
-          </SignedOut>
-          {/* <SignedIn>
-            <TokenCounter dictionary={dictionary} />
-          </SignedIn> */}
-        </div>
+        {user ? (
+          <div className="flex items-center gap-2">
+            <LangSwitcher
+              lang={lang}
+              title="language"
+              className="hover:text-orange-400"
+            />
+            <form action="/auth/sign-out" method="post">
+              <Button type="submit">Вийти</Button>
+            </form>
+          </div>
+        ) : (
+          <>
+            <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
+              <NavLink href={`/${lang}#pricing`}>pricing</NavLink>
+            </div>
 
-        <div className="flex lg:justify-end lg:flex-1">
-          <SignedIn>
-            <div className="flex gap-4 items-center">
-              <LangSwitcher
-                lang={lang}
-                title="language"
-                className="hover:text-orange-400"
-              />
-              <UserButtonWrapper lang={lang} />
+            <div className="flex lg:justify-end lg:flex-1">
+              <div className="flex items-center gap-1">
+                <LangSwitcher
+                  lang={lang}
+                  title="language"
+                  className="hover:text-orange-400"
+                />
+                <NavLink
+                  href={`/${lang}/sign-in`}
+                  className="border border-orange-300 bg-orange-300 hover:bg-orange-400 text-white hover:text-gray-100 px-3 py-1 rounded-full"
+                >
+                  Sign In
+                </NavLink>
+              </div>
             </div>
-          </SignedIn>
-          <SignedOut>
-            <div className="flex items-center gap-1">
-              <LangSwitcher
-                lang={lang}
-                title="language"
-                className="hover:text-orange-400"
-              />
-              <NavLink
-                href={`/${lang}/sign-in`}
-                className="border border-orange-300 bg-orange-300 hover:bg-orange-400 text-white hover:text-gray-100 px-3 py-1 rounded-full"
-              >
-                Sign In
-              </NavLink>
-            </div>
-          </SignedOut>
-        </div>
+          </>
+        )}
       </nav>
     </header>
   );

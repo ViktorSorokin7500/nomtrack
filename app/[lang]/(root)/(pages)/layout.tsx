@@ -11,6 +11,7 @@ export default async function PagesLayout({
   params: Promise<{ lang: Locale }>;
 }>) {
   const { lang } = await params;
+
   return (
     <div className="relative flex flex-col min-h-screen">
       <div className="bg-orange-50">

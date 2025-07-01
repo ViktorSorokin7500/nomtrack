@@ -1,5 +1,4 @@
 import { MonthSection } from "./month-section";
-import { Dish } from "./nutrition-archive";
 
 interface YearData {
   year: number;
@@ -12,10 +11,11 @@ interface YearData {
       protein: number;
       fats: number;
       carbs: number;
-      meals?: Array<{
-        type: string;
-        dishes: Dish[];
-      }>;
+      sugar: number;
+      water: number;
+      weight: number;
+      belly: number;
+      waist: number;
     }>;
   }>;
 }

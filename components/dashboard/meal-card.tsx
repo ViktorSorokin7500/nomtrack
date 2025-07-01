@@ -1,4 +1,5 @@
 "use client";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 interface MealCardProps {
@@ -8,6 +9,7 @@ interface MealCardProps {
   headerColor: string;
   isSnack?: boolean;
   onRemove?: () => void;
+  className?: string;
 }
 
 export function MealCard({
@@ -17,6 +19,7 @@ export function MealCard({
   headerColor,
   isSnack,
   onRemove,
+  className,
 }: MealCardProps) {
   const [foodDescription, setFoodDescription] = useState("");
   const [results, setResults] = useState({
@@ -50,7 +53,12 @@ export function MealCard({
   };
 
   return (
-    <div className="meal-card bg-white rounded-xl shadow-sm overflow-hidden">
+    <div
+      className={cn(
+        "meal-card bg-white rounded-xl shadow-sm overflow-hidden",
+        className
+      )}
+    >
       <div
         className={`px-6 py-3 flex justify-between items-center ${headerColor}`}
       >

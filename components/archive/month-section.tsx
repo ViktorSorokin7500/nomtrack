@@ -1,5 +1,4 @@
 import { DailyCard } from "./daily-card";
-import { Dish } from "./nutrition-archive";
 
 interface Month {
   name: string;
@@ -10,10 +9,11 @@ interface Month {
     protein: number;
     fats: number;
     carbs: number;
-    meals?: Array<{
-      type: string;
-      dishes: Dish[];
-    }>;
+    sugar: number;
+    water: number;
+    weight: number;
+    belly: number;
+    waist: number;
   }>;
 }
 

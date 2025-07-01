@@ -1,3 +1,5 @@
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 import {
   NutritionTargetsForm,
   PersonalInfoForm,
@@ -9,20 +11,47 @@ import { Locale } from "@/i18n.config";
 export default async function Settings({
   params,
 }: {
-  params: Promise<{ lang: Locale }>;
+  params: { lang: Locale };
 }) {
   const { lang } = await params;
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+
+  if (!user) {
+    redirect("/sign-in");
+  }
+
+  const { data: profile, error } = await (
+    await supabase
+  )
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id) // Ось тут ми використовуємо id юзера
+    .maybeSingle();
+
+  // console.log("Результат пошуку профілю:", profile);
+  if (error) {
+    console.error("Помилка пошуку профілю:", error);
+  }
+
   return (
     <section className="bg-orange-50 min-h-screen">
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Profile Settings</h1>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-1">
-            <ProfileSidebar lang={lang} />
+            <ProfileSidebar
+              lang={lang}
+              username={profile.full_name}
+              useremail={profile.email}
+            />
           </div>
           <div className="lg:col-span-2 space-y-8">
-            <PersonalInfoForm />
-            <NutritionTargetsForm />
+            <PersonalInfoForm initialData={profile} />
+            <NutritionTargetsForm initialData={profile} />
             <TelegramConnect />
           </div>
         </div>

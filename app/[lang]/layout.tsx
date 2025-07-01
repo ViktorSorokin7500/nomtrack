@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
-import { ClerkProvider } from "@clerk/nextjs";
 import "../globals.css";
 import { Locale } from "@/i18n.config";
 
@@ -59,18 +58,14 @@ export default async function RootLayout({
   params: Promise<{ lang: Locale }>;
 }>) {
   const { lang } = await params;
+
+  console.log(lang);
+
   return (
-    <ClerkProvider
-      signInUrl={`/${lang}/sign-in`}
-      signUpUrl={`/${lang}/sign-up`}
-      signInFallbackRedirectUrl={`/${lang}/dashboard`}
-      signUpFallbackRedirectUrl={`/${lang}/dashboard`}
-    >
-      <html lang="en">
-        <body className={`${poppins.variable} font-sans antialiased`}>
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en">
+      <body className={`${poppins.variable} font-sans antialiased`}>
+        {children}
+      </body>
+    </html>
   );
 }

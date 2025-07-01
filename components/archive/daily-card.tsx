@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { Card } from "../shared";
 import { DailyDetailModal } from "./daily-detail-modal";
-import { Dish } from "./nutrition-archive";
 
 interface Day {
   date: string;
@@ -11,10 +10,11 @@ interface Day {
   protein: number;
   fats: number;
   carbs: number;
-  meals?: Array<{
-    type: string;
-    dishes: Dish[];
-  }>;
+  sugar: number;
+  water: number;
+  weight: number;
+  belly: number;
+  waist: number;
 }
 
 interface DailyCardProps {
@@ -42,16 +42,8 @@ export function DailyCard({ day }: DailyCardProps) {
             <span className="font-semibold text-gray-800">{day.calories}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Protein:</span>
-            <span className="font-semibold text-gray-800">{day.protein}g</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Fats:</span>
-            <span className="font-semibold text-gray-800">{day.fats}g</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Carbs:</span>
-            <span className="font-semibold text-gray-800">{day.carbs}g</span>
+            <span className="text-gray-600">Weight:</span>
+            <span className="font-semibold text-gray-800">{day.weight}kg</span>
           </div>
         </div>
       </Card>

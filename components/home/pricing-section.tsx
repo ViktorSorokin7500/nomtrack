@@ -3,8 +3,6 @@ import { cn } from "@/lib/utils";
 import { ArrowRight, CheckIcon } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { MotionH2, MotionSection } from "../shared/motion-wrapper";
-import { containerVariants, itemVariants } from "@/lib/constants";
 
 export function PricingSection({ lang }: { lang: Locale }) {
   const plans = [
@@ -33,24 +31,10 @@ export function PricingSection({ lang }: { lang: Locale }) {
     },
   ];
   return (
-    <MotionSection
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="relative overflow-hidden"
-      id="pricing"
-    >
+    <section className="relative overflow-hidden" id="pricing">
       <div className="py-6 sm:py-12 lg:py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 lg:pt-12">
         <div className="flex items-center justify-center w-full pb-12">
-          <MotionH2
-            variants={itemVariants}
-            initial={{ y: 20, opacity: 0 }}
-            whileInView={{ y: 0, opacity: 1 }}
-            transition={{ duration: 0.3, delay: 0.2 }}
-            className="uppercase font-bold text-xl text-orange-400"
-          >
-            title
-          </MotionH2>
+          <h2 className="uppercase font-bold text-xl text-orange-400">title</h2>
         </div>
         <div className="relative flex justify-center flex-col lg:flex-row items-center lg:items-stretch gap-8">
           {plans.map((plan) => (
@@ -58,7 +42,7 @@ export function PricingSection({ lang }: { lang: Locale }) {
           ))}
         </div>
       </div>
-    </MotionSection>
+    </section>
   );
 }
 

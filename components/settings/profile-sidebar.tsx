@@ -1,11 +1,18 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Card } from "../shared";
 import { Locale } from "@/i18n.config";
 
-export function ProfileSidebar({ lang }: { lang: Locale }) {
+export function ProfileSidebar({
+  lang,
+  username,
+  useremail,
+}: {
+  lang: Locale;
+  username: string;
+  useremail: string;
+}) {
   const navItems = [
     {
       label: "Personal Info",
@@ -28,47 +35,16 @@ export function ProfileSidebar({ lang }: { lang: Locale }) {
       icon: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     },
   ];
-  const { isLoaded, user } = useUser();
-
-  if (!isLoaded || !user) {
-    return (
-      <Card className="animate-pulse">
-        <div className="flex items-center space-x-4 mb-8">
-          <div className="size-16 bg-gray-200 rounded-full" />
-          <div className="space-y-2">
-            <div className="h-5 w-32 bg-gray-200 rounded" />
-            <div className="h-4 w-48 bg-gray-200 rounded" />
-          </div>
-        </div>
-      </Card>
-    );
-  }
-
-  const initials = `${user.firstName?.[0] || ""}${
-    user.lastName?.[0] || ""
-  }`.toUpperCase();
 
   return (
     <Card>
       <div className="flex items-center space-x-4 mb-8">
-        <div className="size-16 bg-orange-300 rounded-full flex items-center justify-center text-white text-xl font-medium">
-          {user.imageUrl ? (
-            <img
-              src={user.imageUrl}
-              alt={`${user.fullName || "User"}'s profile picture`}
-              className="w-full h-full object-cover rounded-full"
-            />
-          ) : (
-            <div className="w-full h-full bg-apricot flex items-center justify-center">
-              {initials}
-            </div>
-          )}
+        <div className="size-14 bg-orange-300 rounded-full flex items-center justify-center text-white text-xl font-medium">
+          <div />
         </div>
         <div>
-          <h2 className="font-semibold text-lg">{user.fullName || "User"}</h2>
-          <p className="text-gray-500 text-sm">
-            {user.primaryEmailAddress?.emailAddress || "No email"}
-          </p>
+          <h2 className="font-semibold text-lg">{username || "User"}</h2>
+          <p className="text-gray-500 text-sm">{useremail}</p>
         </div>
       </div>
       <nav>
