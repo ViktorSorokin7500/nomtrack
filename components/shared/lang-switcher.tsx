@@ -21,7 +21,9 @@ export const LangSwitcher = ({ lang, title, className }: LangSwitcherProps) => {
   };
   return (
     <Link href={redirectTarget()} className={className} title={title}>
-      <Languages size={20} />
+      <div className="flex items-center gap-1">
+        <Languages size={20} />
+      </div>
     </Link>
   );
 };

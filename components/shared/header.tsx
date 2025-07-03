@@ -1,8 +1,8 @@
 import { Locale } from "@/i18n.config";
+import NavMenu from "./nav-menu";
 import { NavLink } from "./nav-link";
 import { createClient } from "@/lib/supabase/server";
 import { LangSwitcher } from "./lang-switcher";
-import { Button } from "../ui";
 
 // async function getDictionary(lang: Locale) {
 //   const dictionary = await import(`@/dictionaries/${lang}.json`);
@@ -51,16 +51,7 @@ export async function Header({ lang }: { lang: Locale }) {
         </div>
 
         {user ? (
-          <div className="flex items-center gap-2">
-            <LangSwitcher
-              lang={lang}
-              title="language"
-              className="hover:text-orange-400"
-            />
-            <form action="/auth/sign-out" method="post">
-              <Button type="submit">Вийти</Button>
-            </form>
-          </div>
+          <NavMenu lang={lang} />
         ) : (
           <>
             <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">

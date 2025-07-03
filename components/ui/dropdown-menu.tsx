@@ -1,10 +1,12 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import { CheckIcon, ChevronRightIcon, CircleIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
+import Link from "next/link";
 
 function Menu({
   ...props
@@ -12,7 +14,7 @@ function Menu({
   return <DropdownMenuPrimitive.Root data-slot="dropdown-menu" {...props} />;
 }
 
-function MenuPortal({
+function Portal({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Portal>) {
   return (
@@ -20,7 +22,7 @@ function MenuPortal({
   );
 }
 
-function MenuTrigger({
+function Trigger({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Trigger>) {
   return (
@@ -31,7 +33,7 @@ function MenuTrigger({
   );
 }
 
-function MenuContent({
+function Content({
   className,
   sideOffset = 4,
   ...props
@@ -51,7 +53,7 @@ function MenuContent({
   );
 }
 
-function MenuGroup({
+function Group({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Group>) {
   return (
@@ -59,30 +61,38 @@ function MenuGroup({
   );
 }
 
-function MenuItem({
+function Item({
   className,
+  href,
   inset,
   variant = "default",
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean;
+  href: string;
   variant?: "default" | "destructive";
 }) {
+  const pathname = usePathname();
+  const isActive = pathname === href;
+
   return (
-    <DropdownMenuPrimitive.Item
-      data-slot="dropdown-menu-item"
-      data-inset={inset}
-      data-variant={variant}
-      className={cn(
-        "focus:bg-accent focus:text-accent-foreground data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        className
-      )}
-      {...props}
-    />
+    <Link href={href}>
+      <DropdownMenuPrimitive.Item
+        data-slot="dropdown-menu-item"
+        data-inset={inset}
+        data-variant={variant}
+        className={cn(
+          "focus:bg-green-50 focus:text-orange-500 data-[variant=destructive]:text-destructive data-[variant=destructive]:focus:bg-destructive/10 dark:data-[variant=destructive]:focus:bg-destructive/20 data-[variant=destructive]:focus:text-destructive data-[variant=destructive]:*:[svg]:!text-destructive [&_svg:not([class*='text-'])]:text-muted-foreground relative flex items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-hidden select-none data-[disabled]:pointer-events-none data-[disabled]:opacity-50 data-[inset]:pl-8 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 transition-colors delay-75",
+          isActive && "text-orange-400 hover:text-orange-500",
+          className
+        )}
+        {...props}
+      />
+    </Link>
   );
 }
 
-function MenuCheckboxItem({
+function CheckboxItem({
   className,
   children,
   checked,
@@ -108,7 +118,7 @@ function MenuCheckboxItem({
   );
 }
 
-function MenuRadioGroup({
+function RadioGroup({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.RadioGroup>) {
   return (
@@ -119,7 +129,7 @@ function MenuRadioGroup({
   );
 }
 
-function MenuRadioItem({
+function RadioItem({
   className,
   children,
   ...props
@@ -143,7 +153,7 @@ function MenuRadioItem({
   );
 }
 
-function MenuLabel({
+function Label({
   className,
   inset,
   ...props
@@ -163,7 +173,7 @@ function MenuLabel({
   );
 }
 
-function MenuSeparator({
+function Separator({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Separator>) {
@@ -176,7 +186,7 @@ function MenuSeparator({
   );
 }
 
-function MenuShortcut({ className, ...props }: React.ComponentProps<"span">) {
+function Shortcut({ className, ...props }: React.ComponentProps<"span">) {
   return (
     <span
       data-slot="dropdown-menu-shortcut"
@@ -189,13 +199,13 @@ function MenuShortcut({ className, ...props }: React.ComponentProps<"span">) {
   );
 }
 
-function MenuSub({
+function Sub({
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Sub>) {
   return <DropdownMenuPrimitive.Sub data-slot="dropdown-menu-sub" {...props} />;
 }
 
-function MenuSubTrigger({
+function SubTrigger({
   className,
   inset,
   children,
@@ -219,7 +229,7 @@ function MenuSubTrigger({
   );
 }
 
-function MenuSubContent({
+function SubContent({
   className,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.SubContent>) {
@@ -237,18 +247,18 @@ function MenuSubContent({
 
 export {
   Menu,
-  MenuPortal,
-  MenuTrigger,
-  MenuContent,
-  MenuGroup,
-  MenuLabel,
-  MenuItem,
-  MenuCheckboxItem,
-  MenuRadioGroup,
-  MenuRadioItem,
-  MenuSeparator,
-  MenuShortcut,
-  MenuSub,
-  MenuSubTrigger,
-  MenuSubContent,
+  Portal,
+  Trigger,
+  Content,
+  Group,
+  Label,
+  Item,
+  CheckboxItem,
+  RadioGroup,
+  RadioItem,
+  Separator,
+  Shortcut,
+  Sub,
+  SubTrigger,
+  SubContent,
 };

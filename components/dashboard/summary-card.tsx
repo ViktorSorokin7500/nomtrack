@@ -1,63 +1,37 @@
+// components/dashboard/SummaryCard.tsx
+
 "use client";
-import { Card } from "../shared";
+
 import { useState } from "react";
-// import { Line } from "react-chartjs-2";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
+import { Card } from "../shared";
 
-// Реєстрація компонентів Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
+// 1. Спрощуємо пропси. Тепер нам потрібна лише поточна вага.
 interface SummaryCardProps {
-  calories: { current: number; target: number };
-  macros: {
-    protein: { current: number; target: number };
-    carbs: { current: number; target: number };
-    fat: { current: number; target: number };
-  };
-  weightTracker: {
-    currentWeight: number;
-    weightDifference: number;
-    startDate: string;
-    history: { date: string; weight: number; change: number }[];
-  };
+  currentWeight: number | null;
 }
 
-export function SummaryCard({ weightTracker }: SummaryCardProps) {
+export function SummaryCard({ currentWeight }: SummaryCardProps) {
   const [weightInput, setWeightInput] = useState("");
 
   const handleAddWeight = () => {
-    console.log("Added weight:", weightInput);
+    if (!weightInput) return;
+    console.log("Зберегти нову вагу:", weightInput);
+    // TODO: Тут буде виклик Server Action для збереження ваги
     setWeightInput("");
   };
 
   return (
     <Card className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium text-stone-900">Summary</h2>
-        <div className="text-sm text-gray-500">June 15, 2023</div>
+        <h2 className="text-xl font-medium text-stone-900">Прогрес ваги</h2>
+        {/* Можна показувати поточну дату */}
+        <div className="text-sm text-gray-500">
+          {new Date().toLocaleDateString()}
+        </div>
       </div>
 
+      {/* 2. Прибрали весь блок з калоріями. Залишили лише вагу. */}
       <div className="mb-8">
-        <div className="flex justify-between items-center mb-3">
-          <h3 className="font-medium text-stone-900">Current Progress</h3>
-        </div>
         <div className="bg-green-100 rounded-xl p-4">
           <div className="flex items-center">
             <div className="bg-green-200 rounded-full p-2 mr-3">
@@ -77,26 +51,12 @@ export function SummaryCard({ weightTracker }: SummaryCardProps) {
               </svg>
             </div>
             <div className="flex-1">
-              <div className="flex justify-between items-center">
-                <h4 className="font-medium text-stone-900">Weight Tracking</h4>
-                <span
-                  className={`text-sm font-medium px-2 py-1 rounded-full ${
-                    weightTracker.weightDifference <= 0
-                      ? "bg-green-200"
-                      : "bg-red-200"
-                  }`}
-                >
-                  {weightTracker.weightDifference <= 0
-                    ? `Lost ${Math.abs(weightTracker.weightDifference)} kg`
-                    : `Gained ${weightTracker.weightDifference} kg`}
-                </span>
-              </div>
-              <div className="flex justify-between mt-1">
-                <span className="text-xs text-gray-600">
-                  Started {weightTracker.startDate}
-                </span>
-                <span className="text-xs text-gray-600">
-                  Current: {weightTracker.currentWeight} kg
+              <h4 className="font-medium text-stone-900">Weight Tracking</h4>
+              {/* 3. Показуємо реальну поточну вагу з профілю */}
+              <div className="text-xs text-gray-600 mt-1">
+                Поточна вага:
+                <span className="font-bold ml-1">
+                  {currentWeight ? `${currentWeight} kg` : "Не вказано"}
                 </span>
               </div>
             </div>
@@ -104,31 +64,34 @@ export function SummaryCard({ weightTracker }: SummaryCardProps) {
         </div>
       </div>
 
-      <div className="mb-8 bg-blue-50 rounded-xl p-4">
-        <h3 className="font-medium text-stone-900 mb-3">Todays Weight</h3>
+      {/* Форма для введення ваги залишається без змін */}
+      <div className="bg-blue-50 rounded-xl p-4">
+        <h3 className="font-medium text-stone-900 mb-3">
+          Внести сьогоднішню вагу
+        </h3>
         <div className="flex items-end gap-3">
           <div className="flex-grow">
             <label
               htmlFor="weightInput"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Weight (kg)
+              Вага (kg)
             </label>
             <input
-              type="number"
               id="weightInput"
+              type="number"
               step="0.1"
               value={weightInput}
               onChange={(e) => setWeightInput(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Enter your weight"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              placeholder="Напр., 85.5"
             />
           </div>
           <button
             onClick={handleAddWeight}
-            className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="cursor-pointer px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            Add
+            Зберегти
           </button>
         </div>
       </div>

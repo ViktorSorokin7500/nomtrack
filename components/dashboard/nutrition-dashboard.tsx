@@ -8,26 +8,18 @@ import { ProgressBar } from "./progress-bar";
 
 interface NutritionDashboardProps {
   summaryData: {
-    calories: { current: number; target: number };
+    calories: {
+      consumed: number;
+      burned: number;
+      target: number;
+    };
     macros: {
       protein: { current: number; target: number };
       carbs: { current: number; target: number };
       fat: { current: number; target: number };
     };
   };
-  foodLogData: Array<{
-    name: string;
-    calories: number;
-    foods: Array<{
-      name: string;
-      description: string;
-      calories: number;
-      macros: { protein: number; carbs: number; fat: number };
-      icon: string;
-      iconBg: string;
-    }>;
-    isPlanned?: boolean;
-  }>;
+  foodLogData: Array<any>; // Поки що any, ми його не використовуємо
   lang: Locale;
 }
 

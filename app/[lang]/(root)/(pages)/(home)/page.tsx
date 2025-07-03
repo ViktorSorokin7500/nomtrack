@@ -6,6 +6,8 @@ import {
   PricingSection,
 } from "@/components/home";
 import { Locale } from "@/i18n.config";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function Home({
   params,
@@ -13,6 +15,15 @@ export default async function Home({
   params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+
+  if (user) {
+    redirect(`/${lang}/dashboard`);
+  }
 
   return (
     <>

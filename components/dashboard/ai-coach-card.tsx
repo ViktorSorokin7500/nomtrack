@@ -79,31 +79,31 @@ export function AICoachCard({ foodLogData = [] }: { foodLogData?: FoodLog[] }) {
   };
 
   // Сброс данных после 23:59
-  useEffect(() => {
-    const checkReset = () => {
-      const now = new Date();
-      const currentDate = now.toLocaleDateString();
-      if (currentDate !== dailyData.date) {
-        setActivities([]);
-        setDailyData({
-          activities: [],
-          foodLog: foodLogData, // Сохраняем еду из пропса
-          date: currentDate,
-        });
-      }
-    };
+  // useEffect(() => {
+  //   const checkReset = () => {
+  //     const now = new Date();
+  //     const currentDate = now.toLocaleDateString();
+  //     if (currentDate !== dailyData.date) {
+  //       setActivities([]);
+  //       setDailyData({
+  //         activities: [],
+  //         foodLog: foodLogData, // Сохраняем еду из пропса
+  //         date: currentDate,
+  //       });
+  //     }
+  //   };
 
-    const interval = setInterval(checkReset, 60000); // Проверка каждую минуту
-    return () => clearInterval(interval);
-  }, [dailyData.date, foodLogData]);
+  //   const interval = setInterval(checkReset, 60000); // Проверка каждую минуту
+  //   return () => clearInterval(interval);
+  // }, [dailyData.date, foodLogData]);
 
-  // Обновление еды, если foodLogData меняется
-  useEffect(() => {
-    setDailyData((prev) => ({
-      ...prev,
-      foodLog: foodLogData || [],
-    }));
-  }, [foodLogData]);
+  // // Обновление еды, если foodLogData меняется
+  // useEffect(() => {
+  //   setDailyData((prev) => ({
+  //     ...prev,
+  //     foodLog: foodLogData || [],
+  //   }));
+  // }, [foodLogData]);
 
   return (
     <Card>
