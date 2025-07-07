@@ -13,7 +13,7 @@ export default async function Dashboard({
 }: {
   params: { lang: Locale };
 }) {
-  const { lang } = params;
+  const { lang } = await params;
   const supabase = createClient();
 
   const {

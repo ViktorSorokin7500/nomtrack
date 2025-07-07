@@ -15,7 +15,7 @@ export function ProgressRing({
   const dashOffset = circumference * (1 - progress);
 
   return (
-    <div className={`relative w-32 h-32 ${className}`}>
+    <div className={`relative size-30 ${className}`}>
       <svg className="progressRing" width="120" height="120">
         <circle
           className="text-gray-200"

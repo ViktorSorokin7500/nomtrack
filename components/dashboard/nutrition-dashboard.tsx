@@ -1,11 +1,27 @@
 "use client";
-import { useState } from "react";
-import { Locale } from "@/i18n.config";
+
 import { MealCard } from "./meal-card";
 import { Card } from "../shared";
 import { ProgressRing } from "./progress-ring";
 import { ProgressBar } from "./progress-bar";
+import { FoodEntryCard } from "./food-entry-card";
 
+// Тип для одного запису їжі, що приходить з сервера
+type FoodEntry = {
+  id: number;
+  created_at: string;
+  user_id: string;
+  entry_text: string;
+  meal_type: string;
+  calories: number;
+  protein_g: number;
+  fat_g: number;
+  carbs_g: number;
+  sugar_g: number;
+  water_ml: number;
+};
+
+// Типи для пропсів компонента
 interface NutritionDashboardProps {
   summaryData: {
     calories: {
@@ -19,73 +35,53 @@ interface NutritionDashboardProps {
       fat: { current: number; target: number };
     };
   };
-  foodLogData: Array<any>; // Поки що any, ми його не використовуємо
-  lang: Locale;
+  foodLogData: FoodEntry[];
 }
+
+// Визначаємо прийоми їжі, які ми будемо показувати на дашборді
+const mealTypes = [
+  { name: "Breakfast", color: "bg-red-100" },
+  { name: "Lunch", color: "bg-green-200" },
+  { name: "Dinner", color: "bg-yellow-200" },
+  { name: "Snack", color: "bg-sky-200" },
+];
 
 export function NutritionDashboard({
   summaryData,
   foodLogData,
-  lang,
 }: NutritionDashboardProps) {
-  const [snacks, setSnacks] = useState([
-    {
-      name: "Snack 1",
-      calories: 0,
-      macros: { protein: 0, carbs: 0, fat: 0 },
-    },
-  ]);
-  console.log(lang);
-
-  const handleAddSnack = () => {
-    setSnacks((prev) => [
-      ...prev,
-      {
-        name: `Snack ${prev.length + 1}`,
-        calories: 0,
-        macros: { protein: 0, carbs: 0, fat: 0 },
-      },
-    ]);
-  };
-
-  const handleRemoveSnack = (index: number) => {
-    setSnacks((prev) => prev.filter((_, i) => i !== index));
-  };
+  // Розраховуємо чисті спожиті калорії
+  const netCalories =
+    summaryData.calories.consumed - summaryData.calories.burned;
 
   return (
     <Card className="container mx-auto px-4 py-8 max-w-4xl">
       <header className="mb-8 text-center">
         <h1 className="text-3xl font-light text-gray-800 mb-2">
-          Daily Nutritionss
+          Щоденник харчування
         </h1>
         <p className="text-gray-500 font-light">
-          Track your meals and nutrition intake
+          Записуй прийоми їжі та слідкуй за прогресом
         </p>
       </header>
 
+      {/* Блок з прогресом, що використовує реальні дані */}
       <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h2 className="text-xl font-light text-gray-700 mb-4">
-          Daily Progress
+          Денний прогрес
         </h2>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-medium text-stone-900">Summary</h2>
-          <div className="text-sm text-gray-500">June 15, 2023</div>
-        </div>
-
         <div className="flex items-center justify-between mb-8">
           <ProgressRing
-            current={summaryData.calories.current}
+            current={netCalories}
             target={summaryData.calories.target}
           />
           <div className="flex-1 ml-6 space-y-4">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">
-                  Protein
-                </span>
+                <span className="text-sm font-medium text-gray-600">Білки</span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.protein.current}g /{" "}
-                  {summaryData.macros.protein.target}g
+                  {summaryData.macros.protein.current}г /{" "}
+                  {summaryData.macros.protein.target}г
                 </span>
               </div>
               <ProgressBar
@@ -96,10 +92,12 @@ export function NutritionDashboard({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Carbs</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Вуглеводи
+                </span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.carbs.current}g /{" "}
-                  {summaryData.macros.carbs.target}g
+                  {summaryData.macros.carbs.current}г /{" "}
+                  {summaryData.macros.carbs.target}г
                 </span>
               </div>
               <ProgressBar
@@ -110,10 +108,10 @@ export function NutritionDashboard({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Fat</span>
+                <span className="text-sm font-medium text-gray-600">Жири</span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.fat.current}g /{" "}
-                  {summaryData.macros.fat.target}g
+                  {summaryData.macros.fat.current}г /{" "}
+                  {summaryData.macros.fat.target}г
                 </span>
               </div>
               <ProgressBar
@@ -127,53 +125,29 @@ export function NutritionDashboard({
       </div>
 
       <div className="space-y-6">
-        {foodLogData.map((meal, index) => (
-          <MealCard
-            key={index}
-            mealName={meal.name}
-            calories={meal.calories}
-            macros={{
-              protein: meal.foods.reduce(
-                (sum, food) => sum + food.macros.protein,
-                0
-              ),
-              carbs: meal.foods.reduce(
-                (sum, food) => sum + food.macros.carbs,
-                0
-              ),
-              fat: meal.foods.reduce((sum, food) => sum + food.macros.fat, 0),
-            }}
-            headerColor={
-              meal.name === "Breakfast"
-                ? "bg-red-100"
-                : meal.name === "Lunch"
-                ? "bg-green-200"
-                : "bg-yellow-200"
-            }
-          />
-        ))}
-        <div id="snacks-container">
-          {snacks.map((snack, index) => (
-            <MealCard
-              key={index}
-              mealName={snack.name}
-              calories={snack.calories}
-              macros={snack.macros}
-              headerColor="bg-sky-200"
-              isSnack
-              onRemove={() => handleRemoveSnack(index)}
-              className="mb-4"
-            />
-          ))}
-        </div>
-        <div className="text-center">
-          <button
-            onClick={handleAddSnack}
-            className="cursor-pointer bg-white border border-gray-200 hover:border-green-300 text-gray-700 px-6 py-3 rounded-lg font-medium focus:outline-none shadow-sm"
-          >
-            + Add Snack
-          </button>
-        </div>
+        {/* Динамічно рендеримо блоки для кожного типу їжі */}
+        {mealTypes.map((meal) => {
+          // Фільтруємо записи, що відповідають поточному типу прийому їжі
+          const entriesForMeal = foodLogData.filter(
+            (entry) => entry.meal_type === meal.name.toLowerCase()
+          );
+
+          return (
+            <div key={meal.name}>
+              {/* Якщо є збережені записи, показуємо їх */}
+              {entriesForMeal.length > 0 && (
+                <div className="space-y-2 mb-4">
+                  {entriesForMeal.map((entry) => (
+                    <FoodEntryCard key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              )}
+
+              {/* Завжди показуємо картку-форму для додавання нового запису */}
+              <MealCard mealName={meal.name} headerColor={meal.color} />
+            </div>
+          );
+        })}
       </div>
     </Card>
   );
