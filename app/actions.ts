@@ -113,45 +113,46 @@ export async function analyzeAndSaveFoodEntry(formData: {
   if (!user) return { error: "Ви не авторизовані" };
 
   try {
-    const ingredientPrompt = `You are an ingredient parsing API. Your only job is to extract food items and their weights in grams from the user's text. Return ONLY a JSON object.
+    const ingredientPrompt = `You are a nutritional assistant that analyzes a user's meal description and outputs a flat JSON list of ingredients with estimated weights in grams.
 
-Your logic MUST be as follows:
-1. First, detect the language of the user's text.
-2. If the text is not in English, you MUST translate it to English before parsing. All subsequent analysis MUST be based on the English translation.
-3. Your final output MUST be only a single JSON object with a key "ingredients", which is an array of objects. Each object must contain "name" (in English) and "weight_g".
+Your step-by-step logic:
+1. If the input is not in English, detect the language and translate it to English before analysis.
+2. If the user explicitly lists ingredients and quantities, use them as-is.
+3. If the user provides a common dish name (e.g. "Borscht", "Caesar salad") without ingredients, deconstruct it into typical ingredients with approximate weights per standard portion. Adjust portion size if words like “large” or “small” are present.
+4. Exclude emotional, irrelevant, or decorative phrases.
+5. Output ONLY a valid JSON object in the format below.
 
-The required JSON format:
+JSON format:
 {
   "ingredients": [
     { "name": "<english_food_item_name>", "weight_g": <integer> }
   ]
 }
 
-If no ingredients can be found, return an empty array: { "ingredients": [] }.
+--- Examples ---
 
----
-Example 1:
-User Text: "200g of 9% cottage cheese and one apple (around 150g)"
-Your JSON Response:
+User Text: "my custom soup: 150g chicken broth, 50g chicken, 50g noodles"  
+JSON:
 {
   "ingredients": [
-    { "name": "cottage cheese 9%", "weight_g": 200 },
-    { "name": "apple", "weight_g": 150 }
+    { "name": "chicken broth", "weight_g": 150 },
+    { "name": "chicken", "weight_g": 50 },
+    { "name": "noodles", "weight_g": 50 }
   ]
 }
----
-Example 2 (Non-English):
-User Text: "200г творога 9% і одне яблуко"
-Your JSON Response:
+
+User Text: "a large Chicken Kyiv"  
+JSON:
 {
   "ingredients": [
-    { "name": "cottage cheese 9%", "weight_g": 200 },
-    { "name": "apple", "weight_g": 150 }
+    { "name": "chicken fillet", "weight_g": 200 },
+    { "name": "butter", "weight_g": 40 },
+    { "name": "breadcrumbs", "weight_g": 30 },
+    { "name": "egg", "weight_g": 25 }
   ]
 }
----
 
-Now, analyze the following text.
+--- Now analyze the following ---
 
 User Text: ${text}
 Your JSON Response:`;
@@ -273,4 +274,121 @@ export async function addWaterEntry(amount: number) {
 
   revalidatePath("/dashboard");
   return { success: `Додано ${amount} мл води!` };
+}
+
+export async function addWeightEntry(weight: number) {
+  if (weight <= 0) {
+    return { error: "Вага має бути позитивним числом." };
+  }
+
+  const supabase = createClient();
+
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+  if (!user) {
+    return { error: "Ви не авторизовані" };
+  }
+
+  // Створюємо запис у новій таблиці
+  const { error } = await (await supabase).from("body_measurements").insert([
+    {
+      user_id: user.id,
+      weight_kg: weight,
+    },
+  ]);
+
+  if (error) {
+    return { error: "Не вдалося зберегти вагу: " + error.message };
+  }
+
+  // Також оновлюємо поточну вагу в профілі користувача
+  const { error: profileError } = await (await supabase)
+    .from("profiles")
+    .update({ current_weight_kg: weight })
+    .eq("id", user.id);
+
+  if (profileError) {
+    // Ця помилка менш критична, можна просто залогувати
+    console.error("Не вдалося оновити вагу в профілі:", profileError);
+  }
+
+  revalidatePath("/dashboard");
+  return { success: `Вагу ${weight} кг збережено!` };
+}
+
+export async function analyzeAndSaveActivityEntry(text: string) {
+  if (!text.trim()) {
+    return { error: "Опис активності не може бути порожнім" };
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+  if (!user) {
+    return { error: "Ви не авторизовані" };
+  }
+
+  // Промпт для аналізу активності
+  const prompt = `You are a fitness analysis API.
+
+Your job is to analyze a user's physical activity description and estimate the total number of calories burned. Follow this exact logic:
+
+1. If the user's input is not in English, translate it to English before analyzing.
+2. Estimate calories burned based on the activity type and duration.
+3. If the input is vague or missing key data (e.g. no duration), make a realistic assumption based on common values.
+
+Return ONLY a valid JSON object in the following format:
+{
+  "calories_burned": <integer>
+}
+
+--- Examples ---
+
+User Text: "Running for 30 minutes"  
+Your JSON Response: { "calories_burned": 350 }
+
+User Text: "Силове тренування в залі 1 годину"  
+Your JSON Response: { "calories_burned": 400 }
+
+--- Now analyze the following ---
+  User Text: "${text}"
+  Your JSON Response:`;
+
+  try {
+    const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
+    const response = await together.chat.completions.create({
+      messages: [{ role: "user", content: prompt }],
+      model: "google/gemma-3n-E4B-it",
+      response_format: { type: "json_object" },
+    });
+
+    const content = response.choices?.[0]?.message?.content;
+    if (!content) {
+      return { error: "ШІ не повернув результат" };
+    }
+    const { calories_burned } = JSON.parse(content);
+
+    const { error: insertError } = await (await supabase)
+      .from("activity_entries")
+      .insert([
+        {
+          user_id: user.id,
+          entry_text: text,
+          calories_burned: calories_burned || 0,
+        },
+      ]);
+
+    if (insertError)
+      throw new Error("Помилка збереження активності: " + insertError.message);
+
+    revalidatePath("/dashboard");
+    return { success: "Активність успішно додано!" };
+  } catch (error) {
+    let errorMessage = "Не вдалося проаналізувати активність.";
+    if (error instanceof Error) errorMessage = error.message;
+    console.error("Помилка в analyzeAndSaveActivityEntry:", error);
+    return { error: errorMessage };
+  }
 }

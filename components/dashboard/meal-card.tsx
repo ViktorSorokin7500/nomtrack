@@ -1,5 +1,3 @@
-// components/dashboard/MealCard.tsx
-
 "use client";
 
 import { useForm } from "react-hook-form";
@@ -9,30 +7,25 @@ import { analyzeAndSaveFoodEntry } from "@/app/actions";
 import { Button } from "../ui";
 import { useTransition } from "react";
 
-// Схема валідації для поля вводу
+// Додаємо mealType в схему валідації
 const foodEntrySchema = z.object({
   text: z.string().min(3, { message: "Опис має бути довшим" }),
+  mealType: z.string().min(1, { message: "Вибери тип прийому їжі" }),
 });
 
 type FoodEntrySchema = z.infer<typeof foodEntrySchema>;
 
-// Пропси для картки
 interface MealCardProps {
-  mealName: string;
-  headerColor: string;
+  availableMealTypes: { value: string; label: string }[];
   className?: string;
-  // Ці пропси для снеків, ми їх поки не чіпаємо
-  isSnack?: boolean;
-  onRemove?: () => void;
 }
 
-export function MealCard({ mealName, headerColor, className }: MealCardProps) {
+export function MealCard({ availableMealTypes, className }: MealCardProps) {
   const [isPending, startTransition] = useTransition();
-
   const {
     register,
     handleSubmit,
-    reset, // Функція для очищення форми
+    reset,
     formState: { errors },
   } = useForm<FoodEntrySchema>({
     resolver: zodResolver(foodEntrySchema),
@@ -42,13 +35,12 @@ export function MealCard({ mealName, headerColor, className }: MealCardProps) {
     startTransition(async () => {
       const result = await analyzeAndSaveFoodEntry({
         text: data.text,
-        mealType: mealName,
+        mealType: data.mealType,
       });
-
       if (result?.error) {
-        alert("Помилка: " + result.error); // Поки що просто alert для помилок
+        alert("Помилка: " + result.error);
       } else {
-        reset(); // Очищуємо форму після успішної відправки
+        reset();
       }
     });
   };
@@ -57,22 +49,37 @@ export function MealCard({ mealName, headerColor, className }: MealCardProps) {
     <div
       className={`meal-card bg-white rounded-xl shadow-sm overflow-hidden ${className}`}
     >
-      <div
-        className={`px-6 py-3 flex justify-between items-center ${headerColor}`}
-      >
-        <h3 className="text-lg font-medium text-gray-700">{mealName}</h3>
-      </div>
       <div className="p-6">
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <h3 className="text-lg font-medium text-gray-700">
+            Додати прийом їжі
+          </h3>
+
           <textarea
             {...register("text")}
-            className="w-full p-3 border border-gray-200 rounded-lg mb-4 text-gray-700"
+            className="w-full p-3 border border-gray-200 rounded-lg text-gray-700"
             rows={2}
-            placeholder={`Опиши свій ${mealName.toLowerCase()}...`}
-          ></textarea>
+            placeholder="Опиши, що ти з'їв..."
+          />
           {errors.text && (
-            <p className="text-red-500 text-sm mb-2">{errors.text.message}</p>
+            <p className="text-red-500 text-sm">{errors.text.message}</p>
           )}
+
+          <select
+            {...register("mealType")}
+            className="w-full px-4 py-3 rounded-xl border"
+          >
+            <option value="">-- Вибери тип --</option>
+            {availableMealTypes.map((meal) => (
+              <option key={meal.value} value={meal.value}>
+                {meal.label}
+              </option>
+            ))}
+          </select>
+          {errors.mealType && (
+            <p className="text-red-500 text-sm">{errors.mealType.message}</p>
+          )}
+
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending}>
               {isPending ? "Аналіз..." : "Проаналізувати і зберегти"}

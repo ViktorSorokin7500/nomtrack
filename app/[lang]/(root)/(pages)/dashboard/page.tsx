@@ -1,3 +1,5 @@
+// app/[lang]/(root)/(pages)/dashboard/page.tsx
+
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -14,6 +16,8 @@ export default async function Dashboard({
   params: { lang: Locale };
 }) {
   const { lang } = await params;
+  console.log(lang);
+
   const supabase = createClient();
 
   const {
@@ -33,15 +37,12 @@ export default async function Dashboard({
     redirect("/settings");
   }
 
-  // Надійний фільтр по даті
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
 
-  // --- ЗАВАНТАЖУЄМО ВСІ НЕОБХІДНІ ДАНІ ---
-
-  // 1. Записи про їжу та воду
+  // --- ЗАВАНТАЖУЄМО ВСІ СЬОГОДНІШНІ ДАНІ ---
   const { data: foodEntries } = await (await supabase)
     .from("food_entries")
     .select("*")
@@ -49,7 +50,6 @@ export default async function Dashboard({
     .gte("created_at", today.toISOString())
     .lt("created_at", tomorrow.toISOString());
 
-  // 2. Повертаємо записи про активності
   const { data: activityEntries } = await (await supabase)
     .from("activity_entries")
     .select("*")
@@ -57,10 +57,7 @@ export default async function Dashboard({
     .gte("created_at", today.toISOString())
     .lt("created_at", tomorrow.toISOString());
 
-  // --- РОЗРАХОВУЄМО ПІДСУМКИ ---
-
-  const totalWater =
-    foodEntries?.reduce((sum, entry) => sum + (entry.water_ml || 0), 0) || 0;
+  // --- РОЗРАХОВУЄМО ПІДСУМКИ СПОЖИТОГО/СПАЛЕНОГО ---
   const consumedCalories =
     foodEntries?.reduce((sum, entry) => sum + (entry.calories || 0), 0) || 0;
   const consumedProtein =
@@ -69,28 +66,51 @@ export default async function Dashboard({
     foodEntries?.reduce((sum, entry) => sum + (entry.fat_g || 0), 0) || 0;
   const consumedCarbs =
     foodEntries?.reduce((sum, entry) => sum + (entry.carbs_g || 0), 0) || 0;
-
-  // Розраховуємо спалені калорії
+  const totalWater =
+    foodEntries?.reduce((sum, entry) => sum + (entry.water_ml || 0), 0) || 0;
   const burnedCalories =
     activityEntries?.reduce(
       (sum, entry) => sum + (entry.calories_burned || 0),
       0
     ) || 0;
 
-  // Готуємо об'єкт з даними для передачі в компоненти
+  // --- РОЗРАХУНОК ДИНАМІЧНИХ ЦІЛЕЙ (НОВА ЛОГІКА) ---
+  // 1. Беремо базові цілі з профілю
+  const baseTargetCalories = profile.target_calories || 2000;
+  const baseTargetProtein = profile.target_protein_g || 120;
+  const baseTargetCarbs = profile.target_carbs_g || 250;
+  const baseTargetFat = profile.target_fat_g || 70;
+
+  // 2. Розраховуємо нову ціль по калоріях
+  const adjustedTargetCalories = baseTargetCalories + burnedCalories;
+
+  // 3. Визначаємо процентний розподіл БЖВ на основі БАЗОВИХ цілей
+  const proteinPercentage = (baseTargetProtein * 4) / baseTargetCalories;
+  const carbsPercentage = (baseTargetCarbs * 4) / baseTargetCalories;
+  const fatPercentage = (baseTargetFat * 9) / baseTargetCalories;
+
+  // 4. Розраховуємо нові цілі по БЖВ на основі нової цілі по калоріях
+  const adjustedTargetProtein = Math.round(
+    (adjustedTargetCalories * proteinPercentage) / 4
+  );
+  const adjustedTargetCarbs = Math.round(
+    (adjustedTargetCalories * carbsPercentage) / 4
+  );
+  const adjustedTargetFat = Math.round(
+    (adjustedTargetCalories * fatPercentage) / 9
+  );
+
+  // 5. Готуємо фінальний об'єкт з ДИНАМІЧНИМИ цілями
   const summaryData = {
     calories: {
       consumed: consumedCalories,
-      burned: burnedCalories, // Тепер тут реальне значення
-      target: profile.target_calories || 2000,
+      burned: burnedCalories,
+      target: adjustedTargetCalories, // <-- Використовуємо нову ціль
     },
     macros: {
-      protein: {
-        current: consumedProtein,
-        target: profile.target_protein_g || 120,
-      },
-      fat: { current: consumedFat, target: profile.target_fat_g || 70 },
-      carbs: { current: consumedCarbs, target: profile.target_carbs_g || 250 },
+      protein: { current: consumedProtein, target: adjustedTargetProtein }, // <-- Нова ціль
+      fat: { current: consumedFat, target: adjustedTargetFat }, // <-- Нова ціль
+      carbs: { current: consumedCarbs, target: adjustedTargetCarbs }, // <-- Нова ціль
     },
   };
 
@@ -98,14 +118,13 @@ export default async function Dashboard({
     <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1 space-y-6">
-          {/* Передаємо лише ті дані, які потрібні кожному компоненту */}
           <SummaryCard currentWeight={profile.current_weight_kg} />
           <WaterTrackerCard
-            key={totalWater}
             currentWater={totalWater}
             targetWater={profile.target_water_ml || 2500}
+            key={totalWater}
           />
-          <AICoachCard />
+          <AICoachCard activityLogData={activityEntries || []} />
         </div>
         <div className="lg:col-span-2">
           <NutritionDashboard
@@ -113,7 +132,6 @@ export default async function Dashboard({
             foodLogData={
               foodEntries?.filter((e) => e.meal_type !== "water") || []
             }
-            lang={lang}
           />
         </div>
       </div>

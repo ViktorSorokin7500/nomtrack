@@ -1,27 +1,23 @@
 "use client";
 
-import { MealCard } from "./meal-card";
 import { Card } from "../shared";
 import { ProgressRing } from "./progress-ring";
 import { ProgressBar } from "./progress-bar";
+import { MealCard } from "./meal-card";
 import { FoodEntryCard } from "./food-entry-card";
 
 // Тип для одного запису їжі, що приходить з сервера
 type FoodEntry = {
   id: number;
-  created_at: string;
-  user_id: string;
-  entry_text: string;
   meal_type: string;
+  entry_text: string;
   calories: number;
   protein_g: number;
   fat_g: number;
   carbs_g: number;
-  sugar_g: number;
-  water_ml: number;
 };
 
-// Типи для пропсів компонента
+// Типи для пропсів, які компонент отримує від сторінки
 interface NutritionDashboardProps {
   summaryData: {
     calories: {
@@ -38,21 +34,25 @@ interface NutritionDashboardProps {
   foodLogData: FoodEntry[];
 }
 
-// Визначаємо прийоми їжі, які ми будемо показувати на дашборді
-const mealTypes = [
-  { name: "Breakfast", color: "bg-red-100" },
-  { name: "Lunch", color: "bg-green-200" },
-  { name: "Dinner", color: "bg-yellow-200" },
-  { name: "Snack", color: "bg-sky-200" },
-];
+// Визначаємо основні прийоми їжі, які можна додати лише раз
+const MAIN_MEALS = ["breakfast", "lunch", "dinner"];
 
 export function NutritionDashboard({
   summaryData,
   foodLogData,
 }: NutritionDashboardProps) {
-  // Розраховуємо чисті спожиті калорії
-  const netCalories =
-    summaryData.calories.consumed - summaryData.calories.burned;
+  // Визначаємо, які основні прийоми їжі вже були додані сьогодні
+  const loggedMealTypes = foodLogData.map((entry) => entry.meal_type);
+
+  // Формуємо динамічний список доступних опцій для випадаючого меню
+  const availableMealTypes = [
+    { value: "snack", label: "Snack" }, // Снек доступний завжди
+    ...MAIN_MEALS.filter((meal) => !loggedMealTypes.includes(meal)) // Залишаємо тільки ті, яких ще не було
+      .map((meal) => ({
+        value: meal,
+        label: meal.charAt(0).toUpperCase() + meal.slice(1), // Робимо першу літеру великою
+      })),
+  ];
 
   return (
     <Card className="container mx-auto px-4 py-8 max-w-4xl">
@@ -70,12 +70,12 @@ export function NutritionDashboard({
         <h2 className="text-xl font-light text-gray-700 mb-4">
           Денний прогрес
         </h2>
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between gap-4 sm:gap-6">
           <ProgressRing
-            current={netCalories}
+            current={summaryData.calories.consumed}
             target={summaryData.calories.target}
           />
-          <div className="flex-1 ml-6 space-y-4">
+          <div className="flex-1 space-y-4">
             <div>
               <div className="flex justify-between mb-1">
                 <span className="text-sm font-medium text-gray-600">Білки</span>
@@ -87,7 +87,7 @@ export function NutritionDashboard({
               <ProgressBar
                 current={summaryData.macros.protein.current}
                 target={summaryData.macros.protein.target}
-                color="bg-yellow-200"
+                color="bg-yellow-400"
               />
             </div>
             <div>
@@ -103,7 +103,7 @@ export function NutritionDashboard({
               <ProgressBar
                 current={summaryData.macros.carbs.current}
                 target={summaryData.macros.carbs.target}
-                color="bg-green-200"
+                color="bg-green-400"
               />
             </div>
             <div>
@@ -117,7 +117,7 @@ export function NutritionDashboard({
               <ProgressBar
                 current={summaryData.macros.fat.current}
                 target={summaryData.macros.fat.target}
-                color="bg-orange-200"
+                color="bg-orange-400"
               />
             </div>
           </div>
@@ -125,29 +125,20 @@ export function NutritionDashboard({
       </div>
 
       <div className="space-y-6">
-        {/* Динамічно рендеримо блоки для кожного типу їжі */}
-        {mealTypes.map((meal) => {
-          // Фільтруємо записи, що відповідають поточному типу прийому їжі
-          const entriesForMeal = foodLogData.filter(
-            (entry) => entry.meal_type === meal.name.toLowerCase()
-          );
+        {/* Рендеримо вже існуючі записи, якщо вони є */}
+        {foodLogData.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-3">
+              Сьогоднішні записи
+            </h3>
+            {foodLogData.map((entry) => (
+              <FoodEntryCard key={entry.id} entry={entry} />
+            ))}
+          </div>
+        )}
 
-          return (
-            <div key={meal.name}>
-              {/* Якщо є збережені записи, показуємо їх */}
-              {entriesForMeal.length > 0 && (
-                <div className="space-y-2 mb-4">
-                  {entriesForMeal.map((entry) => (
-                    <FoodEntryCard key={entry.id} entry={entry} />
-                  ))}
-                </div>
-              )}
-
-              {/* Завжди показуємо картку-форму для додавання нового запису */}
-              <MealCard mealName={meal.name} headerColor={meal.color} />
-            </div>
-          );
-        })}
+        {/* Завжди показуємо одну універсальну картку для додавання нового запису */}
+        <MealCard availableMealTypes={availableMealTypes} />
       </div>
     </Card>
   );
