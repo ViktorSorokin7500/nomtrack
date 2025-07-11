@@ -1,203 +1,156 @@
 "use client";
+
 import { useEffect } from "react";
 import { Card } from "../shared";
 import { BodyMeasurements } from "./body-measurements";
-
-// import { MealCategory } from "./meal-category";
-
-interface Day {
-  date: string;
-  fullDate: string;
-  calories: number;
-  protein: number;
-  fats: number;
-  carbs: number;
-  sugar: number;
-  water: number;
-  weight: number;
-  belly: number;
-  waist: number;
-}
+import { ProgressBar } from "../dashboard/progress-bar"; // Перевикористовуємо наш ProgressBar
+import { DayData, Profile } from "@/types";
 
 interface DailyDetailModalProps {
-  day: Day;
+  day: DayData;
+  userProfile: Profile | null;
   onClose: () => void;
 }
 
-export function DailyDetailModal({ day, onClose }: DailyDetailModalProps) {
-  const proteinGoal = 120;
-  const fatGoal = 70;
-  const carbsGoal = 250;
-  const sugarGoal = 30;
-  const waterGoal = 3500;
-
+export function DailyDetailModal({
+  day,
+  userProfile,
+  onClose,
+}: DailyDetailModalProps) {
+  // Блокуємо скрол на фоні, поки модальне вікно відкрите
   useEffect(() => {
-    document.body.classList.add("overflow-hidden");
+    document.body.style.overflow = "hidden";
     return () => {
-      document.body.classList.remove("overflow-hidden");
+      document.body.style.overflow = "auto";
     };
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-orange-50 px-2 bg-opacity-50 flex items-center justify-center z-50 overflow-hidden">
-      <Card className="w-full max-w-4xl max-h-[98vh] overflow-y-auto p-6">
+    // Оверлей, що затемнює фон
+    <div
+      className="fixed inset-0 bg-orange-50 bg-opacity-50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
+      <Card
+        className="w-full max-w-4xl max-h-[95vh] overflow-y-auto p-6"
+        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+      >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            {day.date}, {new Date(day.fullDate).getFullYear()}
+            Підсумок за {day.date},{" "}
+            {new Date(day.fullDate + "T00:00:00Z").getFullYear()}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-2xl"
+            className="text-gray-500 hover:text-gray-700 text-3xl"
             aria-label="close"
           >
-            ×
+            &times;
           </button>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-          <Card className="p-5">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Ліва колонка з основними показниками */}
+          <div className="p-5 rounded-lg bg-gray-50">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              dailySummary
+              Харчування
             </h3>
             <div className="space-y-4">
+              {/* Калорії */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">totalCalories</span>
+                  <span className="text-gray-600">Калорії</span>
                   <span className="font-bold text-gray-800">
-                    {day.calories} kcal
+                    {day.consumed_calories} / {day.target_calories} ккал
                   </span>
                 </div>
+                <ProgressBar
+                  current={day.consumed_calories}
+                  target={day.target_calories}
+                  color="bg-orange-400"
+                />
               </div>
+              {/* Білки */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">protein</span>
+                  <span className="text-gray-600">Білки</span>
                   <span className="font-bold text-gray-800">
-                    {day.protein}g
+                    {day.consumed_protein_g} / {day.target_protein_g} г
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-500 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        (proteinGoal > day.protein
-                          ? day.protein / proteinGoal
-                          : 1) * 100
-                      }%`,
-                    }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 text-right mt-1">
-                  {Math.round((day.protein / proteinGoal) * 100)}% ofDailyGoal
-                </div>
+                <ProgressBar
+                  current={day.consumed_protein_g}
+                  target={day.target_protein_g}
+                  color="bg-yellow-400"
+                />
               </div>
+              {/* Жири */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">fat</span>
-                  <span className="font-bold text-gray-800">{day.fats}g</span>
+                  <span className="text-gray-600">Жири</span>
+                  <span className="font-bold text-gray-800">
+                    {day.consumed_fat_g} / {day.target_fat_g} г
+                  </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-yellow-500 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        (fatGoal > day.fats ? day.fats / fatGoal : 1) * 100
-                      }%`,
-                    }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 text-right mt-1">
-                  {Math.round((day.fats / fatGoal) * 100)}% ofDailyGoal
-                </div>
+                <ProgressBar
+                  current={day.consumed_fat_g}
+                  target={day.target_fat_g}
+                  color="bg-orange-300"
+                />
               </div>
+              {/* Вуглеводи */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">carbs</span>
-                  <span className="font-bold text-gray-800">{day.carbs}g</span>
+                  <span className="text-gray-600">Вуглеводи</span>
+                  <span className="font-bold text-gray-800">
+                    {day.consumed_carbs_g} / {day.target_carbs_g} г
+                  </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-green-500 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        (carbsGoal > day.carbs ? day.carbs / carbsGoal : 0) *
-                        100
-                      }%`,
-                    }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 text-right mt-1">
-                  {Math.round((day.carbs / carbsGoal) * 100)}% ofDailyGoal
-                </div>
+                <ProgressBar
+                  current={day.consumed_carbs_g}
+                  target={day.target_carbs_g}
+                  color="bg-green-400"
+                />
               </div>
+              {/* Цукор */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">sugar</span>
-                  <span className="font-bold text-gray-800">{day.sugar}g</span>
+                  <span className="text-gray-600">Цукор</span>
+                  <span className="font-bold text-gray-800">
+                    {day.consumed_sugar_g} / {day.target_sugar_g} г
+                  </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-stone-400 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        (sugarGoal > day.sugar ? day.sugar / sugarGoal : 1) *
-                        100
-                      }%`,
-                    }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 text-right mt-1">
-                  {Math.round((day.sugar / sugarGoal) * 100)}% ofDailyGoal
-                </div>
+                <ProgressBar
+                  current={day.consumed_sugar_g}
+                  target={day.target_sugar_g}
+                  color="bg-stone-400"
+                />
               </div>
+              {/* Вода */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">water</span>
-                  <span className="font-bold text-gray-800">{day.water}g</span>
+                  <span className="text-gray-600">Вода</span>
+                  <span className="font-bold text-gray-800">
+                    {day.consumed_water_ml} / {day.target_water_ml} мл
+                  </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-blue-400 h-2 rounded-full"
-                    style={{
-                      width: `${
-                        (waterGoal > day.water ? day.water / waterGoal : 1) *
-                        100
-                      }%`,
-                    }}
-                  />
-                </div>
-                <div className="text-xs text-gray-500 text-right mt-1">
-                  {Math.round((day.water / waterGoal) * 100)}% ofDailyGoal
-                </div>
+                <ProgressBar
+                  current={day.consumed_water_ml}
+                  target={day.target_water_ml}
+                  color="bg-blue-400"
+                />
               </div>
             </div>
-          </Card>
+          </div>
+
+          {/* Права колонка з замірами тіла */}
           <BodyMeasurements
-            weight={day.weight}
-            belly={day.belly}
-            waist={day.waist}
+            gender={userProfile?.gender || "male"}
+            weight={day.end_of_day_weight}
+            belly={day.end_of_day_belly}
+            waist={day.end_of_day_waist}
           />
         </div>
-        {/* <div>
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">meals</h3>
-          <div className="space-y-4">
-            {day.meals && day.meals.length > 0 ? (
-              day.meals.map((meal, index) => (
-                <MealCategory
-                  key={index}
-                  type={meal.type}
-                  cal={meal.cal}
-                  protein={meal.protein}
-                  carbs={meal.carbs}
-                  fat={meal.fat}
-                />
-              ))
-            ) : (
-              <div className="bg-gray-50 rounded-lg p-6 text-center text-gray-500">
-                <p>noMealData</p>
-              </div>
-            )}
-          </div>
-        </div> */}
       </Card>
     </div>
   );

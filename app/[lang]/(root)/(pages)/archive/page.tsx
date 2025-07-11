@@ -1,131 +1,86 @@
-import { NutritionArchive } from "@/components/archive/nutrition-archive";
-import { Locale } from "@/i18n.config";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { NutritionArchive } from "@/components/archive/nutrition-archive";
+import { Locale } from "@/i18n.config";
+import { DailySummary, YearData } from "@/types";
 
-export default async function Archive({
+// Функція-трансформер, яка групує дані з бази по роках та місяцях
+function groupDataByYearAndMonth(summaries: DailySummary[]) {
+  const grouped: { [key: number]: YearData } = {};
+
+  summaries.forEach((day) => {
+    const date = new Date(day.date + "T00:00:00Z");
+    const year = date.getUTCFullYear();
+    const month = date.toLocaleString("en-US", {
+      month: "long",
+      timeZone: "UTC",
+    });
+
+    if (!grouped[year]) {
+      grouped[year] = { year, months: {} };
+    }
+    if (!grouped[year].months[month]) {
+      grouped[year].months[month] = { name: month, days: [] };
+    }
+
+    const formattedDay = {
+      ...day,
+      fullDate: day.date,
+      date: `${date.toLocaleString("en-US", {
+        weekday: "short",
+        timeZone: "UTC",
+      })}, ${date.getUTCDate()}`,
+    };
+
+    grouped[year].months[month].days.push(formattedDay);
+  });
+
+  return Object.values(grouped).map((yearData) => ({
+    ...yearData,
+    months: Object.values(yearData.months),
+  }));
+}
+
+export default async function ArchivePage({
   params,
 }: {
-  params: Promise<{ lang: Locale }>;
+  params: { lang: Locale };
 }) {
+  const { lang } = await params;
+  console.log(lang);
+
   const supabase = createClient();
 
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
-
   if (!user) {
     redirect("/sign-in");
   }
 
-  const { lang } = await params;
-  console.log(lang);
+  const [
+    { data: profile, error: profileError },
+    { data: summaries, error: summariesError },
+  ] = await Promise.all([
+    (await supabase).from("profiles").select("*").eq("id", user.id).single(),
+    (await supabase)
+      .from("daily_summaries")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("date", { ascending: false }),
+  ]);
 
-  const nutritionData = [
-    {
-      year: 2024,
-      months: [
-        {
-          name: "February",
-          days: [
-            {
-              date: "Sat, 3",
-              fullDate: "2024-02-03",
-              calories: 2000,
-              protein: 100,
-              fats: 65,
-              carbs: 205,
-              sugar: 7,
-              water: 3500,
-              weight: 110,
-              belly: 110,
-              waist: 103,
-            },
-            {
-              date: "Fri, 2",
-              fullDate: "2024-02-02",
-              calories: 1900,
-              protein: 90,
-              fats: 62,
-              carbs: 195,
-              sugar: 7,
-              water: 3500,
-              weight: 110,
-              belly: 110,
-              waist: 103,
-            },
-          ],
-        },
-        {
-          name: "January",
-          days: [
-            {
-              date: "Thu, 4",
-              fullDate: "2024-01-04",
-              calories: 1950,
-              protein: 95,
-              fats: 63,
-              carbs: 200,
-              sugar: 7,
-              water: 3500,
-              weight: 110,
-              belly: 110,
-              waist: 103,
-            },
-            {
-              date: "Wed, 3",
-              fullDate: "2024-01-03",
-              calories: 2050,
-              protein: 100,
-              fats: 65,
-              carbs: 210,
-              sugar: 7,
-              water: 3500,
-              weight: 110,
-              belly: 110,
-              waist: 103,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      year: 2023,
-      months: [
-        {
-          name: "December",
-          days: [
-            {
-              date: "Sun, 31",
-              fullDate: "2023-12-31",
-              calories: 2300,
-              protein: 120,
-              fats: 75,
-              carbs: 230,
-              sugar: 7,
-              water: 3500,
-              weight: 110,
-              belly: 110,
-              waist: 103,
-            },
-            {
-              date: "Sat, 30",
-              fullDate: "2023-12-30",
-              calories: 2050,
-              protein: 100,
-              fats: 68,
-              carbs: 210,
-              sugar: 7,
-              water: 3500,
-              weight: 110,
-              belly: 110,
-              waist: 103,
-            },
-          ],
-        },
-      ],
-    },
-  ];
+  if (profileError || summariesError) {
+    console.error(
+      "Помилка завантаження даних для архіву:",
+      profileError || summariesError
+    );
+    return <div>Помилка завантаження даних. Спробуйте пізніше.</div>;
+  }
 
-  return <NutritionArchive nutritionData={nutritionData} />;
+  const nutritionData = groupDataByYearAndMonth(summaries || []);
+
+  return (
+    <NutritionArchive nutritionData={nutritionData} userProfile={profile} />
+  );
 }

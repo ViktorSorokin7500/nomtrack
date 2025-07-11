@@ -3,7 +3,7 @@ import { ReactNode } from "react";
 interface CardProps {
   children: ReactNode;
   className?: string;
-  onClick?: () => void;
+  onClick?: (event: React.MouseEvent) => void;
 }
 
 export function Card({ children, className = "", onClick }: CardProps) {
