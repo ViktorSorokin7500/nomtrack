@@ -4,7 +4,6 @@ import { NutritionArchive } from "@/components/archive/nutrition-archive";
 import { Locale } from "@/i18n.config";
 import { DailySummary, YearData } from "@/types";
 
-// Функція-трансформер, яка групує дані з бази по роках та місяцях
 function groupDataByYearAndMonth(summaries: DailySummary[]) {
   const grouped: { [key: number]: YearData } = {};
 
@@ -44,7 +43,7 @@ function groupDataByYearAndMonth(summaries: DailySummary[]) {
 export default async function ArchivePage({
   params,
 }: {
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
   console.log(lang);

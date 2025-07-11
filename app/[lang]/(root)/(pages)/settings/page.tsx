@@ -11,7 +11,7 @@ import { Locale } from "@/i18n.config";
 export default async function Settings({
   params,
 }: {
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }) {
   const { lang } = await params;
   const supabase = createClient();
