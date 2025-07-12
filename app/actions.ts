@@ -162,7 +162,7 @@ Your JSON Response:`;
     const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
     const aiResponse = await together.chat.completions.create({
       messages: [{ role: "user", content: ingredientPrompt }],
-      model: "google/gemma-3n-E4B-it",
+      model: "Qwen/Qwen2-72B-Instruct",
       response_format: { type: "json_object" },
     });
 
@@ -360,7 +360,7 @@ Your JSON Response: { "calories_burned": 400 }
     const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
     const response = await together.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "google/gemma-3n-E4B-it",
+      model: "Qwen/Qwen2-72B-Instruct",
       response_format: { type: "json_object" },
     });
 
