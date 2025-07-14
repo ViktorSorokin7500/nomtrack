@@ -67,6 +67,17 @@ type AiIngredientsResponse = {
   ingredients: Ingredient[];
 };
 
+type ManualEntryData = {
+  entry_text: string;
+  meal_type: string;
+  calories: number;
+  protein_g: number;
+  fat_g: number;
+  carbs_g: number;
+  sugar_g: number;
+  water_ml: number;
+};
+
 // Нова Server Action для оновлення харчових цілей
 export async function updateNutritionTargets(formData: unknown) {
   const supabase = createClient();
@@ -391,4 +402,27 @@ Your JSON Response: { "calories_burned": 400 }
     console.error("Помилка в analyzeAndSaveActivityEntry:", error);
     return { error: errorMessage };
   }
+}
+
+export async function addManualFoodEntry(entryData: ManualEntryData) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+
+  if (!user) {
+    return { error: "Ви не авторизовані" };
+  }
+
+  // Просто вставляємо пораховані дані
+  const { error } = await (await supabase)
+    .from("food_entries")
+    .insert([{ ...entryData, user_id: user.id }]);
+
+  if (error) {
+    return { error: "Не вдалося зберегти запис: " + error.message };
+  }
+
+  revalidatePath("/dashboard");
+  return { success: "Запис успішно додано!" };
 }
