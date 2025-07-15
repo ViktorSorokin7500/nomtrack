@@ -87,41 +87,64 @@ function SocialIcon({ href, path, title, color }: SocialIconProps) {
 }
 
 export function Footer() {
+  // const footerLinks = [
+  //   {
+  //     title: "Product",
+  //     links: [
+  //       { label: "Features", href: "#" },
+  //       { label: "Pricing", href: "#pricing" },
+  //       { label: "Integrations", href: "#" },
+  //       { label: "Updates", href: "#" },
+  //     ],
+  //   },
+  //   {
+  //     title: "Resources",
+  //     links: [
+  //       { label: "Blog", href: "#" },
+  //       { label: "Guides", href: "#" },
+  //       { label: "Support", href: "#" },
+  //       { label: "API", href: "#" },
+  //     ],
+  //   },
+  //   {
+  //     title: "Company",
+  //     links: [
+  //       { label: "About", href: "#" },
+  //       { label: "Careers", href: "#" },
+  //       { label: "Press", href: "#" },
+  //       { label: "Contact", href: "#" },
+  //     ],
+  //   },
+  //   {
+  //     title: "Legal",
+  //     links: [
+  //       { label: "Privacy", href: "#" },
+  //       { label: "Terms", href: "#" },
+  //       { label: "Security", href: "#" },
+  //       { label: "Cookies", href: "#" },
+  //     ],
+  //   },
+  // ];
   const footerLinks = [
     {
-      title: "Product",
+      title: "Продукт",
       links: [
-        { label: "Features", href: "#" },
-        { label: "Pricing", href: "#pricing" },
-        { label: "Integrations", href: "#" },
-        { label: "Updates", href: "#" },
+        { label: "Updates", href: "/updates" },
+        { label: "Ціни", href: "/pricing" },
       ],
     },
     {
-      title: "Resources",
+      title: "Ресурси",
       links: [
-        { label: "Blog", href: "#" },
-        { label: "Guides", href: "#" },
-        { label: "Support", href: "#" },
-        { label: "API", href: "#" },
+        { label: "Підтримка", href: "/support" },
+        { label: "Карта сайту", href: "/sitemap" },
       ],
     },
     {
-      title: "Company",
+      title: "Юридична інформація",
       links: [
-        { label: "About", href: "#" },
-        { label: "Careers", href: "#" },
-        { label: "Press", href: "#" },
-        { label: "Contact", href: "#" },
-      ],
-    },
-    {
-      title: "Legal",
-      links: [
-        { label: "Privacy", href: "#" },
-        { label: "Terms", href: "#" },
-        { label: "Security", href: "#" },
-        { label: "Cookies", href: "#" },
+        { label: "Конфіденційність", href: "/legal/privacy" },
+        { label: "Умови використання", href: "/legal/terms" },
       ],
     },
   ];
@@ -158,7 +181,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-200 pt-8">
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 max-w-5xl mx-auto">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 max-w-5xl mx-auto">
             {footerLinks.map((section, index) => (
               <FooterLinkSection
                 key={index}

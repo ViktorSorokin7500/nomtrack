@@ -50,7 +50,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
     <Card>
       {/* Показуємо список доданих активностей, якщо вони є */}
       {activityLogData.length > 0 && (
-        <div className="p-6 border-b border-gray-200">
+        <div className="py-2 border-b border-gray-200">
           <h3 className="text-lg font-medium text-stone-900 mb-3">
             Сьогоднішні активності
           </h3>
@@ -63,7 +63,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
       )}
 
       {/* Форма для додавання нової активності */}
-      <div className="p-6">
+      <div className="py-2">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-medium text-stone-900">
             Трекер активності

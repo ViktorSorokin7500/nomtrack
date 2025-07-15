@@ -3,10 +3,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
 import { updatePersonalInfo } from "@/app/actions";
+import toast from "react-hot-toast";
 
 // Схема валідації залишається без змін
 const personalInfoSchema = z.object({
@@ -26,11 +26,6 @@ type PersonalInfoFormProps = {
 };
 
 export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
-  const [message, setMessage] = useState("");
-  const [formStatus, setFormStatus] = useState<"success" | "error" | null>(
-    null
-  );
-
   const {
     register,
     handleSubmit,
@@ -49,25 +44,12 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
   });
 
   const onSubmit = async (data: PersonalInfoSchema) => {
-    setMessage("");
-    setFormStatus(null);
-
     const result = await updatePersonalInfo(data);
 
     if (result?.error) {
-      setMessage(result.error);
-      setFormStatus("error");
-      setTimeout(() => {
-        setMessage("");
-        setFormStatus(null);
-      }, 10000);
+      toast.error(result.error);
     } else if (result?.success) {
-      setMessage(result.success);
-      setFormStatus("success");
-      setTimeout(() => {
-        setMessage("");
-        setFormStatus(null);
-      }, 10000);
+      toast.success(result.success);
     }
   };
 
@@ -224,16 +206,6 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
             {isSubmitting ? "Збереження..." : "Зберегти зміни"}
           </Button>
         </div>
-        {/* ВИПРАВЛЕННЯ 2: Використовуємо 'formStatus' для визначення кольору */}
-        {message && (
-          <p
-            className={`mt-4 text-center ${
-              formStatus === "error" ? "text-red-500" : "text-green-500"
-            }`}
-          >
-            {message}
-          </p>
-        )}
       </form>
     </Card>
   );

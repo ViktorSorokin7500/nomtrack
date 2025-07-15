@@ -1,11 +1,10 @@
-// components/dashboard/SummaryCard.tsx
-
 "use client";
 
 import { useState, useTransition } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
 import { addWeightEntry } from "@/app/actions"; // Імпортуємо нову дію
+import toast from "react-hot-toast";
 
 interface SummaryCardProps {
   currentWeight: number | null;
@@ -18,17 +17,20 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
   const handleAddWeight = () => {
     const weightValue = parseFloat(weightInput);
     if (!weightValue || weightValue <= 0) {
-      alert("Введіть коректну вагу.");
+      toast.success("Введіть коректну вагу.");
+      // alert("Введіть коректну вагу.");
       return;
     }
 
     startTransition(async () => {
       const result = await addWeightEntry(weightValue);
       if (result?.error) {
-        alert("Помилка: " + result.error);
+        toast.success("Помилка: " + result.error);
+        // alert("Помилка: " + result.error);
       } else {
         setWeightInput(""); // Очищуємо поле після успішного збереження
-        alert(result.success);
+        toast.success(result.success || "Вага успішно збережена!");
+        // alert(result.success);
       }
     });
   };

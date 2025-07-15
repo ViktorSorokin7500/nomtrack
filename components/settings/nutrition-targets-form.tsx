@@ -3,10 +3,10 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
 import { updateNutritionTargets } from "@/app/actions";
+import toast from "react-hot-toast";
 
 // Схема Zod для валідації полів самої форми
 const targetsSchema = z.object({
@@ -42,11 +42,6 @@ export function NutritionTargetsForm({
 }: {
   initialData: Profile;
 }) {
-  const [message, setMessage] = useState("");
-  const [formStatus, setFormStatus] = useState<"success" | "error" | null>(
-    null
-  );
-
   const {
     register,
     handleSubmit,
@@ -68,10 +63,9 @@ export function NutritionTargetsForm({
     const { gender, current_weight_kg, height_cm, age, activity_level, goal } =
       initialData;
     if (!current_weight_kg || !height_cm || !age) {
-      setMessage(
+      toast.error(
         "Будь ласка, спочатку заповніть вагу, зріст та вік у Personal Info."
       );
-      setFormStatus("error");
       return;
     }
 
@@ -106,32 +100,17 @@ export function NutritionTargetsForm({
     setValue("target_carbs_g", carbs);
     setValue("target_fat_g", fat);
     setValue("target_water_ml", waterTarget);
-    setMessage("Цілі розраховано! Натисніть 'Зберегти', щоб застосувати їх.");
-    setFormStatus("success");
-    setTimeout(() => {
-      setMessage("");
-      setFormStatus(null); // опціонально очищаємо статус
-    }, 10000);
+    toast.success(
+      "Цілі розраховано! Натисніть 'Зберегти', щоб застосувати їх."
+    );
   };
 
   const onSubmit = async (data: TargetsSchema) => {
-    setMessage("");
-    setFormStatus(null);
     const result = await updateNutritionTargets(data);
     if (result?.error) {
-      setMessage(result.error);
-      setFormStatus("error");
-      setTimeout(() => {
-        setMessage("");
-        setFormStatus(null); // опціонально очищаємо статус
-      }, 10000);
+      toast.error(result.error);
     } else if (result?.success) {
-      setMessage(result.success);
-      setFormStatus("success");
-      setTimeout(() => {
-        setMessage("");
-        setFormStatus(null); // опціонально очищаємо статус
-      }, 10000);
+      toast.success(result.success);
     }
   };
 
@@ -139,7 +118,12 @@ export function NutritionTargetsForm({
     <Card>
       <h2 className="text-xl font-semibold mb-6">Nutrition Targets</h2>
       <div className="flex justify-center mb-6">
-        <Button type="button" onClick={handleAutoCalculate} variant="outline">
+        <Button
+          type="button"
+          onClick={handleAutoCalculate}
+          variant="outline"
+          className="bg-blue-400! hover:bg-blue-500! text-stone-600 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
+        >
           Розрахувати автоматично за моїми даними
         </Button>
       </div>
@@ -218,18 +202,9 @@ export function NutritionTargetsForm({
         </div>
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Збереження..." : "Зберегти цілі"}
+            {isSubmitting ? "Збереження..." : "Зберегти"}
           </Button>
         </div>
-        {message && (
-          <p
-            className={`mt-4 text-center ${
-              formStatus === "error" ? "text-red-500" : "text-green-500"
-            }`}
-          >
-            {message}
-          </p>
-        )}
       </form>
     </Card>
   );

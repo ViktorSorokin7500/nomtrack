@@ -1,18 +1,17 @@
-// components/dashboard/WaterTrackerCard.tsx
-
 "use client";
 
 import { useOptimistic, useTransition } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
 import { addWaterEntry } from "@/app/actions";
+import toast from "react-hot-toast";
 
 interface WaterTrackerProps {
   currentWater: number;
   targetWater: number;
 }
 
-const waterAmounts = [100, 150, 200, 250];
+const waterAmounts = [-100, -50, 50, 100];
 
 export function WaterTrackerCard({
   currentWater,
@@ -27,6 +26,11 @@ export function WaterTrackerCard({
   );
 
   const handleAddWater = async (amount: number) => {
+    if (optimisticWater + amount < 0) {
+      toast.error("Не можна додати від'ємну кількість води");
+      return;
+    }
+
     // Миттєво оновлюємо UI
     startTransition(() => {
       addOptimisticWater(amount);
@@ -71,8 +75,9 @@ export function WaterTrackerCard({
               size="sm"
               onClick={() => handleAddWater(amount)}
               disabled={isPending}
+              className="bg-blue-400! hover:bg-blue-500! text-stone-50 hover:text-stone-100"
             >
-              +{amount} мл
+              {amount > 0 ? `+${amount}` : amount} мл
             </Button>
           ))}
         </div>

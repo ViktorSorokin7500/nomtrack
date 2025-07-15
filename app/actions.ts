@@ -131,7 +131,7 @@ Your step-by-step logic:
 2. If the user explicitly lists ingredients and quantities, use them as-is.
 3. If the user provides a common dish name (e.g. "Borscht", "Caesar salad") without ingredients, deconstruct it into typical ingredients with approximate weights per standard portion. Adjust portion size if words like “large” or “small” are present.
 4. Exclude emotional, irrelevant, or decorative phrases.
-5. Output ONLY a valid JSON object in the format below.
+5. Output ONLY a valid JSON object in the format below without any additional text or explanations.
 
 JSON format:
 {
@@ -177,8 +177,12 @@ Your JSON Response:`;
       response_format: { type: "json_object" },
     });
 
-    const aiContent = aiResponse.choices?.[0]?.message?.content;
+    let aiContent = aiResponse.choices?.[0]?.message?.content;
+    console.log(aiContent);
+
     if (!aiContent) return { error: "ШІ не розпізнам інгредієнти" };
+
+    aiContent = aiContent.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "");
 
     const { ingredients } = JSON.parse(aiContent) as AiIngredientsResponse;
     if (!ingredients || ingredients.length === 0) {
@@ -252,10 +256,6 @@ Your JSON Response:`;
 }
 
 export async function addWaterEntry(amount: number) {
-  if (amount <= 0) {
-    return { error: "Кількість має бути позитивною." };
-  }
-
   const supabase = createClient();
 
   const {

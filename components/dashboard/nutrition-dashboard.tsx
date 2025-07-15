@@ -34,7 +34,6 @@ interface NutritionDashboardProps {
   foodLogData: FoodEntry[];
 }
 
-// Визначаємо основні прийоми їжі, які можна додати лише раз
 const MAIN_MEALS = ["breakfast", "lunch", "dinner"];
 
 export function NutritionDashboard({

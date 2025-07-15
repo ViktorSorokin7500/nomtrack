@@ -4,7 +4,6 @@ import {
   NutritionTargetsForm,
   PersonalInfoForm,
   ProfileSidebar,
-  TelegramConnect,
 } from "@/components/settings";
 import { Locale } from "@/i18n.config";
 
@@ -52,7 +51,6 @@ export default async function Settings({
           <div className="lg:col-span-2 space-y-8">
             <PersonalInfoForm initialData={profile} />
             <NutritionTargetsForm initialData={profile} />
-            <TelegramConnect />
           </div>
         </div>
       </div>
