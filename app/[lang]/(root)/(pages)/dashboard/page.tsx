@@ -1,5 +1,4 @@
 // app/[lang]/(root)/(pages)/dashboard/page.tsx
-
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -33,7 +32,9 @@ export default async function Dashboard({
     .eq("id", user.id)
     .single();
 
-  if (!profile) {
+  console.log(profile);
+
+  if (profile.current_weight_kg === null) {
     redirect("/settings");
   }
 
