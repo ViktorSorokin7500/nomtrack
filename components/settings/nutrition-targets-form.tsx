@@ -122,7 +122,7 @@ export function NutritionTargetsForm({
           type="button"
           onClick={handleAutoCalculate}
           variant="outline"
-          className="bg-blue-400! hover:bg-blue-500! text-stone-600 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
+          className="bg-sky-400 hover:bg-blue-300 text-stone-800 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
         >
           Розрахувати автоматично за моїми даними
         </Button>
