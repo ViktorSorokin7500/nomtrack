@@ -56,7 +56,17 @@ type NutritionInfo = {
   fat_total_g: number;
   carbohydrates_total_g: number;
   sugar_g: number;
+  serving_size_g?: number;
 };
+
+interface TotalNutrition {
+  calories: number;
+  protein_g: number;
+  fat_g: number;
+  carbs_g: number;
+  sugar_g: number;
+  total_weight_g: number;
+}
 
 type Ingredient = {
   name: string;
@@ -425,4 +435,259 @@ export async function addManualFoodEntry(entryData: ManualEntryData) {
 
   revalidatePath("/dashboard");
   return { success: "Запис успішно додано!" };
+}
+
+export async function createAndAnalyzeRecipe(formData: {
+  recipeName: string;
+  ingredientsText: string;
+}) {
+  const { recipeName, ingredientsText } = formData;
+  if (!recipeName.trim() || !ingredientsText.trim()) {
+    return { error: "Назва та інгредієнти не можуть бути порожніми." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "Ви не авторизовані" };
+
+  try {
+    const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
+
+    const initialIngredientLines = ingredientsText
+      .split(/,|\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    if (initialIngredientLines.length === 0) {
+      return { error: "Список інгредієнтів порожній або некоректний." };
+    }
+
+    // 1. Пакетный перевод ингредиентов через AI
+    const batchPrompt = `
+      Analyze and translate the following list of recipe ingredients to English.
+      **Crucially, you must preserve the original quantities (like grams, ml, pieces) in the translation.**
+      For example, 'свікла 200 г' should become 'beetroot 200 g'.
+
+      Return the output ONLY as a valid JSON array of strings.
+
+      Input List:
+      ${initialIngredientLines.join("\n")}
+
+      JSON Output:
+    `;
+
+    const batchResponse = await together.chat.completions.create({
+      messages: [{ role: "user", content: batchPrompt }],
+      model: "Qwen/Qwen2-72B-Instruct",
+      response_format: { type: "json_object" },
+    });
+
+    const responseContent = batchResponse.choices?.[0]?.message?.content;
+    if (!responseContent) {
+      throw new Error("AI не повернув результат.");
+    }
+
+    let translatedIngredients: string[];
+    try {
+      const parsedJson = JSON.parse(responseContent);
+      if (Array.isArray(parsedJson)) {
+        translatedIngredients = parsedJson;
+      } else {
+        const arrayKey = Object.keys(parsedJson).find((k) =>
+          Array.isArray(parsedJson[k])
+        );
+        if (!arrayKey)
+          throw new Error(
+            "JSON від AI не є масивом і не містить масиву всередині."
+          );
+        translatedIngredients = parsedJson[arrayKey];
+      }
+    } catch (e) {
+      console.error("Помилка парсингу JSON від AI:", responseContent);
+      console.log(e);
+
+      throw new Error(
+        "Не вдалося обробити відповідь від AI. Спробуйте змінити інгредієнти."
+      );
+    }
+
+    // 2. Обработка каждого ингредиента с умным масштабированием
+    const nutritionPromises = translatedIngredients.map(
+      async (translatedLine): Promise<TotalNutrition> => {
+        if (!translatedLine.trim()) {
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: 0,
+          };
+        }
+
+        const weightMatch = translatedLine.match(/(\d+(\.\d+)?)/);
+        const actualWeight = weightMatch ? parseFloat(weightMatch[1]) : 0;
+        if (actualWeight === 0) {
+          console.warn(
+            `Не вдалося визначити вагу для '${translatedLine}', інгредієнт ігнорується.`
+          );
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: actualWeight,
+          };
+        }
+
+        const nutritionResponse = await fetch(
+          `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
+            translatedLine
+          )}`,
+          { headers: { "X-Api-Key": process.env.CALORIENINJAS_API_KEY! } }
+        );
+
+        if (!nutritionResponse.ok) {
+          console.warn(
+            `Помилка CalorieNinjas для '${translatedLine}', ігноруємо інгредієнт.`
+          );
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: actualWeight,
+          };
+        }
+
+        const nutritionData: { items: NutritionInfo[] } =
+          await nutritionResponse.json();
+        if (nutritionData.items.length === 0) {
+          console.warn(
+            `CalorieNinjas не розпізнав '${translatedLine}', ігноруємо.`
+          );
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: actualWeight,
+          };
+        }
+
+        // Суммируем все части, которые вернул API для одного ингредиента
+        const combinedApiResult = nutritionData.items.reduce(
+          (acc, item) => {
+            acc.calories += item.calories;
+            acc.protein_g += item.protein_g;
+            acc.fat_total_g += item.fat_total_g;
+            acc.carbohydrates_total_g += item.carbohydrates_total_g;
+            acc.sugar_g += item.sugar_g;
+            acc.serving_size_g += item.serving_size_g || 0;
+            return acc;
+          },
+          {
+            calories: 0,
+            protein_g: 0,
+            fat_total_g: 0,
+            carbohydrates_total_g: 0,
+            sugar_g: 0,
+            serving_size_g: 0,
+          }
+        );
+
+        const apiWeight = combinedApiResult.serving_size_g;
+        if (apiWeight === 0) {
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: actualWeight,
+          };
+        }
+
+        // **Ключевая логика: умное масштабирование**
+        const multiplier = actualWeight / apiWeight;
+
+        return {
+          calories: (combinedApiResult.calories || 0) * multiplier,
+          protein_g: (combinedApiResult.protein_g || 0) * multiplier,
+          fat_g: (combinedApiResult.fat_total_g || 0) * multiplier,
+          carbs_g: (combinedApiResult.carbohydrates_total_g || 0) * multiplier,
+          sugar_g: (combinedApiResult.sugar_g || 0) * multiplier,
+          total_weight_g: actualWeight, // Всегда используем НАШ вес
+        };
+      }
+    );
+
+    const allNutritionData = await Promise.all(nutritionPromises);
+
+    // 3. Суммируем финальные результаты
+    const finalTotals = allNutritionData.reduce(
+      (acc, item) => {
+        acc.calories += item.calories;
+        acc.protein_g += item.protein_g;
+        acc.fat_g += item.fat_g;
+        acc.carbs_g += item.carbs_g;
+        acc.sugar_g += item.sugar_g;
+        acc.total_weight_g += item.total_weight_g;
+        return acc;
+      },
+      {
+        calories: 0,
+        protein_g: 0,
+        fat_g: 0,
+        carbs_g: 0,
+        sugar_g: 0,
+        total_weight_g: 0,
+      }
+    );
+
+    if (finalTotals.total_weight_g < 1) {
+      return {
+        error:
+          "Не вдалося визначити вагу інгредієнтів. Переконайтесь, що вага вказана коректно (напр. 'курка 100 г').",
+      };
+    }
+
+    // 4. Нормализуем показатели и сохраняем в БД
+    const multiplier = 100 / finalTotals.total_weight_g;
+    const recipeData = {
+      user_id: user.id,
+      recipe_name: recipeName,
+      total_weight_g: Math.round(finalTotals.total_weight_g),
+      calories_per_100g: Math.round(finalTotals.calories * multiplier),
+      protein_per_100g: parseFloat(
+        (finalTotals.protein_g * multiplier).toFixed(1)
+      ),
+      fat_per_100g: parseFloat((finalTotals.fat_g * multiplier).toFixed(1)),
+      carbs_per_100g: parseFloat((finalTotals.carbs_g * multiplier).toFixed(1)),
+      sugar_per_100g: parseFloat((finalTotals.sugar_g * multiplier).toFixed(1)),
+      ingredients_text: ingredientsText,
+    };
+
+    const { error: insertError } = await supabase
+      .from("user_recipes")
+      .insert([recipeData]);
+    if (insertError) {
+      throw new Error(
+        "Помилка збереження рецепта в БД: " + insertError.message
+      );
+    }
+
+    revalidatePath("/recipes");
+    return { success: `Рецепт "${recipeName}" успішно збережено!` };
+  } catch (error) {
+    let errorMessage = "Сталася невідома помилка.";
+    if (error instanceof Error) errorMessage = error.message;
+    console.error("Помилка в createAndAnalyzeRecipe:", error);
+    return { error: errorMessage };
+  }
 }

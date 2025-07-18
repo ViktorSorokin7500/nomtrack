@@ -32,8 +32,6 @@ export default async function Dashboard({
     .eq("id", user.id)
     .single();
 
-  console.log(profile);
-
   if (profile.current_weight_kg === null) {
     redirect("/settings");
   }
