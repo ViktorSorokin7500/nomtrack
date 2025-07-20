@@ -188,7 +188,6 @@ Your JSON Response:`;
     });
 
     let aiContent = aiResponse.choices?.[0]?.message?.content;
-    console.log(aiContent);
 
     if (!aiContent) return { error: "ШІ не розпізнам інгредієнти" };
 
@@ -454,23 +453,25 @@ export async function createAndAnalyzeRecipe(formData: {
 
   try {
     const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
-
     const initialIngredientLines = ingredientsText
       .split(/,|\n/)
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
-
     if (initialIngredientLines.length === 0) {
       return { error: "Список інгредієнтів порожній або некоректний." };
     }
 
-    // 1. Пакетный перевод ингредиентов через AI
+    // 1. НАЙБІЛЬШ ПРОСУНУТИЙ ПРОМПТ
     const batchPrompt = `
-      Analyze and translate the following list of recipe ingredients to English.
-      **Crucially, you must preserve the original quantities (like grams, ml, pieces) in the translation.**
-      For example, 'свікла 200 г' should become 'beetroot 200 g'.
+      Analyze the following list of recipe ingredients. Your task is to normalize each ingredient into its English name and its total weight in GRAMS.
 
-      Return the output ONLY as a valid JSON array of strings.
+      Follow these rules:
+      1. If you see "кг", "kg", or same meaninig, multiply the number by 1000 to get grams. (e.g., "2 кг муки" -> weightGrams: 2000).
+      2. For items by count (like eggs, onions, etc.), use a standard average weight to calculate the total weight in grams. (e.g., "8 large eggs" -> assume 60g per egg -> weightGrams: 480).
+      3. For liquids in "ml", assume density is 1 g/ml. (e.g., "200 ml milk" -> weightGrams: 200).
+      4. The 'ingredientName' should be a clean, simple English name suitable for an API query (e.g., "cauliflower", "large eggs", "milk").
+
+      Return the output ONLY as a valid JSON array of objects. Each object must have two keys: "ingredientName" (string) and "weightGrams" (number).
 
       Input List:
       ${initialIngredientLines.join("\n")}
@@ -478,22 +479,37 @@ export async function createAndAnalyzeRecipe(formData: {
       JSON Output:
     `;
 
+    // 2. Робимо ОДИН запит до AI
     const batchResponse = await together.chat.completions.create({
       messages: [{ role: "user", content: batchPrompt }],
       model: "Qwen/Qwen2-72B-Instruct",
       response_format: { type: "json_object" },
     });
+    let responseContent = batchResponse.choices?.[0]?.message?.content;
+    console.log("responseContent actions =>", responseContent);
 
-    const responseContent = batchResponse.choices?.[0]?.message?.content;
-    if (!responseContent) {
-      throw new Error("AI не повернув результат.");
-    }
+    if (!responseContent) throw new Error("AI не повернув результат.");
 
-    let translatedIngredients: string[];
+    responseContent = responseContent.replace(
+      /\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm,
+      ""
+    );
+
+    let normalizedIngredients: {
+      ingredientName: string;
+      weightGrams: number;
+    }[];
     try {
-      const parsedJson = JSON.parse(responseContent);
+      const startIndex = responseContent.indexOf("[");
+      const endIndex = responseContent.lastIndexOf("]");
+      if (startIndex === -1 || endIndex === -1) {
+        throw new Error("Не вдалося знайти JSON масив у відповіді AI.");
+      }
+      const jsonString = responseContent.substring(startIndex, endIndex + 1);
+      const parsedJson = JSON.parse(jsonString);
+
       if (Array.isArray(parsedJson)) {
-        translatedIngredients = parsedJson;
+        normalizedIngredients = parsedJson;
       } else {
         const arrayKey = Object.keys(parsedJson).find((k) =>
           Array.isArray(parsedJson[k])
@@ -502,21 +518,21 @@ export async function createAndAnalyzeRecipe(formData: {
           throw new Error(
             "JSON від AI не є масивом і не містить масиву всередині."
           );
-        translatedIngredients = parsedJson[arrayKey];
+        normalizedIngredients = parsedJson[arrayKey];
       }
     } catch (e) {
       console.error("Помилка парсингу JSON від AI:", responseContent);
-      console.log(e);
-
+      console.error("Помилка:", e);
       throw new Error(
         "Не вдалося обробити відповідь від AI. Спробуйте змінити інгредієнти."
       );
     }
 
-    // 2. Обработка каждого ингредиента с умным масштабированием
-    const nutritionPromises = translatedIngredients.map(
-      async (translatedLine): Promise<TotalNutrition> => {
-        if (!translatedLine.trim()) {
+    // 3. Обробляємо кожен нормалізований інгредієнт
+    const nutritionPromises = normalizedIngredients.map(
+      async (item): Promise<TotalNutrition> => {
+        const actualWeight = item.weightGrams;
+        if (!item.ingredientName || actualWeight <= 0) {
           return {
             calories: 0,
             protein_g: 0,
@@ -527,32 +543,16 @@ export async function createAndAnalyzeRecipe(formData: {
           };
         }
 
-        const weightMatch = translatedLine.match(/(\d+(\.\d+)?)/);
-        const actualWeight = weightMatch ? parseFloat(weightMatch[1]) : 0;
-        if (actualWeight === 0) {
-          console.warn(
-            `Не вдалося визначити вагу для '${translatedLine}', інгредієнт ігнорується.`
-          );
-          return {
-            calories: 0,
-            protein_g: 0,
-            fat_g: 0,
-            carbs_g: 0,
-            sugar_g: 0,
-            total_weight_g: actualWeight,
-          };
-        }
-
+        // Робимо запит до CalorieNinjas лише за назвою, щоб отримати дані на 100 г
         const nutritionResponse = await fetch(
           `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
-            translatedLine
+            item.ingredientName
           )}`,
           { headers: { "X-Api-Key": process.env.CALORIENINJAS_API_KEY! } }
         );
-
         if (!nutritionResponse.ok) {
           console.warn(
-            `Помилка CalorieNinjas для '${translatedLine}', ігноруємо інгредієнт.`
+            `Помилка CalorieNinjas для '${item.ingredientName}', ігноруємо.`
           );
           return {
             calories: 0,
@@ -563,12 +563,13 @@ export async function createAndAnalyzeRecipe(formData: {
             total_weight_g: actualWeight,
           };
         }
+        console.log("nutritionResponse actions=>", nutritionResponse);
 
         const nutritionData: { items: NutritionInfo[] } =
           await nutritionResponse.json();
         if (nutritionData.items.length === 0) {
           console.warn(
-            `CalorieNinjas не розпізнав '${translatedLine}', ігноруємо.`
+            `CalorieNinjas не розпізнав '${item.ingredientName}', ігноруємо.`
           );
           return {
             calories: 0,
@@ -580,56 +581,23 @@ export async function createAndAnalyzeRecipe(formData: {
           };
         }
 
-        // Суммируем все части, которые вернул API для одного ингредиента
-        const combinedApiResult = nutritionData.items.reduce(
-          (acc, item) => {
-            acc.calories += item.calories;
-            acc.protein_g += item.protein_g;
-            acc.fat_total_g += item.fat_total_g;
-            acc.carbohydrates_total_g += item.carbohydrates_total_g;
-            acc.sugar_g += item.sugar_g;
-            acc.serving_size_g += item.serving_size_g || 0;
-            return acc;
-          },
-          {
-            calories: 0,
-            protein_g: 0,
-            fat_total_g: 0,
-            carbohydrates_total_g: 0,
-            sugar_g: 0,
-            serving_size_g: 0,
-          }
-        );
-
-        const apiWeight = combinedApiResult.serving_size_g;
-        if (apiWeight === 0) {
-          return {
-            calories: 0,
-            protein_g: 0,
-            fat_g: 0,
-            carbs_g: 0,
-            sugar_g: 0,
-            total_weight_g: actualWeight,
-          };
-        }
-
-        // **Ключевая логика: умное масштабирование**
-        const multiplier = actualWeight / apiWeight;
+        const nutritionPer100g = nutritionData.items[0];
+        const multiplier = actualWeight / 100.0;
 
         return {
-          calories: (combinedApiResult.calories || 0) * multiplier,
-          protein_g: (combinedApiResult.protein_g || 0) * multiplier,
-          fat_g: (combinedApiResult.fat_total_g || 0) * multiplier,
-          carbs_g: (combinedApiResult.carbohydrates_total_g || 0) * multiplier,
-          sugar_g: (combinedApiResult.sugar_g || 0) * multiplier,
-          total_weight_g: actualWeight, // Всегда используем НАШ вес
+          calories: (nutritionPer100g.calories || 0) * multiplier,
+          protein_g: (nutritionPer100g.protein_g || 0) * multiplier,
+          fat_g: (nutritionPer100g.fat_total_g || 0) * multiplier,
+          carbs_g: (nutritionPer100g.carbohydrates_total_g || 0) * multiplier,
+          sugar_g: (nutritionPer100g.sugar_g || 0) * multiplier,
+          total_weight_g: actualWeight,
         };
       }
     );
 
     const allNutritionData = await Promise.all(nutritionPromises);
+    console.log("allNutritionData actions =>", allNutritionData);
 
-    // 3. Суммируем финальные результаты
     const finalTotals = allNutritionData.reduce(
       (acc, item) => {
         acc.calories += item.calories;
@@ -651,13 +619,9 @@ export async function createAndAnalyzeRecipe(formData: {
     );
 
     if (finalTotals.total_weight_g < 1) {
-      return {
-        error:
-          "Не вдалося визначити вагу інгредієнтів. Переконайтесь, що вага вказана коректно (напр. 'курка 100 г').",
-      };
+      return { error: "Не вдалося визначити вагу інгредієнтів." };
     }
 
-    // 4. Нормализуем показатели и сохраняем в БД
     const multiplier = 100 / finalTotals.total_weight_g;
     const recipeData = {
       user_id: user.id,
@@ -690,4 +654,37 @@ export async function createAndAnalyzeRecipe(formData: {
     console.error("Помилка в createAndAnalyzeRecipe:", error);
     return { error: errorMessage };
   }
+}
+
+export async function deleteRecipe(recipeId: string) {
+  if (!recipeId) {
+    return { error: "ID рецепта не вказано." };
+  }
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Ви не авторизовані." };
+  }
+
+  // Видаляємо рецепт, але ТІЛЬКИ якщо він належить поточному користувачу
+  // Це важливий крок для безпеки!
+  const { error } = await supabase
+    .from("user_recipes")
+    .delete()
+    .eq("id", recipeId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Помилка видалення рецепта:", error);
+    return { error: "Не вдалося видалити рецепт." };
+  }
+
+  // Оновлюємо кеш сторінки, щоб список оновився
+  revalidatePath("/recipes");
+
+  return { success: "Рецепт успішно видалено." };
 }

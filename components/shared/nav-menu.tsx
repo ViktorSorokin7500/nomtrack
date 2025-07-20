@@ -21,6 +21,7 @@ export default function NavMenu({ lang }: { lang: Locale }) {
           </Dropdown.Item>
           <Dropdown.Item href={`/${lang}/settings`}>Налаштування</Dropdown.Item>
           <Dropdown.Item href={`/${lang}/archive`}>Архів</Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/recipes`}>Мої рецепти</Dropdown.Item>
           <Dropdown.Item href={`/${lang}/help`}>Допомога</Dropdown.Item>
           <Dropdown.Separator />
           <div className="text-sm py-1 px-2">
