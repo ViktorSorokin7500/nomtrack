@@ -33,7 +33,7 @@ export default async function AuthLayout({
         <Card className="p-8 shadow-xl">{children}</Card>
         <Link href={`/${lang}`} className="flex justify-center mt-8">
           <span className="text-sm text-gray-600 hover:text-orange-500">
-            Повернутися на головну
+            Return to Homepage
           </span>
         </Link>
       </div>

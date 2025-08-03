@@ -23,6 +23,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.5.0",
     "lucide-react": "^0.511.0",
+    "matter-js": "^0.20.0",
     "mongodb": "^6.16.0",
     "mongoose": "^8.15.1",
     "motion": "^12.12.1",
@@ -40,6 +41,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
+    "@types/matter-js": "^0.19.8",
     "@types/negotiator": "^0.6.3",
     "@types/node": "^20",
     "@types/react": "^19",

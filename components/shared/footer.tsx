@@ -127,27 +127,28 @@ export function Footer() {
   // ];
   const footerLinks = [
     {
-      title: "Продукт",
+      title: "Product",
       links: [
         { label: "Updates", href: "/updates" },
-        { label: "Ціни", href: "/pricing" },
+        { label: "Pricing", href: "/pricing" },
       ],
     },
     {
-      title: "Ресурси",
+      title: "Resources",
       links: [
-        { label: "Підтримка", href: "/support" },
-        { label: "Карта сайту", href: "/sitemap" },
+        { label: "Support", href: "/support" },
+        { label: "Sitemap", href: "/sitemap" },
       ],
     },
     {
-      title: "Юридична інформація",
+      title: "Legal",
       links: [
-        { label: "Конфіденційність", href: "/legal/privacy" },
-        { label: "Умови використання", href: "/legal/terms" },
+        { label: "Privacy Policy", href: "/legal/privacy" },
+        { label: "Terms of Service", href: "/legal/terms" },
       ],
     },
   ];
+
   return (
     <footer className="bg-white py-8">
       <div className="container mx-auto px-4">
@@ -166,7 +167,7 @@ export function Footer() {
               />
               <circle cx="20" cy="12" r="4" fill="#FFE066" />
             </svg>
-            <h2 className="text-xl font-bold">Nom Track</h2>
+            <h2 className="text-xl font-bold">NomTrack</h2>
           </div>
           <div className="flex space-x-6">
             {socialIcons.map((icon, index) => (

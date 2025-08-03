@@ -64,7 +64,7 @@ export function NutritionTargetsForm({
       initialData;
     if (!current_weight_kg || !height_cm || !age) {
       toast.error(
-        "Будь ласка, спочатку заповніть вагу, зріст та вік у Personal Info."
+        "Please fill out your weight, height, and age in Personal Info first."
       );
       return;
     }
@@ -100,9 +100,7 @@ export function NutritionTargetsForm({
     setValue("target_carbs_g", carbs);
     setValue("target_fat_g", fat);
     setValue("target_water_ml", waterTarget);
-    toast.success(
-      "Цілі розраховано! Натисніть 'Зберегти', щоб застосувати їх."
-    );
+    toast.success("Targets calculated! Click 'Save Changes' to apply them.");
   };
 
   const onSubmit = async (data: TargetsSchema) => {
@@ -122,9 +120,9 @@ export function NutritionTargetsForm({
           type="button"
           onClick={handleAutoCalculate}
           variant="outline"
-          className="bg-sky-400 hover:bg-blue-300 text-stone-800 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
+          className="bg-lime-400 hover:bg-lime-300 text-stone-800 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
         >
-          Розрахувати автоматично за моїми даними
+          Calculate Automatically
         </Button>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -202,7 +200,7 @@ export function NutritionTargetsForm({
         </div>
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Збереження..." : "Зберегти"}
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </form>

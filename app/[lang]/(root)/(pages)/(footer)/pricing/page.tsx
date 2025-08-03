@@ -24,8 +24,6 @@ export default async function PricingPage() {
   const headersList = headers();
   const countryCode = (await headersList).get("x-vercel-ip-country") || "US"; // За замовчуванням США
 
-  console.log(countryCode);
-
   // 2. Розраховуємо ціни
   const basePriceMonthly = 2.99;
   const basePriceYearly = 29.99; // Припустимо, річна ціна така

@@ -1,28 +1,13 @@
 "use client";
 
 import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { analyzeAndSaveFoodEntry, addManualFoodEntry } from "@/app/actions";
 import { Button } from "../ui";
 import { useTransition } from "react";
-
-// Схема Zod тепер враховує всі можливі поля
-const formSchema = z.object({
-  entry_text: z.string().min(3, "Опис має бути довшим"),
-  meal_type: z.string().min(1, "Вибери тип"),
-  entry_mode: z.enum(["ai", "manual"]),
-  calc_mode: z.enum(["serving", "per100g"]),
-  servings: z.coerce.number().optional(),
-  weight_eaten: z.coerce.number().optional(),
-  calories: z.coerce.number().optional(),
-  protein_g: z.coerce.number().optional(),
-  fat_g: z.coerce.number().optional(),
-  carbs_g: z.coerce.number().optional(),
-  sugar_g: z.coerce.number().optional(),
-});
-
-type FormSchema = z.infer<typeof formSchema>;
+import { foodEntrySchema, type FoodEntryFormSchema } from "@/lib/validators";
+import toast from "react-hot-toast";
+import { Card } from "../shared";
 
 interface MealCardProps {
   availableMealTypes: { value: string; label: string }[];
@@ -36,12 +21,13 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
     register,
     handleSubmit,
     reset,
-    control, // Потрібен для відстеження змін
+    control,
     formState: { errors },
-  } = useForm<FormSchema>({
-    resolver: zodResolver(formSchema),
+  } = useForm<FoodEntryFormSchema>({
+    // <-- Використовуємо імпортований тип
+    resolver: zodResolver(foodEntrySchema), // <-- Використовуємо імпортовану схему
     defaultValues: {
-      entry_mode: "ai", // Починаємо з режиму ШІ
+      entry_mode: "ai",
       calc_mode: "per100g",
     },
   });
@@ -50,7 +36,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
   const entryMode = useWatch({ control, name: "entry_mode" });
   const calcMode = useWatch({ control, name: "calc_mode" });
 
-  const onSubmit = (data: FormSchema) => {
+  const onSubmit = (data: FoodEntryFormSchema) => {
     startTransition(async () => {
       let result;
 
@@ -90,16 +76,14 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
         }
 
         // Викликаємо просту Server Action для збереження порахованих даних
-        result = await addManualFoodEntry({
-          entry_text: data.entry_text,
-          meal_type: data.meal_type,
-          ...finalData,
-        });
+        result = await addManualFoodEntry(data);
       }
 
       // Обробка результату
       if (result?.error) {
-        alert("Помилка: " + result.error);
+        console.log("result.error =>:", result.error);
+
+        toast.error("Error: Invalid input or food not found");
       } else {
         reset({
           ...data, // Зберігаємо вибір режимів
@@ -117,14 +101,12 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
   };
 
   return (
-    <div
+    <Card
       className={`meal-card bg-white rounded-xl shadow-sm overflow-hidden ${className}`}
     >
       <div className="p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-700">
-            Додати прийом їжі
-          </h3>
+          <h3 className="text-lg font-medium text-gray-700">Add Meal</h3>
 
           <div className="flex gap-2 rounded-lg bg-gray-100 p-1">
             <label className="flex-1 text-center cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
@@ -134,7 +116,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 {...register("entry_mode")}
                 className="sr-only"
               />{" "}
-              Аналіз ШІ
+              AI Analysis
             </label>
             <label className="flex-1 text-center cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
               <input
@@ -143,7 +125,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 {...register("entry_mode")}
                 className="sr-only"
               />{" "}
-              Ввести вручну
+              Enter Manually
             </label>
           </div>
 
@@ -157,7 +139,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                     {...register("calc_mode")}
                     className="sr-only"
                   />{" "}
-                  На 100г
+                  Per 100g
                 </label>
                 <label className="flex-1 text-center cursor-pointer p-1 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all">
                   <input
@@ -166,7 +148,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                     {...register("calc_mode")}
                     className="sr-only"
                   />{" "}
-                  На порцію
+                  Per Serving
                 </label>
               </div>
 
@@ -174,54 +156,54 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 {calcMode === "per100g" ? (
                   <input
                     type="number"
-                    placeholder="Скільки з'їв (г)"
+                    placeholder="Weight (g)"
                     {...register("weight_eaten")}
                     className="p-2 border rounded"
                   />
                 ) : (
                   <input
                     type="number"
-                    placeholder="К-сть порцій"
+                    placeholder="Servings"
                     {...register("servings")}
                     className="p-2 border rounded"
                   />
                 )}
                 <input
                   type="number"
-                  placeholder={`Калорії (на ${
-                    calcMode === "per100g" ? "100г" : "порцію"
+                  placeholder={`Calories  (per  ${
+                    calcMode === "per100g" ? "100г" : "serving"
                   })`}
                   {...register("calories")}
                   className="p-2 border rounded"
                 />
                 <input
                   type="number"
-                  placeholder={`Білки (на ${
-                    calcMode === "per100g" ? "100г" : "порцію"
+                  placeholder={`Protein  (per  ${
+                    calcMode === "per100g" ? "100г" : "serving"
                   })`}
                   {...register("protein_g")}
                   className="p-2 border rounded"
                 />
                 <input
                   type="number"
-                  placeholder={`Жири (на ${
-                    calcMode === "per100g" ? "100г" : "порцію"
+                  placeholder={`Fat  (per  ${
+                    calcMode === "per100g" ? "100г" : "serving"
                   })`}
                   {...register("fat_g")}
                   className="p-2 border rounded"
                 />
                 <input
                   type="number"
-                  placeholder={`Вуглеводи (на ${
-                    calcMode === "per100g" ? "100г" : "порцію"
+                  placeholder={`Carbs  (per  ${
+                    calcMode === "per100g" ? "100г" : "serving"
                   })`}
                   {...register("carbs_g")}
                   className="p-2 border rounded"
                 />
                 <input
                   type="number"
-                  placeholder={`Цукор (на ${
-                    calcMode === "per100g" ? "100г" : "порцію"
+                  placeholder={`Sugar (per  ${
+                    calcMode === "per100g" ? "100г" : "serving"
                   })`}
                   {...register("sugar_g")}
                   className="p-2 border rounded"
@@ -234,15 +216,17 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
             {...register("entry_text")}
             className="w-full p-3 border border-gray-200 rounded-lg text-gray-700"
             rows={2}
-            placeholder="Опиши, що ти з'їв, або введи назву продукту..."
+            placeholder="Describe your meal or enter a food name..."
           />
-          {errors.entry_text && <p>{errors.entry_text.message}</p>}
+          {errors.entry_text && (
+            <p className="text-red-500 text-sm">{errors.entry_text.message}</p>
+          )}
 
           <select
             {...register("meal_type")}
             className="w-full px-4 py-3 rounded-xl border border-gray-300"
           >
-            <option value="">-- Вибери тип --</option>
+            <option value="">-- Select a meal type --</option>
             {availableMealTypes.map((meal) => (
               <option key={meal.value} value={meal.value}>
                 {meal.label}
@@ -255,11 +239,11 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Обробка..." : "Додати запис"}
+              {isPending ? "Processing..." : "Add Entry"}
             </Button>
           </div>
         </form>
       </div>
-    </div>
+    </Card>
   );
 }

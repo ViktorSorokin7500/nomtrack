@@ -8,6 +8,7 @@ import {
 import { Locale } from "@/i18n.config";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+// import SplashCursor from "@/components/ui/splash-cursor";
 
 export default async function Home({
   params,
@@ -27,15 +28,16 @@ export default async function Home({
 
   return (
     <>
+      {/* <SplashCursor /> */}
       <div className="bg-orange-50">
         <HeroSection lang={lang} />
       </div>
-      <FeatureSection />
-      <div className="bg-orange-50">
-        <PhilosophySection />
-      </div>
-      <PricingSection lang={lang} />
       <CtaSection lang={lang} />
+      <FeatureSection />
+      <PhilosophySection />
+      <div className="bg-orange-50">
+        <PricingSection lang={lang} />
+      </div>
     </>
   );
 }

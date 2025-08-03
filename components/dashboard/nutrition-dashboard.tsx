@@ -15,6 +15,7 @@ type FoodEntry = {
   protein_g: number;
   fat_g: number;
   carbs_g: number;
+  sugar_g: number;
 };
 
 // Типи для пропсів, які компонент отримує від сторінки
@@ -29,6 +30,7 @@ interface NutritionDashboardProps {
       protein: { current: number; target: number };
       carbs: { current: number; target: number };
       fat: { current: number; target: number };
+      sugar: { current: number; target: number };
     };
   };
   foodLogData: FoodEntry[];
@@ -56,18 +58,16 @@ export function NutritionDashboard({
   return (
     <Card className="container mx-auto px-4 py-8 max-w-4xl">
       <header className="mb-8 text-center">
-        <h1 className="text-3xl font-light text-gray-800 mb-2">
-          Щоденник харчування
-        </h1>
+        <h1 className="text-3xl font-light text-gray-800 mb-2">Food Log</h1>
         <p className="text-gray-500 font-light">
-          Записуй прийоми їжі та слідкуй за прогресом
+          Track meals to follow your progress
         </p>
       </header>
 
       {/* Блок з прогресом, що використовує реальні дані */}
-      <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+      <Card className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h2 className="text-xl font-light text-gray-700 mb-4">
-          Денний прогрес
+          Today&apos;s Summary
         </h2>
         <div className="flex items-center justify-between gap-4 sm:gap-6">
           <ProgressRing
@@ -77,10 +77,12 @@ export function NutritionDashboard({
           <div className="flex-1 space-y-4">
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Білки</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Protein
+                </span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.protein.current}г /{" "}
-                  {summaryData.macros.protein.target}г
+                  {summaryData.macros.protein.current}g /{" "}
+                  {summaryData.macros.protein.target}g
                 </span>
               </div>
               <ProgressBar
@@ -91,12 +93,10 @@ export function NutritionDashboard({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">
-                  Вуглеводи
-                </span>
+                <span className="text-sm font-medium text-gray-600">Carbs</span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.carbs.current}г /{" "}
-                  {summaryData.macros.carbs.target}г
+                  {summaryData.macros.carbs.current}g /{" "}
+                  {summaryData.macros.carbs.target}g
                 </span>
               </div>
               <ProgressBar
@@ -107,10 +107,10 @@ export function NutritionDashboard({
             </div>
             <div>
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Жири</span>
+                <span className="text-sm font-medium text-gray-600">Fat </span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.fat.current}г /{" "}
-                  {summaryData.macros.fat.target}г
+                  {summaryData.macros.fat.current}g /{" "}
+                  {summaryData.macros.fat.target}g
                 </span>
               </div>
               <ProgressBar
@@ -119,16 +119,30 @@ export function NutritionDashboard({
                 color="bg-orange-400"
               />
             </div>
+            <div>
+              <div className="flex justify-between mb-1">
+                <span className="text-sm font-medium text-gray-600">Sugar</span>
+                <span className="text-sm text-gray-600">
+                  {summaryData.macros.sugar.current}g /{" "}
+                  {summaryData.macros.sugar.target}g
+                </span>
+              </div>
+              <ProgressBar
+                current={summaryData.macros.sugar.current}
+                target={summaryData.macros.sugar.target}
+                color="bg-sky-300"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       <div className="space-y-6">
         {/* Рендеримо вже існуючі записи, якщо вони є */}
         {foodLogData.length > 0 && (
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-3">
-              Сьогоднішні записи
+              Today&apos;s Log
             </h3>
             {foodLogData.map((entry) => (
               <FoodEntryCard key={entry.id} entry={entry} />

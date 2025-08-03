@@ -13,16 +13,14 @@ export default function NavMenu({ lang }: { lang: Locale }) {
       />
       <Dropdown.Menu>
         <Dropdown.Trigger className="cursor-pointer">
-          <span className="text-stone-700 hover:text-orange-500">Меню</span>
+          <span className="text-stone-700 hover:text-orange-500">Menu</span>
         </Dropdown.Trigger>
         <Dropdown.Content>
-          <Dropdown.Item href={`/${lang}/dashboard`}>
-            Панель керування
-          </Dropdown.Item>
-          <Dropdown.Item href={`/${lang}/settings`}>Налаштування</Dropdown.Item>
-          <Dropdown.Item href={`/${lang}/archive`}>Архів</Dropdown.Item>
-          <Dropdown.Item href={`/${lang}/recipes`}>Мої рецепти</Dropdown.Item>
-          <Dropdown.Item href={`/${lang}/help`}>Допомога</Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/dashboard`}>Dashboard</Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/settings`}>Settings</Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/archive`}>History </Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/recipes`}>My Recipes</Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/help`}>Help</Dropdown.Item>
           <Dropdown.Separator />
           <div className="text-sm py-1 px-2">
             <form action="/auth/sign-out" method="POST">
@@ -30,7 +28,7 @@ export default function NavMenu({ lang }: { lang: Locale }) {
                 className="cursor-pointer hover:text-red-500 transition-colors delay-75"
                 type="submit"
               >
-                Вийти
+                Log Out
               </button>
             </form>
           </div>

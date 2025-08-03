@@ -13,6 +13,7 @@ type Recipe = {
   protein_per_100g: number;
   fat_per_100g: number;
   carbs_per_100g: number;
+  sugar_per_100g: number; // Додаємо цукор, якщо він є
   ingredients_text: string;
   total_weight_g: number;
 };
@@ -32,7 +33,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
       (t) => (
         <div className="flex flex-col items-center gap-4">
           <p className="font-semibold">
-            Ви впевнені, що хочете видалити цей рецепт?
+            Are you sure you want to delete this recipe?
           </p>
           <div className="flex gap-3">
             <button
@@ -43,7 +44,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
                     if (res.error) {
                       toast.error(res.error); // Показуємо помилку, якщо вона є
                     } else {
-                      toast.success(res.success || "Рецепт видалено!"); // Повідомлення про успіх
+                      toast.success(res.success || "Recipe deleted!"); // Повідомлення про успіх
                     }
                   });
                 });
@@ -51,13 +52,13 @@ export function RecipeList({ recipes }: RecipeListProps) {
               }}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
             >
-              Так, видалити
+              Yes, delete
             </button>
             <button
               onClick={() => toast.dismiss(t.id)} // Просто закриваємо сповіщення
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Скасувати
+              Cancel
             </button>
           </div>
         </div>
@@ -70,7 +71,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
 
   return (
     <>
-      <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
+      <div className="space-y-4 md:max-h-[500] overflow-y-auto pr-2">
         {recipes && recipes.length > 0 ? (
           recipes.map((recipe) => (
             // Тепер цей div - просто контейнер, без onClick
@@ -82,9 +83,9 @@ export function RecipeList({ recipes }: RecipeListProps) {
               <div className="flex-grow">
                 <h3 className="font-bold">{recipe.recipe_name}</h3>
                 <p className="text-sm text-gray-500">
-                  На 100г: {recipe.calories_per_100g} ккал, Б:{" "}
-                  {recipe.protein_per_100g}г, Ж: {recipe.fat_per_100g}г, В:{" "}
-                  {recipe.carbs_per_100g}г
+                  Per 100g: {recipe.calories_per_100g} kcal, p:{" "}
+                  {recipe.protein_per_100g}g, f: {recipe.fat_per_100g}g, c:{" "}
+                  {recipe.carbs_per_100g}g, s: {recipe.sugar_per_100g}g
                 </p>
               </div>
 
@@ -94,7 +95,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
                 <button
                   onClick={() => setSelectedRecipe(recipe)}
                   className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors"
-                  aria-label="Переглянути деталі рецепта"
+                  aria-label="View Recipe Details"
                 >
                   📖
                 </button>
@@ -104,7 +105,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
                   onClick={() => handleDeleteConfirmation(recipe.id)}
                   disabled={isPending}
                   className="p-2 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 disabled:opacity-50 transition-colors"
-                  aria-label="Видалити рецепт"
+                  aria-label="Delete Recipe"
                 >
                   🗑️
                 </button>
@@ -113,7 +114,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
           ))
         ) : (
           <p className="text-center text-gray-500 py-10">
-            У вас ще немає збережених рецептів.
+            You don&apos;t have any saved recipes yet.
           </p>
         )}
       </div>
@@ -125,22 +126,23 @@ export function RecipeList({ recipes }: RecipeListProps) {
             <h2 className="text-2xl font-bold">{selectedRecipe.recipe_name}</h2>
 
             <div>
-              <h4 className="font-semibold">Поживна цінність (на 100г):</h4>
+              <h4 className="font-semibold">Nutrition Facts (per 100g):</h4>
               <p className="text-gray-700">
-                {selectedRecipe.calories_per_100g} ккал | Б:{" "}
-                {selectedRecipe.protein_per_100g}г | Ж:{" "}
-                {selectedRecipe.fat_per_100g}г | В:{" "}
-                {selectedRecipe.carbs_per_100g}г
+                {selectedRecipe.calories_per_100g} kcal | protein:{" "}
+                {selectedRecipe.protein_per_100g}g | fat:{" "}
+                {selectedRecipe.fat_per_100g}g | carbs:{" "}
+                {selectedRecipe.carbs_per_100g}g | sugar:{" "}
+                {selectedRecipe.sugar_per_100g}g
               </p>
             </div>
 
             <p className="text-sm text-gray-600">
-              Загальна вага страви:{" "}
-              <strong>{selectedRecipe.total_weight_g} г</strong>
+              Total Dish Weight:{" "}
+              <strong>{selectedRecipe.total_weight_g}g</strong>
             </p>
 
             <div>
-              <h4 className="font-semibold">Склад:</h4>
+              <h4 className="font-semibold">Ingredients:</h4>
               <pre className="p-3 bg-gray-100 rounded-md whitespace-pre-wrap text-sm font-sans">
                 {selectedRecipe.ingredients_text}
               </pre>

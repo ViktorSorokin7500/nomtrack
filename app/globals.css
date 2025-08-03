@@ -153,3 +153,52 @@
 .progressRing circle {
   transition: stroke-dashoffset 0.35s;
 }
+
+.spinner-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px; /* Відстань між елементами */
+}
+
+/* Стиль для кожного стовпчика спінера */
+.spinner-bar {
+  width: var(--spinner-size, 15px);
+  height: var(--spinner-size, 15px);
+  background-color: var(--spinner-color, #4a90e2);
+  border-radius: 4px;
+
+  /* Підключаємо анімацію */
+  animation: rise-animation 1.2s infinite ease-in-out;
+}
+
+/* Затримка анімації для кожного наступного елемента, що створює ефект хвилі */
+.spinner-bar:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.spinner-bar:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.spinner-bar:nth-child(4) {
+  animation-delay: 0.3s;
+}
+
+.spinner-bar:nth-child(5) {
+  animation-delay: 0.4s;
+}
+
+/* Опис самої анімації "підйому" */
+@keyframes rise-animation {
+  0%,
+  60%,
+  100% {
+    transform: scaleY(0.4);
+    opacity: 0.5;
+  }
+  30% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}

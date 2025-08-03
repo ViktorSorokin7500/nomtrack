@@ -33,7 +33,7 @@ export default async function Settings({
 
   // console.log("Результат пошуку профілю:", profile);
   if (error) {
-    console.error("Помилка пошуку профілю:", error);
+    console.error("Could not load profile:", error);
   }
 
   return (

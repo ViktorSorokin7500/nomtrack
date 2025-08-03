@@ -1,6 +1,6 @@
 "use client";
 
-import { useOptimistic, useTransition } from "react";
+import { useOptimistic, useTransition, useState } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
 import { addWaterEntry } from "@/app/actions";
@@ -11,50 +11,63 @@ interface WaterTrackerProps {
   targetWater: number;
 }
 
-const waterAmounts = [-100, -50, 50, 100];
+const quickAddAmounts = [-50, 250, 500];
 
 export function WaterTrackerCard({
   currentWater,
   targetWater,
 }: WaterTrackerProps) {
   const [isPending, startTransition] = useTransition();
+  const [customAmount, setCustomAmount] = useState("");
 
-  // Ініціалізуємо useOptimistic для миттєвого оновлення
   const [optimisticWater, addOptimisticWater] = useOptimistic(
     currentWater,
-    (state, amount: number) => state + amount
+    (state, amount: number) => {
+      const newState = state + amount;
+      return newState < 0 ? 0 : newState;
+    }
   );
 
-  const handleAddWater = async (amount: number) => {
+  // 1. Централізована функція, яка тепер містить перевірку
+  const handleUpdateWater = async (amount: number) => {
+    // Ця перевірка тепер працює для ВСІХ кнопок та поля вводу
     if (optimisticWater + amount < 0) {
-      toast.error("Не можна додати від'ємну кількість води");
+      toast.error("Water amount cannot be negative.");
       return;
     }
 
-    // Миттєво оновлюємо UI
     startTransition(() => {
       addOptimisticWater(amount);
     });
 
-    // У фоні відправляємо запит на сервер
-    await addWaterEntry(amount);
+    const result = await addWaterEntry(amount);
+    if (result?.error) {
+      toast.error(result.error);
+    }
   };
 
-  // Розраховуємо прогрес на основі ОПТИМІСТИЧНОГО значення
+  const handleAddCustomAmount = () => {
+    const amount = parseInt(customAmount, 10);
+    if (!isNaN(amount) && amount !== 0) {
+      // 2. Тепер ця функція просто викликає основний обробник
+      handleUpdateWater(amount);
+      setCustomAmount("");
+    }
+  };
+
   const progressPercent = Math.min((optimisticWater / targetWater) * 100, 100);
 
   return (
     <Card className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-xl font-medium text-stone-900 mb-4">Трекер води</h2>
+      <h2 className="text-xl font-medium text-stone-900 mb-4">Water Tracker</h2>
 
       <div className="mb-4">
         <div className="flex justify-between items-baseline mb-1">
-          {/* Показуємо оптимістичне значення */}
           <span className="text-lg font-bold text-blue-500">
-            {optimisticWater.toLocaleString()} мл
+            {optimisticWater.toLocaleString()} ml
           </span>
           <span className="text-sm text-gray-500">
-            Ціль: {targetWater.toLocaleString()} мл
+            Goal: {targetWater.toLocaleString()} ml
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -65,21 +78,42 @@ export function WaterTrackerCard({
         </div>
       </div>
 
-      <div className="text-center">
-        <p className="text-sm text-gray-600 mb-3">Швидко додати:</p>
-        <div className="flex justify-center gap-1 sm:gap-2">
-          {waterAmounts.map((amount) => (
-            <Button
-              key={amount}
-              variant="outline"
-              size="sm"
-              onClick={() => handleAddWater(amount)}
-              disabled={isPending}
-              className="bg-blue-400! hover:bg-blue-500! text-stone-50 hover:text-stone-100"
-            >
-              {amount > 0 ? `+${amount}` : amount} мл
-            </Button>
-          ))}
+      <div className="space-y-4">
+        <div className="text-center">
+          <p className="text-sm text-gray-600 mb-2">Quick Add:</p>
+          <div className="flex justify-center gap-2">
+            {quickAddAmounts.map((amount) => (
+              <Button
+                key={amount}
+                variant="outline"
+                size="sm"
+                onClick={() => handleUpdateWater(amount)}
+                disabled={isPending}
+                className="bg-blue-50 hover:bg-blue-100 text-blue-600 border-blue-200"
+              >
+                {/* 3. Невеличке покращення: додаємо '+' для позитивних значень */}
+                {amount > 0 ? `+${amount}` : amount} ml
+              </Button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            value={customAmount}
+            onChange={(e) => setCustomAmount(e.target.value)}
+            placeholder="e.g., 350 or -100"
+            className="w-full px-4 py-2 border rounded-md text-center"
+            disabled={isPending}
+          />
+          <Button
+            onClick={handleAddCustomAmount}
+            disabled={isPending || customAmount === ""}
+            className="bg-blue-500 hover:bg-blue-600 text-white"
+          >
+            Add
+          </Button>
         </div>
       </div>
     </Card>

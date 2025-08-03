@@ -13,7 +13,7 @@ export default async function RecipesPage() {
   )
     .from("user_recipes")
     .select(
-      "id, recipe_name, calories_per_100g, protein_per_100g, fat_per_100g, carbs_per_100g, ingredients_text, total_weight_g" // <-- Додаємо поля
+      "id, recipe_name, calories_per_100g, protein_per_100g, fat_per_100g, carbs_per_100g, ingredients_text, sugar_per_100g, total_weight_g" // <-- Додаємо поля
     )
     .eq("user_id", user?.id || "")
     .order("created_at", { ascending: false });
@@ -22,10 +22,8 @@ export default async function RecipesPage() {
     <section className="bg-orange-50 p-4">
       <div className="container max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Мої рецепти</h1>
-          <p className="text-gray-500">
-            Створюй та керуй своїми власними рецептами.
-          </p>
+          <h1 className="text-3xl font-bold">My Recipes</h1>
+          <p className="text-gray-500">Create and manage your own recipes.</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">

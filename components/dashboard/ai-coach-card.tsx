@@ -8,9 +8,12 @@ import { useTransition } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
 import { ActivityEntryCard } from "./activity-entry-card";
+import toast from "react-hot-toast";
 
 const activitySchema = z.object({
-  text: z.string().min(3, { message: "Опишіть активність детальніше" }),
+  text: z
+    .string()
+    .min(3, { message: "Please describe the activity in more detail" }),
 });
 type ActivitySchema = z.infer<typeof activitySchema>;
 
@@ -39,8 +42,9 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
     startTransition(async () => {
       const result = await analyzeAndSaveActivityEntry(data.text);
       if (result?.error) {
-        alert("Помилка: " + result.error);
+        toast.error(result.error);
       } else {
+        toast.success("Activity logged successfully!");
         reset();
       }
     });
@@ -52,7 +56,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
       {activityLogData.length > 0 && (
         <div className="py-2 border-b border-gray-200">
           <h3 className="text-lg font-medium text-stone-900 mb-3">
-            Сьогоднішні активності
+            Today&apos;s Activities
           </h3>
           <div className="space-y-2">
             {activityLogData.map((entry) => (
@@ -66,7 +70,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
       <div className="py-2">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-medium text-stone-900">
-            Трекер активності
+            Activity Tracker
           </h2>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -74,14 +78,14 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
             {...register("text")}
             rows={2}
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder="Опиши свою активність (напр., 'Пробіжка 45 хвилин')"
+            placeholder="Describe your activity (e.g., '45 minute run')"
           />
           {errors.text && (
             <p className="text-red-500 text-sm">{errors.text.message}</p>
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Аналіз..." : "Додати активність"}
+              {isPending ? "Analyzing..." : "Add Activity"}
             </Button>
           </div>
         </form>

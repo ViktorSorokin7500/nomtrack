@@ -203,7 +203,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
 
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Збереження..." : "Зберегти зміни"}
+            {isSubmitting ? "Saving..." : "Save Changes"}
           </Button>
         </div>
       </form>

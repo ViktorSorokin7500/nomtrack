@@ -17,7 +17,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
   const handleAddWeight = () => {
     const weightValue = parseFloat(weightInput);
     if (!weightValue || weightValue <= 0) {
-      toast.success("Введіть коректну вагу.");
+      toast.error("Please enter a valid weight");
       // alert("Введіть коректну вагу.");
       return;
     }
@@ -25,11 +25,11 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
     startTransition(async () => {
       const result = await addWeightEntry(weightValue);
       if (result?.error) {
-        toast.success("Помилка: " + result.error);
+        toast.success("Error: " + result.error);
         // alert("Помилка: " + result.error);
       } else {
         setWeightInput(""); // Очищуємо поле після успішного збереження
-        toast.success(result.success || "Вага успішно збережена!");
+        toast.success(result.success || "Weight saved successfully!");
         // alert(result.success);
       }
     });
@@ -38,7 +38,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
   return (
     <Card className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium text-stone-900">Прогрес ваги</h2>
+        <h2 className="text-xl font-medium text-stone-900">Weight Progress</h2>
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString()}
         </div>
@@ -53,9 +53,9 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
             <div className="flex-1">
               <h4 className="font-medium text-stone-900">Weight Tracking</h4>
               <div className="text-xs text-gray-600 mt-1">
-                Поточна вага:
+                Current Weight:
                 <span className="font-bold ml-1">
-                  {currentWeight ? `${currentWeight} kg` : "Не вказано"}
+                  {currentWeight ? `${currentWeight} kg` : "N/A"}
                 </span>
               </div>
             </div>
@@ -65,7 +65,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
 
       <div className="bg-blue-50 rounded-xl p-4">
         <h3 className="font-medium text-stone-900 mb-3">
-          Внести сьогоднішню вагу
+          Log today&apos;s weight
         </h3>
         <div className="flex items-end gap-3">
           <div className="flex-grow">
@@ -73,7 +73,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               htmlFor="weightInput"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Вага (kg)
+              Weight (kg)
             </label>
             <input
               id="weightInput"
@@ -82,11 +82,15 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               value={weightInput}
               onChange={(e) => setWeightInput(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="Напр., 85.5"
+              placeholder="e.g., 85.5"
             />
           </div>
-          <Button onClick={handleAddWeight} disabled={isPending}>
-            {isPending ? "Збереження..." : "Зберегти"}
+          <Button
+            onClick={handleAddWeight}
+            disabled={isPending}
+            className="my-1"
+          >
+            {isPending ? "Saving..." : "Save"}
           </Button>
         </div>
       </div>

@@ -10,21 +10,21 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import { Button } from "@/components/ui";
 
-// Схема для Magic Link (тільки email)
+// Schema for Magic Link (email only)
 const magicLinkSchema = z.object({
-  email: z.string().email({ message: "Введіть правильну адресу пошти" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
 });
 
-// Схема для входу з паролем
+// Schema for password sign-in
 const passwordSchema = z.object({
-  email: z.string().email({ message: "Введіть правильну адресу пошти" }),
-  password: z.string().min(1, { message: "Пароль не може бути порожнім" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  password: z.string().min(1, { message: "Password cannot be empty" }),
 });
 
 type MagicLinkSchema = z.infer<typeof magicLinkSchema>;
 type PasswordSchema = z.infer<typeof passwordSchema>;
 
-// Компонент форми для Magic Link
+// Magic Link form component
 const MagicLinkForm = () => {
   const {
     register,
@@ -44,9 +44,9 @@ const MagicLinkForm = () => {
     });
 
     if (error) {
-      toast.error(`Помилка: ${error.message}`);
+      toast.error(`Error: ${error.message}`);
     } else {
-      toast.success("Перевірте вашу пошту для посилання на вхід!", {
+      toast.success("Check your email for a sign-in link!", {
         duration: 6000,
       });
     }
@@ -55,7 +55,7 @@ const MagicLinkForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <p className="text-center text-sm text-gray-500">
-        Введіть вашу пошту, щоб миттєво отримати посилання для входу.
+        Enter your email to receive an instant sign-in link.
       </p>
       <div>
         <label htmlFor="email">Email</label>
@@ -71,13 +71,13 @@ const MagicLinkForm = () => {
         )}
       </div>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Відправка..." : "Отримати посилання"}
+        {isSubmitting ? "Sending..." : "Get Magic Link"}
       </Button>
     </form>
   );
 };
 
-// Компонент форми для входу з паролем
+// Password form component
 const PasswordForm = () => {
   const router = useRouter();
   const {
@@ -96,9 +96,9 @@ const PasswordForm = () => {
     });
 
     if (error) {
-      toast.error(`Помилка входу: ${error.message}`);
+      toast.error(`Sign-in error: ${error.message}`);
     } else {
-      toast.success("Вхід успішний! Перенаправляємо...");
+      toast.success("Sign-in successful! Redirecting...");
       router.push("/dashboard");
       router.refresh();
     }
@@ -119,7 +119,7 @@ const PasswordForm = () => {
         )}
       </div>
       <div>
-        <label htmlFor="password">Пароль</label>
+        <label htmlFor="password">Password</label>
         <input
           id="password"
           type="password"
@@ -131,13 +131,13 @@ const PasswordForm = () => {
         )}
       </div>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Вхід..." : "Увійти"}
+        {isSubmitting ? "Signing in..." : "Sign In"}
       </Button>
     </form>
   );
 };
 
-// Головний компонент сторінки
+// Main page component
 export default function SignInPage() {
   const [view, setView] = useState<"magic_link" | "password">("magic_link");
 
@@ -151,17 +151,19 @@ export default function SignInPage() {
     });
 
     if (error) {
-      toast.error(`Помилка входу через Google: ${error.message}`);
+      toast.error(`Google sign-in error: ${error.message}`);
     }
   };
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-4 text-center">Вхід в акаунт</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">
+        Sign In to Your Account
+      </h1>
 
       {view === "magic_link" ? <MagicLinkForm /> : <PasswordForm />}
 
-      {/* Перемикач режимів */}
+      {/* View switcher */}
       <div className="text-center mt-4">
         <a
           href="#"
@@ -172,19 +174,19 @@ export default function SignInPage() {
           className="text-sm font-medium text-orange-500 hover:underline"
         >
           {view === "magic_link"
-            ? "Увійти за допомогою пароля"
-            : "Увійти за магічним посиланням"}
+            ? "Sign in with password"
+            : "Sign in with a magic link"}
         </a>
       </div>
 
-      {/* Розділювач */}
+      {/* Divider */}
       <div className="relative flex py-5 items-center">
         <div className="flex-grow border-t border-gray-300"></div>
-        <span className="flex-shrink mx-4 text-gray-400 text-sm">АБО</span>
+        <span className="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
         <div className="flex-grow border-t border-gray-300"></div>
       </div>
 
-      {/* Вхід через Google */}
+      {/* Google Sign-In */}
       <Button
         variant="outline"
         onClick={handleSignInWithGoogle}
@@ -208,17 +210,17 @@ export default function SignInPage() {
             d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.244,44,30.036,44,24C44,22.659,43.862,21.35,43.611,20.083z"
           ></path>
         </svg>
-        Продовжити з Google
+        Continue with Google
       </Button>
 
-      {/* Посилання на реєстрацію */}
+      {/* Sign-up link */}
       <p className="text-center text-sm text-gray-600 mt-8">
-        Не маєте акаунту?{" "}
+        Don&apos;t have an account?{" "}
         <Link
           href="/sign-up"
           className="font-medium text-orange-500 hover:underline"
         >
-          Зареєструватися
+          Sign up
         </Link>
       </p>
     </div>

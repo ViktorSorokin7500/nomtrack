@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import Together from "together-ai";
+import { type FoodEntryFormSchema } from "@/lib/validators";
 
 // Наша Server Action для оновлення особистих даних
 export async function updatePersonalInfo(formData: {
@@ -77,17 +78,6 @@ type AiIngredientsResponse = {
   ingredients: Ingredient[];
 };
 
-type ManualEntryData = {
-  entry_text: string;
-  meal_type: string;
-  calories: number;
-  protein_g: number;
-  fat_g: number;
-  carbs_g: number;
-  sugar_g: number;
-  water_ml: number;
-};
-
 // Нова Server Action для оновлення харчових цілей
 export async function updateNutritionTargets(formData: unknown) {
   const supabase = createClient();
@@ -142,7 +132,7 @@ Your step-by-step logic:
 3. If the user provides a common dish name (e.g. "Borscht", "Caesar salad") without ingredients, deconstruct it into typical ingredients with approximate weights per standard portion. Adjust portion size if words like “large” or “small” are present.
 4. Exclude emotional, irrelevant, or decorative phrases.
 5. Output ONLY a valid JSON object in the format below without any additional text or explanations.
-
+I will kill you if you will return anything else than JSON.
 JSON format:
 {
   "ingredients": [
@@ -358,8 +348,9 @@ Your job is to analyze a user's physical activity description and estimate the t
 1. If the user's input is not in English, translate it to English before analyzing.
 2. Estimate calories burned based on the activity type and duration.
 3. If the input is vague or missing key data (e.g. no duration), make a realistic assumption based on common values.
-
-Return ONLY a valid JSON object in the following format:
+4. If the text is NOT a physical activity (e.g., "hello world", "2+2", "what is the weather"), return 0 for calories_burned.
+I will kill you if you will return anything else than JSON.
+Return ONLY a valid JSON, without any additional text. The JSON should be an object in the following format:
 {
   "calories_burned": <integer>
 }
@@ -385,10 +376,30 @@ Your JSON Response: { "calories_burned": 400 }
     });
 
     const content = response.choices?.[0]?.message?.content;
+
     if (!content) {
       return { error: "ШІ не повернув результат" };
     }
-    const { calories_burned } = JSON.parse(content);
+
+    const startIndex = content.indexOf("{");
+    const endIndex = content.lastIndexOf("}");
+
+    // 2. Перевіряємо, чи знайдено JSON
+    if (startIndex === -1 || endIndex === -1) {
+      console.error("Не знайдено JSON у відповіді від AI:", content);
+      return { error: "Некоректна відповідь від AI. Спробуйте ще раз." };
+    }
+
+    // 3. Вирізаємо чисту JSON-строку
+    const jsonString = content.substring(startIndex, endIndex + 1);
+
+    const { calories_burned } = JSON.parse(jsonString);
+    if (!calories_burned || calories_burned <= 0) {
+      return {
+        error:
+          "Це не схоже на фізичну активність. Спробуйте описати її інакше.",
+      };
+    }
 
     const { error: insertError } = await (await supabase)
       .from("activity_entries")
@@ -413,27 +424,101 @@ Your JSON Response: { "calories_burned": 400 }
   }
 }
 
-export async function addManualFoodEntry(entryData: ManualEntryData) {
+export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
+  console.log("--- Server Action 'addManualFoodEntry' запущено ---");
+  console.log("Отримані дані з форми:", entryData);
+
+  // Перевіряємо, що ми в правильному режимі
+  if (entryData.entry_mode !== "manual") {
+    return { error: "Неправильний режим для цього екшену" };
+  }
+
   const supabase = createClient();
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
 
   if (!user) {
+    console.error("Помилка: Користувач не авторизований.");
     return { error: "Ви не авторизовані" };
   }
 
-  // Просто вставляємо пораховані дані
-  const { error } = await (await supabase)
-    .from("food_entries")
-    .insert([{ ...entryData, user_id: user.id }]);
+  // Використовуємо 'try...catch' для відлову будь-яких непередбачуваних помилок
+  try {
+    const {
+      entry_text,
+      meal_type,
+      calc_mode,
+      calories,
+      protein_g,
+      fat_g,
+      carbs_g,
+      sugar_g,
+      weight_eaten,
+      servings,
+    } = entryData;
 
-  if (error) {
-    return { error: "Не вдалося зберегти запис: " + error.message };
+    const finalData = {
+      calories: 0,
+      protein_g: 0,
+      fat_g: 0,
+      carbs_g: 0,
+      sugar_g: 0,
+    };
+
+    // --- ЛОГІКА РОЗРАХУНКУ ---
+    if (calc_mode === "per100g") {
+      const multiplier = (weight_eaten || 0) / 100;
+      finalData.calories = (calories || 0) * multiplier;
+      finalData.protein_g = (protein_g || 0) * multiplier;
+      finalData.fat_g = (fat_g || 0) * multiplier;
+      finalData.carbs_g = (carbs_g || 0) * multiplier;
+      finalData.sugar_g = (sugar_g || 0) * multiplier;
+    } else {
+      // Режим "на порцію"
+      const servingsCount = servings || 1;
+      finalData.calories = (calories || 0) * servingsCount;
+      finalData.protein_g = (protein_g || 0) * servingsCount;
+      finalData.fat_g = (fat_g || 0) * servingsCount;
+      finalData.carbs_g = (carbs_g || 0) * servingsCount;
+      finalData.sugar_g = (sugar_g || 0) * servingsCount;
+    }
+
+    console.log("Дані після розрахунку:", finalData);
+
+    const dataToInsert = {
+      user_id: user.id,
+      entry_text: entry_text,
+      meal_type: meal_type,
+      calories: Math.round(finalData.calories),
+      protein_g: Math.round(finalData.protein_g),
+      fat_g: Math.round(finalData.fat_g),
+      carbs_g: Math.round(finalData.carbs_g),
+      sugar_g: Math.round(finalData.sugar_g),
+      water_ml: 0,
+    };
+
+    console.log("Об'єкт для запису в БД:", dataToInsert);
+
+    const { error } = await (await supabase)
+      .from("food_entries")
+      .insert([dataToInsert]);
+
+    if (error) {
+      console.error("ПОМИЛКА ЗАПИСУ В SUPABASE:", error);
+      return { error: "Помилка бази даних: " + error.message };
+    }
+
+    revalidatePath("/dashboard");
+    console.log("--- Запис успішно додано! ---");
+    return { success: "Запис успішно додано!" };
+  } catch (e) {
+    console.error("КРИТИЧНА ПОМИЛКА В ЕКШЕНІ addManualFoodEntry:", e);
+    if (e instanceof Error) {
+      return { error: `Невідома помилка на сервері: ${e.message}` };
+    }
+    return { error: "Невідома помилка на сервері." };
   }
-
-  revalidatePath("/dashboard");
-  return { success: "Запис успішно додано!" };
 }
 
 export async function createAndAnalyzeRecipe(formData: {
@@ -470,7 +555,8 @@ export async function createAndAnalyzeRecipe(formData: {
       2. For items by count (like eggs, onions, etc.), use a standard average weight to calculate the total weight in grams. (e.g., "8 large eggs" -> assume 60g per egg -> weightGrams: 480).
       3. For liquids in "ml", assume density is 1 g/ml. (e.g., "200 ml milk" -> weightGrams: 200).
       4. The 'ingredientName' should be a clean, simple English name suitable for an API query (e.g., "cauliflower", "large eggs", "milk").
-
+      5. If the input text does not appear to be a list of ingredients, or if it's nonsensical, return an empty JSON array: []
+      I will kill you if you will return anything else than JSON.
       Return the output ONLY as a valid JSON array of objects. Each object must have two keys: "ingredientName" (string) and "weightGrams" (number).
 
       Input List:
@@ -526,6 +612,13 @@ export async function createAndAnalyzeRecipe(formData: {
       throw new Error(
         "Не вдалося обробити відповідь від AI. Спробуйте змінити інгредієнти."
       );
+    }
+
+    if (!normalizedIngredients || normalizedIngredients.length === 0) {
+      return {
+        error:
+          "Не вдалося розпізнати інгредієнти. Будь ласка, введіть список продуктів та їх вагу.",
+      };
     }
 
     // 3. Обробляємо кожен нормалізований інгредієнт
@@ -687,4 +780,43 @@ export async function deleteRecipe(recipeId: string) {
   revalidatePath("/recipes");
 
   return { success: "Рецепт успішно видалено." };
+}
+
+export async function deleteFoodEntry(entryId: number) {
+  console.log(`--- Server Action 'deleteFoodEntry' для ID: ${entryId} ---`);
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+
+  if (!user) {
+    console.error("Помилка видалення: Користувач не авторизований.");
+    return { error: "Ви не авторизовані" };
+  }
+
+  try {
+    const { error } = await (
+      await supabase
+    )
+      .from("food_entries")
+      .delete()
+      .eq("user_id", user.id) // Дуже важливо: перевіряємо, що користувач видаляє СВІЙ запис
+      .eq("id", entryId);
+
+    if (error) {
+      console.error("ПОМИЛКА ВИДАЛЕННЯ З SUPABASE:", error);
+      return { error: "Помилка бази даних: " + error.message };
+    }
+
+    revalidatePath("/dashboard");
+    console.log("--- Запис успішно видалено! ---");
+    return { success: "Запис видалено!" };
+  } catch (e) {
+    console.error("КРИТИЧНА ПОМИЛКА В ЕКШЕНІ deleteFoodEntry:", e);
+    if (e instanceof Error) {
+      return { error: `Невідома помилка на сервері: ${e.message}` };
+    }
+    return { error: "Невідома помилка на сервері." };
+  }
 }

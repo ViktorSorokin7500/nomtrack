@@ -42,19 +42,23 @@ export default async function Dashboard({
   tomorrow.setDate(today.getDate() + 1);
 
   // --- ЗАВАНТАЖУЄМО ВСІ СЬОГОДНІШНІ ДАНІ ---
-  const { data: foodEntries } = await (await supabase)
-    .from("food_entries")
-    .select("*")
-    .eq("user_id", user.id)
-    .gte("created_at", today.toISOString())
-    .lt("created_at", tomorrow.toISOString());
+  const [foodEntriesResult, activityEntriesResult] = await Promise.all([
+    (await supabase)
+      .from("food_entries")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("created_at", today.toISOString())
+      .lt("created_at", tomorrow.toISOString()),
+    (await supabase)
+      .from("activity_entries")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("created_at", today.toISOString())
+      .lt("created_at", tomorrow.toISOString()),
+  ]);
 
-  const { data: activityEntries } = await (await supabase)
-    .from("activity_entries")
-    .select("*")
-    .eq("user_id", user.id)
-    .gte("created_at", today.toISOString())
-    .lt("created_at", tomorrow.toISOString());
+  const foodEntries = foodEntriesResult.data;
+  const activityEntries = activityEntriesResult.data;
 
   // --- РОЗРАХОВУЄМО ПІДСУМКИ СПОЖИТОГО/СПАЛЕНОГО ---
   const consumedCalories =
@@ -65,6 +69,8 @@ export default async function Dashboard({
     foodEntries?.reduce((sum, entry) => sum + (entry.fat_g || 0), 0) || 0;
   const consumedCarbs =
     foodEntries?.reduce((sum, entry) => sum + (entry.carbs_g || 0), 0) || 0;
+  const consumedSugar =
+    foodEntries?.reduce((sum, entry) => sum + (entry.sugar_g || 0), 0) || 0;
   const totalWater =
     foodEntries?.reduce((sum, entry) => sum + (entry.water_ml || 0), 0) || 0;
   const burnedCalories =
@@ -79,6 +85,7 @@ export default async function Dashboard({
   const baseTargetProtein = profile.target_protein_g || 120;
   const baseTargetCarbs = profile.target_carbs_g || 250;
   const baseTargetFat = profile.target_fat_g || 70;
+  const baseTargetSugar = profile.target_sugar_g || 30;
 
   // 2. Розраховуємо нову ціль по калоріях
   const adjustedTargetCalories = baseTargetCalories + burnedCalories;
@@ -110,13 +117,22 @@ export default async function Dashboard({
       protein: { current: consumedProtein, target: adjustedTargetProtein }, // <-- Нова ціль
       fat: { current: consumedFat, target: adjustedTargetFat }, // <-- Нова ціль
       carbs: { current: consumedCarbs, target: adjustedTargetCarbs }, // <-- Нова ціль
+      sugar: { current: consumedSugar, target: baseTargetSugar },
     },
   };
 
   return (
     <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-1 space-y-6">
+        <div className="lg:col-span-2 lg:order-2">
+          <NutritionDashboard
+            summaryData={summaryData}
+            foodLogData={
+              foodEntries?.filter((e) => e.meal_type !== "water") || []
+            }
+          />
+        </div>
+        <div className="lg:col-span-1 space-y-6 lg:order-1">
           <SummaryCard currentWeight={profile.current_weight_kg} />
           <WaterTrackerCard
             currentWater={totalWater}
@@ -124,14 +140,6 @@ export default async function Dashboard({
             key={totalWater}
           />
           <AICoachCard activityLogData={activityEntries || []} />
-        </div>
-        <div className="lg:col-span-2">
-          <NutritionDashboard
-            summaryData={summaryData}
-            foodLogData={
-              foodEntries?.filter((e) => e.meal_type !== "water") || []
-            }
-          />
         </div>
       </div>
     </div>

@@ -16,7 +16,7 @@ export function FeatureCard({
   iconPath,
 }: FeatureCardProps) {
   return (
-    <div className="feature-card bg-orange-50 rounded-2xl p-6 shadow-sm transition duration-300 hover:-translate-y-2">
+    <div className="feature-card bg-stone-50 rounded-2xl p-6 shadow-sm transition duration-300 hover:-translate-y-2">
       <div
         className={`size-14 ${iconColor} opacity-80 shadow-lg rounded-full flex items-center justify-center mb-5`}
       >

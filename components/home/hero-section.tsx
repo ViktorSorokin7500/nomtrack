@@ -1,9 +1,9 @@
 import { Locale } from "@/i18n.config";
-import Link from "next/link";
 import React from "react";
-import { Button } from "../ui";
 
 export function HeroSection({ lang }: { lang: Locale }) {
+  console.log(lang);
+
   return (
     <section className="container mx-auto px-4 py-16 lg:py-24 flex flex-col lg:flex-row items-center">
       <div className="lg:w-1/2 mb-10 lg:mb-0">
@@ -11,30 +11,15 @@ export function HeroSection({ lang }: { lang: Locale }) {
           Welcome to
           <br className="sm:hidden lg:block xl:hidden" />
           <span className="bg-gradient-to-r from-orange-400 to-green-300 text-white px-4 parallelogram">
-            Nom Track
+            NomTrack
           </span>{" "}
           — Your Smart Calorie &amp; Macro Tracker
         </h1>
         <p className="text-lg mb-8 text-gray-700">
-          Take control of your nutrition with the help of AI. Nom Track is a
+          Take control of your nutrition with the help of AI. NomTrack is a
           modern tool designed to make healthy eating easy, personalized, and
           enjoyable.
         </p>
-        <div className="flex flex-col sm:flex-row sm:justify-center lg:justify-start space-y-4 sm:space-y-0 sm:space-x-4">
-          <Button
-            asChild
-            className="px-6 py-3 cursor-pointer rounded-full bg-orange-300 text-white font-medium hover:bg-orange-400 transition-colors duration-300"
-          >
-            <Link href={`/${lang}/sign-in`}>Get Started</Link>
-          </Button>
-
-          <Button
-            asChild
-            className="px-6 py-3 cursor-pointer rounded-full border border-green-200 text-charcoal font-medium bg-inherit hover:bg-green-50 transition-colors  duration-300"
-          >
-            <Link href={`/${lang}/sign-in`}>Watch Demo</Link>
-          </Button>
-        </div>
       </div>
       <div className="lg:w-1/2 flex justify-center">
         <div className="relative w-full md:w-md max-w-md">
