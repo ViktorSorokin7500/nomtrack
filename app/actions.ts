@@ -4,7 +4,17 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import Together from "together-ai";
-import { type FoodEntryFormSchema } from "@/lib/validators";
+import { type FoodEntryFormSchema, foodEntrySchema } from "@/lib/validators";
+
+const personalInfoSchema = z.object({
+  full_name: z.string().optional(),
+  current_weight_kg: z.coerce.number().positive(),
+  height_cm: z.coerce.number().positive().int(),
+  age: z.coerce.number().positive().int(),
+  gender: z.string(),
+  activity_level: z.string(),
+  goal: z.string(),
+});
 
 // Наша Server Action для оновлення особистих даних
 export async function updatePersonalInfo(formData: {
@@ -23,6 +33,11 @@ export async function updatePersonalInfo(formData: {
   } = await (await supabase).auth.getUser();
   if (!user) {
     return { error: "Ви не авторизовані" };
+  }
+
+  const result = personalInfoSchema.safeParse(formData);
+  if (!result.success) {
+    return { error: "Неправильні дані: " + result.error.flatten().fieldErrors };
   }
 
   const { error } = await (
@@ -132,7 +147,7 @@ Your step-by-step logic:
 3. If the user provides a common dish name (e.g. "Borscht", "Caesar salad") without ingredients, deconstruct it into typical ingredients with approximate weights per standard portion. Adjust portion size if words like “large” or “small” are present.
 4. Exclude emotional, irrelevant, or decorative phrases.
 5. Output ONLY a valid JSON object in the format below without any additional text or explanations.
-I will kill you if you will return anything else than JSON.
+Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
 JSON format:
 {
   "ingredients": [
@@ -168,7 +183,7 @@ JSON:
 User Text: ${text}
 Your JSON Response:`;
 
-    console.log(text);
+    console.log("updateNutritionTargets actions text =>", text);
 
     const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
     const aiResponse = await together.chat.completions.create({
@@ -178,6 +193,8 @@ Your JSON Response:`;
     });
 
     let aiContent = aiResponse.choices?.[0]?.message?.content;
+
+    console.log("updateNutritionTargets actions aiContent =>", aiContent);
 
     if (!aiContent) return { error: "ШІ не розпізнам інгредієнти" };
 
@@ -220,6 +237,7 @@ Your JSON Response:`;
     };
 
     for (const item of nutritionData.items) {
+      console.log("updateNutritionTargets actions item =>", item);
       totals.calories += item.calories;
       totals.protein_g += item.protein_g;
       totals.fat_g += item.fat_total_g;
@@ -349,7 +367,7 @@ Your job is to analyze a user's physical activity description and estimate the t
 2. Estimate calories burned based on the activity type and duration.
 3. If the input is vague or missing key data (e.g. no duration), make a realistic assumption based on common values.
 4. If the text is NOT a physical activity (e.g., "hello world", "2+2", "what is the weather"), return 0 for calories_burned.
-I will kill you if you will return anything else than JSON.
+Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
 Return ONLY a valid JSON, without any additional text. The JSON should be an object in the following format:
 {
   "calories_burned": <integer>
@@ -425,6 +443,12 @@ Your JSON Response: { "calories_burned": 400 }
 }
 
 export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
+  const validationResult = foodEntrySchema.safeParse(entryData);
+  if (!validationResult.success) {
+    console.error("Помилка серверної валідації:", validationResult.error);
+    return { error: "Некоректні дані, надіслані на сервер." };
+  }
+
   console.log("--- Server Action 'addManualFoodEntry' запущено ---");
   console.log("Отримані дані з форми:", entryData);
 
@@ -556,7 +580,7 @@ export async function createAndAnalyzeRecipe(formData: {
       3. For liquids in "ml", assume density is 1 g/ml. (e.g., "200 ml milk" -> weightGrams: 200).
       4. The 'ingredientName' should be a clean, simple English name suitable for an API query (e.g., "cauliflower", "large eggs", "milk").
       5. If the input text does not appear to be a list of ingredients, or if it's nonsensical, return an empty JSON array: []
-      I will kill you if you will return anything else than JSON.
+      Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
       Return the output ONLY as a valid JSON array of objects. Each object must have two keys: "ingredientName" (string) and "weightGrams" (number).
 
       Input List:

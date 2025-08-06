@@ -20,19 +20,21 @@ export function BodyMeasurements({
   waist,
 }: MeasurementsProps) {
   const measurementsList = [
-    { id: "weight", label: "Вага", value: weight, unit: "кг" },
-    { id: "waist", label: "Талія", value: waist, unit: "см" },
-    { id: "belly", label: "Живіт", value: belly, unit: "см" },
+    { id: "weight", label: "Weight", value: weight, unit: "kg " },
+    { id: "waist", label: "Waist", value: waist, unit: "cm " },
+    { id: "belly", label: "Belly ", value: belly, unit: "cm " },
   ];
 
   return (
     <Card className="p-5 lg:col-span-2">
-      <h3 className="text-lg font-semibold text-gray-800 mb-4">Заміри тіла</h3>
+      <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        Body Measurements
+      </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
         <div className="flex justify-center items-center h-full">
           <Image
             src={gender === "female" ? Woman : Man}
-            alt="Модель тіла"
+            alt="Body Model"
             width={300}
             height={500}
             className="object-contain max-h-[450px] w-auto"

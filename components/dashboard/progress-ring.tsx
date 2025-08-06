@@ -10,9 +10,21 @@ export function ProgressRing({
   className = "",
 }: ProgressRingProps) {
   const radius = 50;
-  const circumference = 2 * Math.PI * radius; // 314
-  const progress = current / target;
-  const dashOffset = circumference * (1 - progress);
+  const circumference = 2 * Math.PI * radius;
+
+  // 1. Розраховуємо фактичний прогрес (може бути > 1)
+  const progress = target > 0 ? current / target : 0;
+
+  // 2. Обмежуємо ВІЗУАЛЬНИЙ прогрес максимумом в 1 (100%)
+  // Це ключова зміна, яка вирішує проблему.
+  const clampedProgress = Math.min(progress, 1);
+
+  // 3. Розраховуємо зсув на основі обмеженого значення
+  const dashOffset = circumference * (1 - clampedProgress);
+
+  // 4. (Покращення UX) Визначаємо колір залежно від прогресу
+  // Якщо ціль перевищено, кільце стає червоним.
+  const ringColor = progress > 1 ? "text-red-400" : "text-orange-200";
 
   return (
     <div className={`relative size-30 ${className}`}>
@@ -27,7 +39,8 @@ export function ProgressRing({
           cy="60"
         />
         <circle
-          className="text-orange-200"
+          // 5. Застосовуємо динамічний колір та анімацію
+          className={`${ringColor} transition-colors duration-500`}
           strokeWidth="8"
           stroke="currentColor"
           fill="transparent"
@@ -36,6 +49,7 @@ export function ProgressRing({
           cy="60"
           strokeDasharray={circumference}
           strokeDashoffset={dashOffset}
+          style={{ transition: "stroke-dashoffset 0.5s ease-out" }}
         />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">

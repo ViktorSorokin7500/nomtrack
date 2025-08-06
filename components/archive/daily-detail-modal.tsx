@@ -37,12 +37,12 @@ export function DailyDetailModal({
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            Підсумок за {day.date},{" "}
+            Summary for {day.date},{" "}
             {new Date(day.fullDate + "T00:00:00Z").getFullYear()}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-700 text-3xl"
+            className="text-gray-500 hover:text-gray-700 text-3xl cursor-pointer"
             aria-label="close"
           >
             &times;
@@ -52,16 +52,14 @@ export function DailyDetailModal({
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Ліва колонка з основними показниками */}
           <div className="p-5 rounded-lg bg-gray-50">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Харчування
-            </h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Food</h3>
             <div className="space-y-4">
               {/* Калорії */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Калорії</span>
+                  <span className="text-gray-600">Calories</span>
                   <span className="font-bold text-gray-800">
-                    {day.consumed_calories} / {day.target_calories} ккал
+                    {day.consumed_calories} / {day.target_calories} kcal
                   </span>
                 </div>
                 <ProgressBar
@@ -73,9 +71,9 @@ export function DailyDetailModal({
               {/* Білки */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Білки</span>
+                  <span className="text-gray-600">Protein</span>
                   <span className="font-bold text-gray-800">
-                    {day.consumed_protein_g} / {day.target_protein_g} г
+                    {day.consumed_protein_g} / {day.target_protein_g} g
                   </span>
                 </div>
                 <ProgressBar
@@ -87,9 +85,9 @@ export function DailyDetailModal({
               {/* Жири */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Жири</span>
+                  <span className="text-gray-600">Fat</span>
                   <span className="font-bold text-gray-800">
-                    {day.consumed_fat_g} / {day.target_fat_g} г
+                    {day.consumed_fat_g} / {day.target_fat_g} g
                   </span>
                 </div>
                 <ProgressBar
@@ -101,9 +99,9 @@ export function DailyDetailModal({
               {/* Вуглеводи */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Вуглеводи</span>
+                  <span className="text-gray-600">Carbs</span>
                   <span className="font-bold text-gray-800">
-                    {day.consumed_carbs_g} / {day.target_carbs_g} г
+                    {day.consumed_carbs_g} / {day.target_carbs_g} g
                   </span>
                 </div>
                 <ProgressBar
@@ -115,9 +113,9 @@ export function DailyDetailModal({
               {/* Цукор */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Цукор</span>
+                  <span className="text-gray-600">Sugar</span>
                   <span className="font-bold text-gray-800">
-                    {day.consumed_sugar_g} / {day.target_sugar_g} г
+                    {day.consumed_sugar_g} / {day.target_sugar_g} g
                   </span>
                 </div>
                 <ProgressBar
@@ -129,9 +127,9 @@ export function DailyDetailModal({
               {/* Вода */}
               <div>
                 <div className="flex justify-between mb-1">
-                  <span className="text-gray-600">Вода</span>
+                  <span className="text-gray-600">Water</span>
                   <span className="font-bold text-gray-800">
-                    {day.consumed_water_ml} / {day.target_water_ml} мл
+                    {day.consumed_water_ml} / {day.target_water_ml} ml
                   </span>
                 </div>
                 <ProgressBar

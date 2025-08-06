@@ -71,10 +71,10 @@ export default async function ArchivePage({
 
   if (profileError || summariesError) {
     console.error(
-      "Помилка завантаження даних для архіву:",
+      "Failed to load archive data:",
       profileError || summariesError
     );
-    return <div>Помилка завантаження даних. Спробуйте пізніше.</div>;
+    return <div>Failed to load data. Please try again later.</div>;
   }
 
   const nutritionData = groupDataByYearAndMonth(summaries || []);

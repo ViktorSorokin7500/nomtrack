@@ -156,6 +156,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 {calcMode === "per100g" ? (
                   <input
                     type="number"
+                    step={0.01}
                     placeholder="Weight (g)"
                     {...register("weight_eaten")}
                     className="p-2 border rounded"
@@ -163,6 +164,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 ) : (
                   <input
                     type="number"
+                    step={0.01}
                     placeholder="Servings"
                     {...register("servings")}
                     className="p-2 border rounded"
@@ -170,6 +172,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 )}
                 <input
                   type="number"
+                  step={0.01}
                   placeholder={`Calories  (per  ${
                     calcMode === "per100g" ? "100г" : "serving"
                   })`}
@@ -178,6 +181,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 />
                 <input
                   type="number"
+                  step={0.01}
                   placeholder={`Protein  (per  ${
                     calcMode === "per100g" ? "100г" : "serving"
                   })`}
@@ -186,6 +190,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 />
                 <input
                   type="number"
+                  step={0.01}
                   placeholder={`Fat  (per  ${
                     calcMode === "per100g" ? "100г" : "serving"
                   })`}
@@ -194,6 +199,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 />
                 <input
                   type="number"
+                  step={0.01}
                   placeholder={`Carbs  (per  ${
                     calcMode === "per100g" ? "100г" : "serving"
                   })`}
@@ -202,6 +208,7 @@ export function MealCard({ availableMealTypes, className }: MealCardProps) {
                 />
                 <input
                   type="number"
+                  step={0.01}
                   placeholder={`Sugar (per  ${
                     calcMode === "per100g" ? "100г" : "serving"
                   })`}

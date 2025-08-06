@@ -28,14 +28,14 @@ export function DailyCard({ day, userProfile }: DailyCardProps) {
         </div>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-600">Калорії (спожито):</span>
+            <span className="text-gray-600">Calories (consumed):</span>
             <span className="font-semibold text-gray-800">
               {day.consumed_calories}
             </span>
           </div>
           {day.end_of_day_weight && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Вага:</span>
+              <span className="text-gray-600">Weight:</span>
               <span className="font-semibold text-gray-800">
                 {day.end_of_day_weight} kg
               </span>

@@ -17,16 +17,16 @@ export function NutritionArchive({
   return (
     <section className="container mx-auto px-4 py-8 max-w-7xl">
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Архів</h1>
-        <p className="text-gray-600">Твоя історія харчування та прогресу</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Archive</h1>
+        <p className="text-gray-600">Your Food & Progress History</p>
       </header>
 
       {nutritionData.length === 0 ? (
         <div className="text-center text-gray-500 py-16">
-          <p>Тут поки що порожньо.</p>
+          <p>Nothing here yet.</p>
           <p>
-            Дані зmявляться тут наступного дня після того, як ти почнеш вести
-            щоденник.
+            Your data will show up here the day after you start logging your
+            entries.
           </p>
         </div>
       ) : (
