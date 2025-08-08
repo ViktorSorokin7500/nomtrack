@@ -15,7 +15,7 @@ export function ActivityEntryCard({ entry }: ActivityEntryCardProps) {
         <span className="font-bold block text-red-500">
           -{entry.calories_burned}
         </span>
-        <span className="text-xs text-gray-600">ккал</span>
+        <span className="text-xs text-gray-600">kcal</span>
       </div>
     </div>
   );

@@ -787,8 +787,6 @@ export async function deleteRecipe(recipeId: string) {
     return { error: "Ви не авторизовані." };
   }
 
-  // Видаляємо рецепт, але ТІЛЬКИ якщо він належить поточному користувачу
-  // Це важливий крок для безпеки!
   const { error } = await supabase
     .from("user_recipes")
     .delete()
@@ -807,37 +805,29 @@ export async function deleteRecipe(recipeId: string) {
 }
 
 export async function deleteFoodEntry(entryId: number) {
-  console.log(`--- Server Action 'deleteFoodEntry' для ID: ${entryId} ---`);
-
   const supabase = createClient();
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
 
   if (!user) {
-    console.error("Помилка видалення: Користувач не авторизований.");
     return { error: "Ви не авторизовані" };
   }
 
   try {
-    const { error } = await (
-      await supabase
-    )
+    const { error } = await (await supabase)
       .from("food_entries")
       .delete()
-      .eq("user_id", user.id) // Дуже важливо: перевіряємо, що користувач видаляє СВІЙ запис
+      .eq("user_id", user.id)
       .eq("id", entryId);
 
     if (error) {
-      console.error("ПОМИЛКА ВИДАЛЕННЯ З SUPABASE:", error);
       return { error: "Помилка бази даних: " + error.message };
     }
-
     revalidatePath("/dashboard");
-    console.log("--- Запис успішно видалено! ---");
+
     return { success: "Запис видалено!" };
   } catch (e) {
-    console.error("КРИТИЧНА ПОМИЛКА В ЕКШЕНІ deleteFoodEntry:", e);
     if (e instanceof Error) {
       return { error: `Невідома помилка на сервері: ${e.message}` };
     }
