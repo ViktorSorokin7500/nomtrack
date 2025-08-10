@@ -5,6 +5,7 @@ import { ProgressRing } from "./progress-ring";
 import { ProgressBar } from "./progress-bar";
 import { MealCard } from "./meal-card";
 import { FoodEntryCard } from "./food-entry-card";
+import { UserRecipe } from "@/types";
 
 // Тип для одного запису їжі, що приходить з сервера
 type FoodEntry = {
@@ -34,6 +35,7 @@ interface NutritionDashboardProps {
     };
   };
   foodLogData: FoodEntry[];
+  userRecipes: UserRecipe[];
 }
 
 const MAIN_MEALS = ["breakfast", "lunch", "dinner"];
@@ -41,6 +43,7 @@ const MAIN_MEALS = ["breakfast", "lunch", "dinner"];
 export function NutritionDashboard({
   summaryData,
   foodLogData,
+  userRecipes,
 }: NutritionDashboardProps) {
   // Визначаємо, які основні прийоми їжі вже були додані сьогодні
   const loggedMealTypes = foodLogData.map((entry) => entry.meal_type);
@@ -151,7 +154,10 @@ export function NutritionDashboard({
         )}
 
         {/* Завжди показуємо одну універсальну картку для додавання нового запису */}
-        <MealCard availableMealTypes={availableMealTypes} />
+        <MealCard
+          availableMealTypes={availableMealTypes}
+          userRecipes={userRecipes}
+        />
       </div>
     </Card>
   );

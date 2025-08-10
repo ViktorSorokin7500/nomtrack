@@ -42,23 +42,26 @@ export default async function Dashboard({
   tomorrow.setDate(today.getDate() + 1);
 
   // --- ЗАВАНТАЖУЄМО ВСІ СЬОГОДНІШНІ ДАНІ ---
-  const [foodEntriesResult, activityEntriesResult] = await Promise.all([
-    (await supabase)
-      .from("food_entries")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("created_at", today.toISOString())
-      .lt("created_at", tomorrow.toISOString()),
-    (await supabase)
-      .from("activity_entries")
-      .select("*")
-      .eq("user_id", user.id)
-      .gte("created_at", today.toISOString())
-      .lt("created_at", tomorrow.toISOString()),
-  ]);
+  const [foodEntriesResult, activityEntriesResult, userRecipesResult] =
+    await Promise.all([
+      (await supabase)
+        .from("food_entries")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("created_at", today.toISOString())
+        .lt("created_at", tomorrow.toISOString()),
+      (await supabase)
+        .from("activity_entries")
+        .select("*")
+        .eq("user_id", user.id)
+        .gte("created_at", today.toISOString())
+        .lt("created_at", tomorrow.toISOString()),
+      (await supabase).from("user_recipes").select("*").eq("user_id", user.id),
+    ]);
 
   const foodEntries = foodEntriesResult.data;
   const activityEntries = activityEntriesResult.data;
+  const userRecipes = userRecipesResult.data || [];
 
   // --- РОЗРАХОВУЄМО ПІДСУМКИ СПОЖИТОГО/СПАЛЕНОГО ---
   const consumedCalories =
@@ -130,6 +133,7 @@ export default async function Dashboard({
             foodLogData={
               foodEntries?.filter((e) => e.meal_type !== "water") || []
             }
+            userRecipes={userRecipes}
           />
         </div>
         <div className="lg:col-span-1 space-y-6 lg:order-1">

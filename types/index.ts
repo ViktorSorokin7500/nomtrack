@@ -47,3 +47,13 @@ export type Profile = {
   premium_expires_at?: string | null;
   ai_requests_left?: number | null;
 };
+
+export type UserRecipe = {
+  id: string;
+  recipe_name: string;
+  calories_per_100g: number;
+  protein_per_100g: number;
+  fat_per_100g: number;
+  carbs_per_100g: number;
+  sugar_per_100g: number;
+};

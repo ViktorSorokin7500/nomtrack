@@ -1,18 +1,68 @@
 import { z } from "zod";
 
-// Ми експортуємо і саму схему, і її тип, щоб використовувати їх в інших файлах
-export const foodEntrySchema = z.object({
-  entry_text: z.string().min(3, "Опис має бути довшим"),
-  meal_type: z.string().min(1, "Вибери тип"),
-  entry_mode: z.enum(["ai", "manual"]),
-  calc_mode: z.enum(["serving", "per100g"]),
-  servings: z.coerce.number().optional(),
-  weight_eaten: z.coerce.number().optional(),
-  calories: z.coerce.number().optional(),
-  protein_g: z.coerce.number().optional(),
-  fat_g: z.coerce.number().optional(),
-  carbs_g: z.coerce.number().optional(),
-  sugar_g: z.coerce.number().optional(),
-});
+export const foodEntrySchema = z
+  .object({
+    entry_mode: z.enum(["ai", "manual"]),
+    calc_mode: z.enum(["per100g", "serving"]).optional(),
+
+    // Робимо поле `entry_text` опціональним на базовому рівні
+    entry_text: z.string().optional(),
+
+    meal_type: z.string().min(1, "Будь ласка, оберіть прийом їжі."),
+    selected_recipe_id: z.string().optional(),
+
+    // Поля для ручного вводу (min(0) дозволяє вводити нуль, наприклад для цукру)
+    calories: z.coerce.number().min(0).optional().nullable(),
+    protein_g: z.coerce.number().min(0).optional().nullable(),
+    fat_g: z.coerce.number().min(0).optional().nullable(),
+    carbs_g: z.coerce.number().min(0).optional().nullable(),
+    sugar_g: z.coerce.number().min(0).optional().nullable(),
+    weight_eaten: z.coerce
+      .number()
+      .positive("Вага має бути вказана")
+      .optional()
+      .nullable(),
+    servings: z.coerce.number().positive().optional().nullable(),
+  })
+  .superRefine((data, ctx) => {
+    // --- УМОВНА ВАЛІДАЦІЯ ---
+
+    // Правило 1: Якщо режим AI, то `entry_text` обов'язковий.
+    if (
+      data.entry_mode === "ai" &&
+      (!data.entry_text || data.entry_text.trim().length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Будь ласка, опишіть вашу страву для аналізу.",
+        path: ["entry_text"],
+      });
+    }
+
+    // Правило 2: Якщо ручний режим І рецепт НЕ обрано, то `entry_text` обов'язковий.
+    if (
+      data.entry_mode === "manual" &&
+      !data.selected_recipe_id &&
+      (!data.entry_text || data.entry_text.trim().length === 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Будь ласка, введіть назву продукту.",
+        path: ["entry_text"],
+      });
+    }
+
+    // Правило 3: Якщо ручний режим, то поле ваги обов'язкове.
+    if (
+      data.entry_mode === "manual" &&
+      (!data.weight_eaten || data.weight_eaten <= 0)
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Будь ласка, вкажіть вагу.",
+        path: ["weight_eaten"],
+      });
+    }
+  });
 
 export type FoodEntryFormSchema = z.infer<typeof foodEntrySchema>;

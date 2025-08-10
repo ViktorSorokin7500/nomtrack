@@ -78,7 +78,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
             {...register("text")}
             rows={2}
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder="Describe your activity (e.g., '45 minute run')"
+            placeholder={`Carrying a 20kg load for 60 minutes.\nLight gardening (watering) for 60 minutes.`}
           />
           {errors.text && (
             <p className="text-red-500 text-sm">{errors.text.message}</p>
