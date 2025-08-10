@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   NutritionDashboard,
-  // SummaryCard,
+  SummaryCard,
   AICoachCard,
   WaterTrackerCard,
 } from "@/components/dashboard";
@@ -137,7 +137,7 @@ export default async function Dashboard({
           />
         </div>
         <div className="lg:col-span-1 space-y-6 lg:order-1">
-          {/* <SummaryCard currentWeight={profile.current_weight_kg} /> */}
+          <SummaryCard currentWeight={profile.current_weight_kg} />
           <WaterTrackerCard
             currentWater={totalWater}
             targetWater={profile.target_water_ml || 2500}
