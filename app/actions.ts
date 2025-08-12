@@ -2,19 +2,34 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
-import Together from "together-ai";
-import { type FoodEntryFormSchema, foodEntrySchema } from "@/lib/validators";
+import {
+  type FoodEntryFormSchema,
+  foodEntrySchema,
+  nutritionTargetsSchema,
+  personalInfoSchema,
+} from "@/lib/validators";
+import {
+  AiRecipeResponse,
+  Ingredient,
+  NormalizedIngredient,
+  NutritionInfo,
+  TotalNutrition,
+} from "@/types";
+import {
+  promptWithActivity,
+  promptWithIngredients,
+  promptWithRecipe,
+} from "@/lib/prompts";
+import { getAiJsonResponse } from "@/lib/utils";
 
-const personalInfoSchema = z.object({
-  full_name: z.string().optional(),
-  current_weight_kg: z.coerce.number().positive(),
-  height_cm: z.coerce.number().positive().int(),
-  age: z.coerce.number().positive().int(),
-  gender: z.string(),
-  activity_level: z.string(),
-  goal: z.string(),
-});
+async function getAuthUserOrError() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await (await supabase).auth.getUser();
+  if (!user) throw new Error("Ви не авторизовані");
+  return { supabase: await supabase, user };
+}
 
 // Наша Server Action для оновлення особистих даних
 export async function updatePersonalInfo(formData: {
@@ -26,14 +41,7 @@ export async function updatePersonalInfo(formData: {
   activity_level: string;
   goal: string;
 }) {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-  if (!user) {
-    return { error: "Ви не авторизовані" };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   const result = personalInfoSchema.safeParse(formData);
   if (!result.success) {
@@ -57,52 +65,9 @@ export async function updatePersonalInfo(formData: {
   return { success: "Профіль успішно оновлено!" };
 }
 
-const nutritionTargetsSchema = z.object({
-  target_calories: z.coerce.number().positive().int(),
-  target_protein_g: z.coerce.number().positive().int(),
-  target_carbs_g: z.coerce.number().positive().int(),
-  target_fat_g: z.coerce.number().positive().int(),
-  target_water_ml: z.coerce.number().positive().int(),
-});
-
-type NutritionInfo = {
-  name: string;
-  calories: number;
-  protein_g: number;
-  fat_total_g: number;
-  carbohydrates_total_g: number;
-  sugar_g: number;
-  serving_size_g?: number;
-};
-
-interface TotalNutrition {
-  calories: number;
-  protein_g: number;
-  fat_g: number;
-  carbs_g: number;
-  sugar_g: number;
-  total_weight_g: number;
-}
-
-type Ingredient = {
-  name: string;
-  weight_g: number;
-};
-
-type AiIngredientsResponse = {
-  ingredients: Ingredient[];
-};
-
 // Нова Server Action для оновлення харчових цілей
 export async function updateNutritionTargets(formData: unknown) {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-  if (!user) {
-    return { error: "Ви не авторизовані" };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   // Валідація даних
   const result = nutritionTargetsSchema.safeParse(formData);
@@ -132,75 +97,20 @@ export async function analyzeAndSaveFoodEntry(formData: {
   const { text, mealType } = formData;
   if (!text.trim()) return { error: "Текст не може бути порожнім" };
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Ви не авторизовані" };
+  const { supabase, user } = await getAuthUserOrError();
 
   try {
-    const ingredientPrompt = `You are a nutritional assistant that analyzes a user's meal description and outputs a flat JSON list of ingredients with estimated weights in grams.
+    const ingredientPrompt = promptWithIngredients(text);
 
-Your step-by-step logic:
-1. If the input is not in English, detect the language and translate it to English before analysis.
-2. If the user explicitly lists ingredients and quantities, use them as-is.
-3. If the user provides a common dish name (e.g. "Borscht", "Caesar salad") without ingredients, deconstruct it into typical ingredients with approximate weights per standard portion. Adjust portion size if words like “large” or “small” are present.
-4. Exclude emotional, irrelevant, or decorative phrases.
-5. Output ONLY a valid JSON object in the format below without any additional text or explanations.
-Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
-JSON format:
-{
-  "ingredients": [
-    { "name": "<english_food_item_name>", "weight_g": <integer> }
-  ]
-}
+    const { data, error } = await getAiJsonResponse<{
+      ingredients: Ingredient[];
+    }>(ingredientPrompt);
 
---- Examples ---
+    if (error) {
+      return { error: `Помилка аналізу ШІ: ${error}` };
+    }
 
-User Text: "my custom soup: 150g chicken broth, 50g chicken, 50g noodles"  
-JSON:
-{
-  "ingredients": [
-    { "name": "chicken broth", "weight_g": 150 },
-    { "name": "chicken", "weight_g": 50 },
-    { "name": "noodles", "weight_g": 50 }
-  ]
-}
-
-User Text: "a large Chicken Kyiv"  
-JSON:
-{
-  "ingredients": [
-    { "name": "chicken fillet", "weight_g": 200 },
-    { "name": "butter", "weight_g": 40 },
-    { "name": "breadcrumbs", "weight_g": 30 },
-    { "name": "egg", "weight_g": 25 }
-  ]
-}
-
---- Now analyze the following ---
-
-User Text: ${text}
-Your JSON Response:`;
-
-    console.log("updateNutritionTargets actions text =>", text);
-
-    const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
-    const aiResponse = await together.chat.completions.create({
-      messages: [{ role: "user", content: ingredientPrompt }],
-      model: "Qwen/Qwen2-72B-Instruct",
-      response_format: { type: "json_object" },
-    });
-
-    let aiContent = aiResponse.choices?.[0]?.message?.content;
-
-    console.log("updateNutritionTargets actions aiContent =>", aiContent);
-
-    if (!aiContent) return { error: "ШІ не розпізнам інгредієнти" };
-
-    aiContent = aiContent.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, "");
-
-    const { ingredients } = JSON.parse(aiContent) as AiIngredientsResponse;
+    const ingredients = data?.ingredients;
     if (!ingredients || ingredients.length === 0) {
       return { error: "Не вдалося знайти інгредієнти у вашому запиті." };
     }
@@ -273,14 +183,7 @@ Your JSON Response:`;
 }
 
 export async function addWaterEntry(amount: number) {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-  if (!user) {
-    return { error: "Ви не авторизовані" };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   const { error } = await (await supabase).from("food_entries").insert([
     {
@@ -309,14 +212,7 @@ export async function addWeightEntry(weight: number) {
     return { error: "Вага має бути позитивним числом." };
   }
 
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-  if (!user) {
-    return { error: "Ви не авторизовані" };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   // Створюємо запис у новій таблиці
   const { error } = await (await supabase).from("body_measurements").insert([
@@ -350,68 +246,21 @@ export async function analyzeAndSaveActivityEntry(text: string) {
     return { error: "Опис активності не може бути порожнім" };
   }
 
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-  if (!user) {
-    return { error: "Ви не авторизовані" };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   // Промпт для аналізу активності
-  const prompt = `You are a fitness analysis API.
-
-Your job is to analyze a user's physical activity description and estimate the total number of calories burned. Follow this exact logic:
-
-1. If the user's input is not in English, translate it to English before analyzing.
-2. Estimate calories burned based on the activity type and duration.
-3. If the input is vague or missing key data (e.g. no duration), make a realistic assumption based on common values.
-4. If the text is NOT a physical activity (e.g., "hello world", "2+2", "what is the weather"), return 0 for calories_burned.
-Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
-Return ONLY a valid JSON, without any additional text. The JSON should be an object in the following format:
-{
-  "calories_burned": <integer>
-}
-
---- Examples ---
-
-User Text: "Running for 30 minutes"  
-Your JSON Response: { "calories_burned": 350 }
-
-User Text: "Силове тренування в залі 1 годину"  
-Your JSON Response: { "calories_burned": 400 }
-
---- Now analyze the following ---
-  User Text: "${text}"
-  Your JSON Response:`;
+  const prompt = promptWithActivity(text);
 
   try {
-    const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
-    const response = await together.chat.completions.create({
-      messages: [{ role: "user", content: prompt }],
-      model: "Qwen/Qwen2-72B-Instruct",
-      response_format: { type: "json_object" },
-    });
+    const { data, error } = await getAiJsonResponse<{
+      calories_burned: number;
+    }>(prompt);
 
-    const content = response.choices?.[0]?.message?.content;
-
-    if (!content) {
-      return { error: "ШІ не повернув результат" };
+    if (error) {
+      return { error: `Помилка аналізу ШІ: ${error}` };
     }
 
-    const startIndex = content.indexOf("{");
-    const endIndex = content.lastIndexOf("}");
-
-    // 2. Перевіряємо, чи знайдено JSON
-    if (startIndex === -1 || endIndex === -1) {
-      console.error("Не знайдено JSON у відповіді від AI:", content);
-      return { error: "Некоректна відповідь від AI. Спробуйте ще раз." };
-    }
-
-    // 3. Вирізаємо чисту JSON-строку
-    const jsonString = content.substring(startIndex, endIndex + 1);
-
-    const { calories_burned } = JSON.parse(jsonString);
+    const calories_burned = data?.calories_burned;
     if (!calories_burned || calories_burned <= 0) {
       return {
         error:
@@ -457,17 +306,8 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
     return { error: "Неправильний режим для цього екшену" };
   }
 
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
+  const { supabase, user } = await getAuthUserOrError();
 
-  if (!user) {
-    console.error("Помилка: Користувач не авторизований.");
-    return { error: "Ви не авторизовані" };
-  }
-
-  // Використовуємо 'try...catch' для відлову будь-яких непередбачуваних помилок
   try {
     const {
       entry_text,
@@ -554,98 +394,65 @@ export async function createAndAnalyzeRecipe(formData: {
     return { error: "Назва та інгредієнти не можуть бути порожніми." };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { error: "Ви не авторизовані" };
+  const { supabase, user } = await getAuthUserOrError();
 
   try {
-    const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
     const initialIngredientLines = ingredientsText
       .split(/,|\n/)
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
+
     if (initialIngredientLines.length === 0) {
       return { error: "Список інгредієнтів порожній або некоректний." };
     }
 
-    // 1. НАЙБІЛЬШ ПРОСУНУТИЙ ПРОМПТ
-    const batchPrompt = `
-      Analyze the following list of recipe ingredients. Your task is to normalize each ingredient into its English name and its total weight in GRAMS.
+    // Крок 1: Робимо запит до ШІ з нашим безпечним типом AiRecipeResponse
+    const batchPrompt = promptWithRecipe(initialIngredientLines.join("\n"));
+    const { data: aiData, error: aiError } =
+      await getAiJsonResponse<AiRecipeResponse>(batchPrompt);
 
-      Follow these rules:
-      1. If you see "кг", "kg", or same meaninig, multiply the number by 1000 to get grams. (e.g., "2 кг муки" -> weightGrams: 2000).
-      2. For items by count (like eggs, onions, etc.), use a standard average weight to calculate the total weight in grams. (e.g., "8 large eggs" -> assume 60g per egg -> weightGrams: 480).
-      3. For liquids in "ml", assume density is 1 g/ml. (e.g., "200 ml milk" -> weightGrams: 200).
-      4. The 'ingredientName' should be a clean, simple English name suitable for an API query (e.g., "cauliflower", "large eggs", "milk").
-      5. If the input text does not appear to be a list of ingredients, or if it's nonsensical, return an empty JSON array: []
-      Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
-      Return the output ONLY as a valid JSON array of objects. Each object must have two keys: "ingredientName" (string) and "weightGrams" (number).
+    if (aiError) {
+      return { error: `Помилка аналізу ШІ: ${aiError}` };
+    }
 
-      Input List:
-      ${initialIngredientLines.join("\n")}
+    // Крок 2: Визначаємо масив інгредієнтів, незалежно від формату відповіді ШІ
+    let normalizedIngredients: NormalizedIngredient[];
 
-      JSON Output:
-    `;
+    if (aiData === null) {
+      // Спочатку перевіряємо на null, щоб уникнути помилок
+      throw new Error("ШІ повернув порожню відповідь (null).");
+    }
 
-    // 2. Робимо ОДИН запит до AI
-    const batchResponse = await together.chat.completions.create({
-      messages: [{ role: "user", content: batchPrompt }],
-      model: "Qwen/Qwen2-72B-Instruct",
-      response_format: { type: "json_object" },
-    });
-    let responseContent = batchResponse.choices?.[0]?.message?.content;
-    console.log("responseContent actions =>", responseContent);
+    if (Array.isArray(aiData)) {
+      // Випадок 1: ШІ повернув просто масив [...]
+      // Тут все безпечно, TypeScript знає, що aiData - це масив.
+      normalizedIngredients = aiData;
+    } else {
+      // Випадок 2: ШІ повернув об'єкт {...}
+      // TypeScript тепер знає, що aiData - це об'єкт, а не null.
 
-    if (!responseContent) throw new Error("AI не повернув результат.");
-
-    responseContent = responseContent.replace(
-      /\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm,
-      ""
-    );
-
-    let normalizedIngredients: {
-      ingredientName: string;
-      weightGrams: number;
-    }[];
-    try {
-      const startIndex = responseContent.indexOf("[");
-      const endIndex = responseContent.lastIndexOf("]");
-      if (startIndex === -1 || endIndex === -1) {
-        throw new Error("Не вдалося знайти JSON масив у відповіді AI.");
-      }
-      const jsonString = responseContent.substring(startIndex, endIndex + 1);
-      const parsedJson = JSON.parse(jsonString);
-
-      if (Array.isArray(parsedJson)) {
-        normalizedIngredients = parsedJson;
-      } else {
-        const arrayKey = Object.keys(parsedJson).find((k) =>
-          Array.isArray(parsedJson[k])
-        );
-        if (!arrayKey)
-          throw new Error(
-            "JSON від AI не є масивом і не містить масиву всередині."
-          );
-        normalizedIngredients = parsedJson[arrayKey];
-      }
-    } catch (e) {
-      console.error("Помилка парсингу JSON від AI:", responseContent);
-      console.error("Помилка:", e);
-      throw new Error(
-        "Не вдалося обробити відповідь від AI. Спробуйте змінити інгредієнти."
+      // Шукаємо назву ключа, за яким знаходиться масив
+      const arrayKey = Object.keys(aiData).find((key) =>
+        Array.isArray(aiData[key])
       );
+
+      if (arrayKey) {
+        // Якщо ключ знайдено, безпечно отримуємо масив за цим ключем.
+        // Завдяки індексній сигнатурі в типі ця помилка зникає.
+        normalizedIngredients = aiData[arrayKey];
+      } else {
+        // Якщо в об'єкті немає жодного масиву
+        throw new Error("Не вдалося знайти масив інгредієнтів у відповіді ШІ.");
+      }
     }
 
     if (!normalizedIngredients || normalizedIngredients.length === 0) {
       return {
-        error:
-          "Не вдалося розпізнати інгредієнти. Будь ласка, введіть список продуктів та їх вагу.",
+        error: "Не вдалося розпізнати інгредієнти у вашому запиті.",
       };
     }
 
-    // 3. Обробляємо кожен нормалізований інгредієнт
+    // Крок 3: Отримуємо дані про харчування для кожного інгредієнта
     const nutritionPromises = normalizedIngredients.map(
       async (item): Promise<TotalNutrition> => {
         const actualWeight = item.weightGrams;
@@ -660,13 +467,13 @@ export async function createAndAnalyzeRecipe(formData: {
           };
         }
 
-        // Робимо запит до CalorieNinjas лише за назвою, щоб отримати дані на 100 г
         const nutritionResponse = await fetch(
           `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
             item.ingredientName
           )}`,
           { headers: { "X-Api-Key": process.env.CALORIENINJAS_API_KEY! } }
         );
+
         if (!nutritionResponse.ok) {
           console.warn(
             `Помилка CalorieNinjas для '${item.ingredientName}', ігноруємо.`
@@ -680,7 +487,6 @@ export async function createAndAnalyzeRecipe(formData: {
             total_weight_g: actualWeight,
           };
         }
-        console.log("nutritionResponse actions=>", nutritionResponse);
 
         const nutritionData: { items: NutritionInfo[] } =
           await nutritionResponse.json();
@@ -713,8 +519,8 @@ export async function createAndAnalyzeRecipe(formData: {
     );
 
     const allNutritionData = await Promise.all(nutritionPromises);
-    console.log("allNutritionData actions =>", allNutritionData);
 
+    // Крок 4: Підсумовуємо всі поживні речовини
     const finalTotals = allNutritionData.reduce(
       (acc, item) => {
         acc.calories += item.calories;
@@ -739,6 +545,7 @@ export async function createAndAnalyzeRecipe(formData: {
       return { error: "Не вдалося визначити вагу інгредієнтів." };
     }
 
+    // Крок 5: Розраховуємо значення на 100г і готуємо дані для збереження
     const multiplier = 100 / finalTotals.total_weight_g;
     const recipeData = {
       user_id: user.id,
@@ -754,9 +561,11 @@ export async function createAndAnalyzeRecipe(formData: {
       ingredients_text: ingredientsText,
     };
 
+    // Крок 6: Зберігаємо рецепт в базу даних
     const { error: insertError } = await supabase
       .from("user_recipes")
       .insert([recipeData]);
+
     if (insertError) {
       throw new Error(
         "Помилка збереження рецепта в БД: " + insertError.message
@@ -768,7 +577,7 @@ export async function createAndAnalyzeRecipe(formData: {
   } catch (error) {
     let errorMessage = "Сталася невідома помилка.";
     if (error instanceof Error) errorMessage = error.message;
-    console.error("Помилка в createAndAnalyzeRecipe:", error);
+    console.error("Повна помилка в createAndAnalyzeRecipe:", error);
     return { error: errorMessage };
   }
 }
@@ -778,14 +587,7 @@ export async function deleteRecipe(recipeId: string) {
     return { error: "ID рецепта не вказано." };
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    return { error: "Ви не авторизовані." };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   const { error } = await supabase
     .from("user_recipes")
@@ -805,14 +607,7 @@ export async function deleteRecipe(recipeId: string) {
 }
 
 export async function deleteFoodEntry(entryId: number) {
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-
-  if (!user) {
-    return { error: "Ви не авторизовані" };
-  }
+  const { supabase, user } = await getAuthUserOrError();
 
   try {
     const { error } = await (await supabase)

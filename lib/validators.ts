@@ -66,3 +66,22 @@ export const foodEntrySchema = z
   });
 
 export type FoodEntryFormSchema = z.infer<typeof foodEntrySchema>;
+
+//actions.ts
+export const personalInfoSchema = z.object({
+  full_name: z.string().optional(),
+  current_weight_kg: z.coerce.number().positive(),
+  height_cm: z.coerce.number().positive().int(),
+  age: z.coerce.number().positive().int(),
+  gender: z.string(),
+  activity_level: z.string(),
+  goal: z.string(),
+});
+
+export const nutritionTargetsSchema = z.object({
+  target_calories: z.coerce.number().positive().int(),
+  target_protein_g: z.coerce.number().positive().int(),
+  target_carbs_g: z.coerce.number().positive().int(),
+  target_fat_g: z.coerce.number().positive().int(),
+  target_water_ml: z.coerce.number().positive().int(),
+});

@@ -57,3 +57,43 @@ export type UserRecipe = {
   carbs_per_100g: number;
   sugar_per_100g: number;
 };
+
+//actions.ts
+
+export type NutritionInfo = {
+  name: string;
+  calories: number;
+  protein_g: number;
+  fat_total_g: number;
+  carbohydrates_total_g: number;
+  sugar_g: number;
+  serving_size_g?: number;
+};
+
+export interface TotalNutrition {
+  calories: number;
+  protein_g: number;
+  fat_g: number;
+  carbs_g: number;
+  sugar_g: number;
+  total_weight_g: number;
+}
+
+export type Ingredient = {
+  name: string;
+  weight_g: number;
+};
+
+export type AiIngredientsResponse = {
+  ingredients: Ingredient[];
+};
+
+export type NormalizedIngredient = {
+  ingredientName: string;
+  weightGrams: number;
+};
+
+// Тип, що описує ОБИДВА можливі формати відповіді від ШІ
+export type AiRecipeResponse =
+  | NormalizedIngredient[]
+  | { [key: string]: NormalizedIngredient[] };
