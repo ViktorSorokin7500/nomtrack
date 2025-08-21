@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NutritionArchive } from "@/components/archive/nutrition-archive";
-import { Locale } from "@/i18n.config";
 import { DailySummary, YearData } from "@/types";
 
 function groupDataByYearAndMonth(summaries: DailySummary[]) {
@@ -40,14 +39,7 @@ function groupDataByYearAndMonth(summaries: DailySummary[]) {
   }));
 }
 
-export default async function ArchivePage({
-  params,
-}: {
-  params: Promise<{ lang: Locale }>;
-}) {
-  const { lang } = await params;
-  console.log(lang);
-
+export default async function ArchivePage() {
   const supabase = createClient();
 
   const {

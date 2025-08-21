@@ -6,18 +6,10 @@ import { ProgressBar } from "./progress-bar";
 import { MealCard } from "./meal-card";
 import { FoodEntryCard } from "./food-entry-card";
 import { UserRecipe } from "@/types";
+import { useState } from "react";
 
 // Тип для одного запису їжі, що приходить з сервера
-type FoodEntry = {
-  id: number;
-  meal_type: string;
-  entry_text: string;
-  calories: number;
-  protein_g: number;
-  fat_g: number;
-  carbs_g: number;
-  sugar_g: number;
-};
+import type { FoodEntry } from "@/types";
 
 // Типи для пропсів, які компонент отримує від сторінки
 interface NutritionDashboardProps {
@@ -38,24 +30,27 @@ interface NutritionDashboardProps {
   userRecipes: UserRecipe[];
 }
 
-const MAIN_MEALS = ["breakfast", "lunch", "dinner"];
-
 export function NutritionDashboard({
   summaryData,
   foodLogData,
   userRecipes,
 }: NutritionDashboardProps) {
-  // Визначаємо, які основні прийоми їжі вже були додані сьогодні
-  const loggedMealTypes = foodLogData.map((entry) => entry.meal_type);
+  const [hoveredMacro, setHoveredMacro] = useState<string | null>(null);
 
+  const getMacroValue = (macro: "protein" | "carbs" | "fat" | "sugar") => {
+    const { current, target } = summaryData.macros[macro];
+    if (hoveredMacro === macro) {
+      const percentage = target > 0 ? Math.round((current / target) * 100) : 0;
+      return `${percentage}%`;
+    }
+    return `${current}g / ${target}g`;
+  };
   // Формуємо динамічний список доступних опцій для випадаючого меню
   const availableMealTypes = [
-    { value: "snack", label: "Snack" }, // Снек доступний завжди
-    ...MAIN_MEALS.filter((meal) => !loggedMealTypes.includes(meal)) // Залишаємо тільки ті, яких ще не було
-      .map((meal) => ({
-        value: meal,
-        label: meal.charAt(0).toUpperCase() + meal.slice(1), // Робимо першу літеру великою
-      })),
+    { value: "breakfast", label: "Сніданок" },
+    { value: "lunch", label: "Обід" },
+    { value: "dinner", label: "Вечеря" },
+    { value: "snack", label: "Перекус" },
   ];
 
   return (
@@ -78,14 +73,16 @@ export function NutritionDashboard({
             target={summaryData.calories.target}
           />
           <div className="flex-1 space-y-4">
-            <div>
+            {/* Protein */}
+            <div
+              onMouseEnter={() => setHoveredMacro("protein")}
+              onMouseLeave={() => setHoveredMacro(null)}
+              className="cursor-pointer"
+            >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">
-                  Protein
-                </span>
+                <span className="text-sm font-medium text-gray-600">Білки</span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.protein.current}g /{" "}
-                  {summaryData.macros.protein.target}g
+                  {getMacroValue("protein")}
                 </span>
               </div>
               <ProgressBar
@@ -94,12 +91,18 @@ export function NutritionDashboard({
                 color="bg-yellow-400"
               />
             </div>
-            <div>
+            {/* Carbs */}
+            <div
+              onMouseEnter={() => setHoveredMacro("carbs")}
+              onMouseLeave={() => setHoveredMacro(null)}
+              className="cursor-pointer"
+            >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Carbs</span>
+                <span className="text-sm font-medium text-gray-600">
+                  Вуглеводи
+                </span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.carbs.current}g /{" "}
-                  {summaryData.macros.carbs.target}g
+                  {getMacroValue("carbs")}
                 </span>
               </div>
               <ProgressBar
@@ -108,12 +111,16 @@ export function NutritionDashboard({
                 color="bg-green-400"
               />
             </div>
-            <div>
+            {/* Fat */}
+            <div
+              onMouseEnter={() => setHoveredMacro("fat")}
+              onMouseLeave={() => setHoveredMacro(null)}
+              className="cursor-pointer"
+            >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Fat </span>
+                <span className="text-sm font-medium text-gray-600">Жири</span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.fat.current}g /{" "}
-                  {summaryData.macros.fat.target}g
+                  {getMacroValue("fat")}
                 </span>
               </div>
               <ProgressBar
@@ -122,12 +129,16 @@ export function NutritionDashboard({
                 color="bg-orange-400"
               />
             </div>
-            <div>
+            {/* Sugar */}
+            {/* <div
+              onMouseEnter={() => setHoveredMacro("sugar")}
+              onMouseLeave={() => setHoveredMacro(null)}
+              className="cursor-pointer"
+            >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Sugar</span>
+                <span className="text-sm font-medium text-gray-600">Цукор</span>
                 <span className="text-sm text-gray-600">
-                  {summaryData.macros.sugar.current}g /{" "}
-                  {summaryData.macros.sugar.target}g
+                  {getMacroValue("sugar")}
                 </span>
               </div>
               <ProgressBar
@@ -135,7 +146,7 @@ export function NutritionDashboard({
                 target={summaryData.macros.sugar.target}
                 color="bg-sky-300"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </Card>

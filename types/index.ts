@@ -97,3 +97,23 @@ export type NormalizedIngredient = {
 export type AiRecipeResponse =
   | NormalizedIngredient[]
   | { [key: string]: NormalizedIngredient[] };
+
+export type GlobalFoodSearchResult = {
+  id: number;
+  name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+};
+
+export interface FoodEntry {
+  id: number;
+  meal_type: "breakfast" | "lunch" | "dinner" | "snack";
+  entry_text: string;
+  calories: number;
+  protein_g: number;
+  fat_g: number;
+  carbs_g: number;
+  sugar_g?: number | null;
+}

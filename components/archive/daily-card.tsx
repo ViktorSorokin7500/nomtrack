@@ -14,6 +14,18 @@ export function DailyCard({ day, userProfile }: DailyCardProps) {
   // Стан для контролю видимості модального вікна
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  console.log(
+    day.date,
+    day.consumed_calories,
+    day.target_calories,
+    day.consumed_protein_g,
+    day.target_protein_g,
+    day.consumed_fat_g,
+    day.target_fat_g,
+    day.consumed_carbs_g,
+    day.target_carbs_g
+  );
+
   return (
     <>
       <Card

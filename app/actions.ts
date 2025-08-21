@@ -629,3 +629,48 @@ export async function deleteFoodEntry(entryId: number) {
     return { error: "Невідома помилка на сервері." };
   }
 }
+
+export async function searchGlobalFood(searchTerm: string) {
+  if (!searchTerm || searchTerm.length < 2) {
+    return { success: [] };
+  }
+
+  const { supabase } = await getAuthUserOrError();
+
+  try {
+    const { data, error } = await supabase.rpc("search_products", {
+      search_term: searchTerm,
+    });
+
+    if (error) {
+      console.error("Помилка пошуку в БД:", error);
+      return { error: "Не вдалося знайти продукти. Спробуйте пізніше." };
+    }
+
+    // Прибираємо зайві дані, залишаємо тільки потрібні поля
+    const formattedData = data.map(
+      (item: {
+        id: number;
+        name: string;
+        calories: number | null;
+        protein: number | null;
+        fat: number | null;
+        carbs: number | null;
+      }) => ({
+        id: item.id,
+        name: item.name,
+        calories: item.calories,
+        protein: item.protein,
+        fat: item.fat,
+        carbs: item.carbs,
+      })
+    );
+
+    return { success: formattedData };
+  } catch (e) {
+    console.error("Критична помилка в searchGlobalFood:", e);
+    const errorMessage =
+      e instanceof Error ? e.message : "Невідома помилка на сервері.";
+    return { error: errorMessage };
+  }
+}

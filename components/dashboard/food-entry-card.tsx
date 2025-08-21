@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { deleteFoodEntry } from "@/app/actions";
 import toast from "react-hot-toast";
 import { Button } from "../ui";
+import { FoodEntry } from "@/types";
 
 const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -23,45 +24,27 @@ const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
-// Цей компонент дуже простий, він просто показує дані
 interface FoodEntryCardProps {
-  entry: {
-    id: number;
-    entry_text: string;
-    calories: number;
-    protein_g: number;
-    fat_g: number;
-    carbs_g: number;
-    sugar_g: number;
-  };
+  entry: FoodEntry;
 }
+
+// Об'єкт для перекладу та кольорів
+const mealLabels: { [key: string]: string } = {
+  breakfast: "Сніданок",
+  lunch: "Обід",
+  dinner: "Вечеря",
+  snack: "Перекус",
+};
+
+const mealColors: { [key: string]: string } = {
+  breakfast: "text-yellow-400",
+  lunch: "text-green-400",
+  dinner: "text-orange-400",
+  snack: "text-sky-300",
+};
 
 export function FoodEntryCard({ entry }: FoodEntryCardProps) {
   const [isPending, startTransition] = useTransition();
-  // const handleDelete = () => {
-  //   if (confirm("Are you sure you want to delete this entry?")) {
-  //     startTransition(() => {
-  //       // 2. Use toast.promise for a better UX
-  //       toast.promise(
-  //         // Pass the async request itself
-  //         deleteFoodEntry(entry.id).then((result) => {
-  //           // Important: if there's an error, we must throw it
-  //           // for toast.promise to catch it in the error state.
-  //           if (result?.error) {
-  //             throw new Error(result.error);
-  //           }
-  //           return result;
-  //         }),
-  //         // Describe the messages for each state
-  //         {
-  //           loading: "Deleting entry...",
-  //           success: "Entry deleted successfully!",
-  //           error: (err) => `Error: ${err.message}`, // Display the error message
-  //         }
-  //       );
-  //     });
-  //   }
-  // };
 
   const performDelete = () => {
     startTransition(() => {
@@ -73,9 +56,9 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
           return result;
         }),
         {
-          loading: "Deleting entry...",
-          success: "Entry deleted successfully!",
-          error: (err) => `Error: ${err.message}`,
+          loading: "Видалення запису...",
+          success: "Запис успішно видалено!",
+          error: (err) => `Помилка: ${err.message}`,
         }
       );
     });
@@ -86,7 +69,7 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
       (t) => (
         <div className="flex flex-col items-center gap-4">
           <p className="font-semibold text-center">
-            Are you sure you want to delete this entry?
+            Ви впевнені, що хочете видалити цей запис?
           </p>
           <div className="flex gap-2">
             <Button
@@ -94,17 +77,17 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
               size="sm"
               onClick={() => {
                 toast.dismiss(t.id);
-                performDelete(); // Викликаємо функцію видалення
+                performDelete();
               }}
             >
-              Yes, delete
+              Так, видалити
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => toast.dismiss(t.id)}
             >
-              Cancel
+              Відміна
             </Button>
           </div>
         </div>
@@ -117,9 +100,17 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 text-sm flex flex-col md:flex-row md:items-center gap-4">
-      {/* --- Верхня частина: Назва і кнопка --- */}
+      {/* --- Верхня частина: Назва, тип прийому їжі та кнопка --- */}
       <div className="flex-grow flex items-center justify-between">
-        <p className="font-medium text-gray-800 mr-4">{entry.entry_text}</p>
+        <div className="flex flex-col">
+          {/* НОВИЙ БЛОК: Тип прийому їжі */}
+          <span
+            className={`text-xs font-semibold ${mealColors[entry.meal_type]}`}
+          >
+            {mealLabels[entry.meal_type]}
+          </span>
+          <p className="font-medium text-gray-800 mr-4">{entry.entry_text}</p>
+        </div>
         <button
           onClick={askForConfirmation}
           disabled={isPending}
@@ -134,32 +125,29 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
         </button>
       </div>
 
-      {/* --- Нижня частина: Нутрієнти (використовуємо Grid) --- */}
-      {/* w-full розтягує на всю ширину на мобільних, md:w-auto - повертає до авто-ширини на десктопі */}
-      <div className="w-full md:w-auto grid grid-cols-3 sm:grid-cols-5 gap-x-4 gap-y-2 text-xs text-gray-600 text-center flex-shrink-0">
+      <div className="w-full md:w-auto grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 text-xs text-gray-600 text-center flex-shrink-0">
         <div>
           <span className="font-bold block">{entry.calories}</span>
-          <span>kcal</span>
+          <span>ккал</span>
         </div>
         <div>
-          <span className="font-bold block">{entry.protein_g}g</span>
-          <span>protein</span>
+          <span className="font-bold block">{entry.protein_g}г</span>
+          <span>білки</span>
         </div>
         <div>
-          <span className="font-bold block">{entry.fat_g}g</span>
-          <span>fat</span>
+          <span className="font-bold block">{entry.fat_g}г</span>
+          <span>жири</span>
         </div>
         <div>
-          <span className="font-bold block">{entry.carbs_g}g</span>
-          <span>carbs</span>
+          <span className="font-bold block">{entry.carbs_g}г</span>
+          <span>вугл.</span>
         </div>
-        {/* Показуємо цукор, тільки якщо він є */}
-        {entry.sugar_g != null && (
+        {/* {entry.sugar_g != null && (
           <div>
-            <span className="font-bold block">{entry.sugar_g}g</span>
-            <span>sugar</span>
+            <span className="font-bold block">{entry.sugar_g}г</span>
+            <span>цукор</span>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

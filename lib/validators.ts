@@ -1,3 +1,5 @@
+// @/lib/validators.ts
+
 import { z } from "zod";
 
 export const foodEntrySchema = z
@@ -5,11 +7,8 @@ export const foodEntrySchema = z
     entry_mode: z.enum(["ai", "manual"]),
     calc_mode: z.enum(["per100g", "serving"]).optional(),
 
-    // Робимо поле `entry_text` опціональним на базовому рівні
     entry_text: z.string().optional(),
-
-    meal_type: z.string().min(1, "Будь ласка, оберіть прийом їжі."),
-    selected_recipe_id: z.string().optional(),
+    meal_type: z.string().min(1, "Будь ласка, оберіть прийом їжі."), // <-- ПОВЕРНУТО
 
     // Поля для ручного вводу (min(0) дозволяє вводити нуль, наприклад для цукру)
     calories: z.coerce.number().min(0).optional().nullable(),
@@ -23,6 +22,10 @@ export const foodEntrySchema = z
       .optional()
       .nullable(),
     servings: z.coerce.number().positive().optional().nullable(),
+
+    // Додаємо нові опціональні поля
+    selected_recipe_id: z.string().optional(),
+    selected_global_food_name: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     // --- УМОВНА ВАЛІДАЦІЯ ---
@@ -39,10 +42,11 @@ export const foodEntrySchema = z
       });
     }
 
-    // Правило 2: Якщо ручний режим І рецепт НЕ обрано, то `entry_text` обов'язковий.
+    // Правило 2: Якщо ручний режим І рецепт/продукт НЕ обрано, то `entry_text` обов'язковий.
     if (
       data.entry_mode === "manual" &&
       !data.selected_recipe_id &&
+      !data.selected_global_food_name &&
       (!data.entry_text || data.entry_text.trim().length === 0)
     ) {
       ctx.addIssue({
@@ -67,7 +71,7 @@ export const foodEntrySchema = z
 
 export type FoodEntryFormSchema = z.infer<typeof foodEntrySchema>;
 
-//actions.ts
+// ... (інші схеми залишаються без змін)
 export const personalInfoSchema = z.object({
   full_name: z.string().optional(),
   current_weight_kg: z.coerce.number().positive(),

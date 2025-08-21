@@ -2,13 +2,28 @@
 
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { analyzeAndSaveFoodEntry, addManualFoodEntry } from "@/app/actions";
+import {
+  analyzeAndSaveFoodEntry,
+  addManualFoodEntry,
+  searchGlobalFood,
+} from "@/app/actions";
 import { Button } from "../ui";
-import { useEffect, useTransition } from "react";
+import { useEffect, useTransition, useState } from "react";
 import { foodEntrySchema, type FoodEntryFormSchema } from "@/lib/validators";
 import toast from "react-hot-toast";
 import { Card } from "../shared";
 import { UserRecipe } from "@/types";
+import { XCircle } from "lucide-react";
+
+// Тип для результатів пошуку з глобальної БД
+type GlobalFoodSearchResult = {
+  id: number;
+  name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+};
 
 interface MealCardProps {
   availableMealTypes: { value: string; label: string }[];
@@ -22,6 +37,15 @@ export function MealCard({
   className,
 }: MealCardProps) {
   const [isPending, startTransition] = useTransition();
+
+  // Стан для управління пошуком в глобальній БД
+  const [searchTerm, setSearchTerm] = useState("");
+  const [globalSearchResults, setGlobalSearchResults] = useState<
+    GlobalFoodSearchResult[]
+  >([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [selectedGlobalFood, setSelectedGlobalFood] =
+    useState<GlobalFoodSearchResult | null>(null);
 
   const {
     register,
@@ -45,21 +69,35 @@ export function MealCard({
   const selectedRecipeId = useWatch({ control, name: "selected_recipe_id" });
   const isRecipeSelected = entryMode === "manual" && !!selectedRecipeId;
 
-  // --- ДІАГНОСТИКА: Перевіряємо, чи компонент взагалі отримує рецепти ---
-  useEffect(() => {
-    console.log("MealCard отримав рецепти:", userRecipes);
-  }, [userRecipes]);
+  // НОВЕ: Відстежуємо calc_mode
+  const calcMode = useWatch({ control, name: "calc_mode" });
 
-  // --- ОСНОВНА ЛОГІКА: Автозаповнення форми при виборі рецепту ---
   useEffect(() => {
-    // Якщо режим не ручний, нічого не робимо
+    const handleSearch = async () => {
+      if (entryMode !== "manual" || searchTerm.length < 2) {
+        setGlobalSearchResults([]);
+        return;
+      }
+      setSearchLoading(true);
+      const { success } = await searchGlobalFood(searchTerm);
+      if (success) {
+        setGlobalSearchResults(success as GlobalFoodSearchResult[]);
+      }
+      setSearchLoading(false);
+    };
+
+    const debounceSearch = setTimeout(() => {
+      handleSearch();
+    }, 500);
+
+    return () => clearTimeout(debounceSearch);
+  }, [searchTerm, entryMode]);
+
+  useEffect(() => {
     if (entryMode !== "manual") return;
-
-    console.log(`Обрано ID рецепту: '${selectedRecipeId}'`);
+    if (selectedGlobalFood) return;
 
     if (!selectedRecipeId) {
-      // Користувач обрав "-- Ввести дані вручну --", очищуємо поля
-      console.log("Рецепт не обрано, очищуємо поля для ручного вводу.");
       setValue("entry_text", "");
       setValue("calories", undefined);
       setValue("protein_g", undefined);
@@ -69,13 +107,8 @@ export function MealCard({
       return;
     }
 
-    const recipe = userRecipes.find(
-      (r) => String(r.id) === String(selectedRecipeId)
-    );
-
+    const recipe = userRecipes.find((r) => String(r.id) === selectedRecipeId);
     if (recipe) {
-      // ЗНАЙШЛИ РЕЦЕПТ! Заповнюємо форму.
-      console.log("ЗНАЙДЕНО РЕЦЕПТ:", recipe);
       setValue("entry_text", recipe.recipe_name);
       setValue("calc_mode", "per100g");
       setValue("calories", recipe.calories_per_100g);
@@ -84,17 +117,27 @@ export function MealCard({
       setValue("carbs_g", recipe.carbs_per_100g);
       setValue("sugar_g", recipe.sugar_per_100g);
     } else {
-      // ЦЕ ПОГАНО: ID є, але рецепт не знайдено.
       console.error(
         `ПОМИЛКА: Не вдалося знайти рецепт з ID: ${selectedRecipeId}`
       );
     }
-  }, [selectedRecipeId, entryMode, userRecipes, setValue]);
+  }, [selectedRecipeId, entryMode, userRecipes, setValue, selectedGlobalFood]);
 
   const onSubmit = (data: FoodEntryFormSchema) => {
     startTransition(async () => {
       let result;
-      if (data.entry_mode === "ai") {
+      if (selectedGlobalFood) {
+        result = await addManualFoodEntry({
+          ...data,
+          entry_text: selectedGlobalFood.name,
+          calories: selectedGlobalFood.calories,
+          protein_g: selectedGlobalFood.protein,
+          fat_g: selectedGlobalFood.fat,
+          carbs_g: selectedGlobalFood.carbs,
+          sugar_g: selectedGlobalFood.carbs,
+          entry_mode: "manual",
+        });
+      } else if (data.entry_mode === "ai") {
         result = await analyzeAndSaveFoodEntry({
           text: data.entry_text!,
           mealType: data.meal_type,
@@ -121,9 +164,38 @@ export function MealCard({
           servings: undefined,
           weight_eaten: undefined,
         });
+        setGlobalSearchResults([]);
+        setSelectedGlobalFood(null);
       }
     });
   };
+
+  const handleSelectGlobalFood = (food: GlobalFoodSearchResult) => {
+    setSelectedGlobalFood(food);
+    setSearchTerm("");
+    setGlobalSearchResults([]);
+    setValue("entry_text", food.name);
+    setValue("calories", food.calories);
+    setValue("protein_g", food.protein);
+    setValue("fat_g", food.fat);
+    setValue("carbs_g", food.carbs);
+    setValue("sugar_g", food.carbs);
+    setValue("selected_recipe_id", "");
+  };
+
+  const handleResetGlobalFood = () => {
+    setSelectedGlobalFood(null);
+    setSearchTerm("");
+    setValue("entry_text", "");
+    setValue("calories", undefined);
+    setValue("protein_g", undefined);
+    setValue("fat_g", undefined);
+    setValue("carbs_g", undefined);
+    setValue("sugar_g", undefined);
+  };
+
+  const placeholderText =
+    calcMode === "serving" ? "Кількість порцій" : "Вага (г)";
 
   return (
     <Card
@@ -158,14 +230,52 @@ export function MealCard({
 
           {entryMode === "manual" && (
             <div className="p-4 border rounded-lg space-y-4 bg-gray-50/70">
-              {userRecipes?.length > 0 && (
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Пошук продукту в базі..."
+                  className={`w-full bg-white p-2 border rounded-md ${
+                    selectedGlobalFood ? "hidden" : ""
+                  }`}
+                />
+                {searchLoading && (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-700 animate-pulse">
+                    Пошук...
+                  </span>
+                )}
+              </div>
+
+              {globalSearchResults.length > 0 && (
+                <div className="border border-gray-200 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
+                  {globalSearchResults.map((food) => (
+                    <button
+                      key={food.id}
+                      type="button"
+                      onClick={() => handleSelectGlobalFood(food)}
+                      className="w-full text-left p-3 hover:bg-gray-100 transition-colors border-b last:border-b-0"
+                    >
+                      <h4 className="font-semibold text-gray-800">
+                        {food.name}
+                      </h4>
+                      <p className="text-xs text-gray-500">
+                        К: {food.calories} | Б: {food.protein}г | Ж: {food.fat}г
+                        | В: {food.carbs}г
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {userRecipes?.length > 0 && !selectedGlobalFood && (
                 <select
                   {...register("selected_recipe_id")}
                   className="w-full p-2 border rounded-lg bg-white"
                 >
-                  <option value="">-- Ввести дані вручну --</option>
+                  <option value="">-- Або обрати мій рецепт: --</option>
                   <option value="" disabled>
-                    Або обрати мій рецепт:
+                    Мої рецепти:
                   </option>
                   {userRecipes.map((recipe) => (
                     <option key={recipe.id} value={recipe.id}>
@@ -175,17 +285,17 @@ export function MealCard({
                 </select>
               )}
 
-              {!isRecipeSelected && (
-                <div className="flex gap-2 rounded-lg bg-gray-200 p-1 text-sm">
-                  <label className="flex-1 text-center cursor-pointer p-1 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all">
-                    <input
-                      type="radio"
-                      value="per100g"
-                      {...register("calc_mode")}
-                      className="sr-only"
-                    />
-                    На 100г
-                  </label>
+              <div className="flex gap-2 rounded-lg bg-gray-200 p-1 text-sm">
+                <label className="flex-1 text-center cursor-pointer p-1 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all">
+                  <input
+                    type="radio"
+                    value="per100g"
+                    {...register("calc_mode")}
+                    className="sr-only"
+                  />
+                  На 100г
+                </label>
+                {!selectedGlobalFood && (
                   <label className="flex-1 text-center cursor-pointer p-1 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all">
                     <input
                       type="radio"
@@ -195,15 +305,18 @@ export function MealCard({
                     />
                     На порцію
                   </label>
-                </div>
-              )}
+                )}
+              </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <input
                   type="number"
                   step="1"
-                  placeholder="Вага (г)"
-                  {...register("weight_eaten", { valueAsNumber: true })}
+                  placeholder={placeholderText}
+                  {...register(
+                    calcMode === "serving" ? "servings" : "weight_eaten",
+                    { valueAsNumber: true }
+                  )}
                   className="p-2 border rounded"
                 />
                 <input
@@ -212,11 +325,11 @@ export function MealCard({
                   placeholder="Калорії"
                   {...register("calories", { valueAsNumber: true })}
                   className={`p-2 border rounded ${
-                    isRecipeSelected
+                    isRecipeSelected || selectedGlobalFood
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : ""
                   }`}
-                  readOnly={isRecipeSelected}
+                  readOnly={isRecipeSelected || !!selectedGlobalFood}
                 />
                 <input
                   type="number"
@@ -224,11 +337,11 @@ export function MealCard({
                   placeholder="Білки"
                   {...register("protein_g", { valueAsNumber: true })}
                   className={`p-2 border rounded ${
-                    isRecipeSelected
+                    isRecipeSelected || selectedGlobalFood
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : ""
                   }`}
-                  readOnly={isRecipeSelected}
+                  readOnly={isRecipeSelected || !!selectedGlobalFood}
                 />
                 <input
                   type="number"
@@ -236,11 +349,11 @@ export function MealCard({
                   placeholder="Жири"
                   {...register("fat_g", { valueAsNumber: true })}
                   className={`p-2 border rounded ${
-                    isRecipeSelected
+                    isRecipeSelected || selectedGlobalFood
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : ""
                   }`}
-                  readOnly={isRecipeSelected}
+                  readOnly={isRecipeSelected || !!selectedGlobalFood}
                 />
                 <input
                   type="number"
@@ -248,11 +361,11 @@ export function MealCard({
                   placeholder="Вуглеводи"
                   {...register("carbs_g", { valueAsNumber: true })}
                   className={`p-2 border rounded ${
-                    isRecipeSelected
+                    isRecipeSelected || selectedGlobalFood
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : ""
                   }`}
-                  readOnly={isRecipeSelected}
+                  readOnly={isRecipeSelected || !!selectedGlobalFood}
                 />
                 <input
                   type="number"
@@ -260,11 +373,11 @@ export function MealCard({
                   placeholder="Цукор"
                   {...register("sugar_g", { valueAsNumber: true })}
                   className={`p-2 border rounded ${
-                    isRecipeSelected
+                    isRecipeSelected || selectedGlobalFood
                       ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                       : ""
                   }`}
-                  readOnly={isRecipeSelected}
+                  readOnly={isRecipeSelected || !!selectedGlobalFood}
                 />
               </div>
               {errors.weight_eaten && (
@@ -275,23 +388,44 @@ export function MealCard({
             </div>
           )}
 
-          {(entryMode === "ai" || !isRecipeSelected) && (
-            <div>
-              <textarea
-                {...register("entry_text")}
-                className="w-full p-3 border border-gray-200 rounded-lg text-gray-700"
-                rows={2}
-                placeholder={
-                  entryMode === "ai"
-                    ? "Опишіть вашу страву для аналізу..."
-                    : "Введіть назву продукту..."
-                }
-              />
-              {errors.entry_text && (
-                <p className="text-red-500 text-sm">
-                  {errors.entry_text.message}
-                </p>
-              )}
+          <div
+            className={`
+              ${
+                entryMode === "ai" || (!isRecipeSelected && !selectedGlobalFood)
+                  ? "block"
+                  : "hidden"
+              }
+            `}
+          >
+            <textarea
+              {...register("entry_text")}
+              className="w-full p-3 border border-gray-200 rounded-lg text-gray-700"
+              rows={2}
+              placeholder={
+                entryMode === "ai"
+                  ? "Опишіть вашу страву для аналізу..."
+                  : "Введіть назву продукту..."
+              }
+            />
+            {errors.entry_text && (
+              <p className="text-red-500 text-sm">
+                {errors.entry_text.message}
+              </p>
+            )}
+          </div>
+
+          {selectedGlobalFood && (
+            <div className="p-3 bg-gray-100 rounded-lg border border-gray-200 flex items-center justify-between">
+              <span className="font-semibold text-gray-700">
+                Обрано: {selectedGlobalFood.name}
+              </span>
+              <button
+                type="button"
+                onClick={handleResetGlobalFood}
+                className="text-red-500 hover:text-red-700"
+              >
+                <XCircle size={20} />
+              </button>
             </div>
           )}
 
