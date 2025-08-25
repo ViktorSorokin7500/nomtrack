@@ -14,7 +14,7 @@ export async function getAiJsonResponse<T>(
 
     const response = await together.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "Qwen/Qwen2-72B-Instruct",
+      model: "Qwen/Qwen3-235B-A22B-Instruct-2507-tput",
       response_format: { type: "json_object" },
     });
 

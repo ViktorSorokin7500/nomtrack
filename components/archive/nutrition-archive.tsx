@@ -11,7 +11,7 @@ type YearData = { year: number; months: MonthData[] };
 
 interface NutritionArchiveProps {
   nutritionData: YearData[];
-  userProfile: Profile | null;
+  userProfile: Profile;
 }
 
 export function NutritionArchive({

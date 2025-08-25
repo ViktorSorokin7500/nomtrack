@@ -1,4 +1,4 @@
-import { DailySummary } from "@/types";
+import { DailySummary, Profile } from "@/types";
 
 export const promptWithIngredients = (
   userText: string
@@ -75,47 +75,64 @@ Your JSON Response: { "calories_burned": 400 }
   Your JSON Response:`;
 
 export const promptWithRecipe = (userText: string) => `
-      Analyze the following list of recipe ingredients. Your task is to normalize each ingredient into its English name and its total weight in GRAMS.
+You are an AI culinary assistant and nutritional calculator. Your task is to analyze a list of recipe ingredients. For each ingredient, you must normalize its name and estimate its weight after cooking or preparation.
 
-      Follow these rules:
-      1. If you see "кг", "kg", or same meaninig, multiply the number by 1000 to get grams. (e.g., "2 кг муки" -> weightGrams: 2000).
-      2. For items by count (like eggs, onions, etc.), use a standard average weight to calculate the total weight in grams. (e.g., "8 large eggs" -> assume 60g per egg -> weightGrams: 480).
-      3. For liquids in "ml", assume density is 1 g/ml. (e.g., "200 ml milk" -> weightGrams: 200).
-      4. The 'ingredientName' should be a clean, simple English name suitable for an API query (e.g., "cauliflower", "large eggs", "milk").
-      5. If the input text does not appear to be a list of ingredients, or if it's nonsensical, return an empty JSON array: []
-      Your response MUST be a valid JSON object. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
-      Return the output ONLY as a valid JSON array of objects. Each object must have two keys: "ingredientName" (string) and "weightGrams" (number).
+Follow these rules:
+1. Identify each ingredient and its raw weight in grams. Normalize the ingredient name to a simple English name for a nutritional API query.
+2. If you see "кг", "kg", multiply the number by 1000 to get grams.
+3. For items by count (like eggs, onions), use a standard average weight to calculate the total grams.
+4. For liquids in "ml", assume a density of 1 g/ml.
+5. **Crucially, for each ingredient, estimate its weight after cooking.** Account for typical weight changes:
+    - **Meat (chicken, beef, etc.):** Typically loses 20-30% of its weight. (e.g., 100g raw chicken becomes ~75g cooked).
+    - **Rice, Pasta, Legumes:** Typically gains 200-300% of its weight due to water absorption. (e.g., 50g raw rice becomes ~125g cooked).
+    - **Vegetables:** Weight change varies, usually loses 10-20% when cooked.
+    - **Oils, Sauces:** Weight usually doesn't change.
+6. If the input text is not a list of ingredients, return an empty JSON array: [].
 
-      Input List:
-      ${userText}
+Your response MUST be a valid JSON array. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
 
-      JSON Output:
-    `;
+JSON format:
+[
+  { "ingredientName": "<english_food_item_name>", "weightGrams": <estimated_cooked_weight_in_grams> },
+  // ... more ingredients with their cooked weight
+]
+
+Example:
+Input List:
+100г курячого філе
+50г рису
+
+JSON Output:
+[
+    { "ingredientName": "chicken fillet", "weightGrams": 75},
+    { "ingredientName": "rice", "weightGrams": 125}
+]
+
+Input List:
+${userText}
+
+JSON Output:
+`;
 
 export const promptWithMonthlyReport = (
-  daysData: DailySummary[]
-) => `You are an experienced nutritionist and a professional data analyst. Your task is to generate a detailed, actionable, and encouraging monthly nutrition and body progress analysis.
+  daysData: DailySummary[],
+  userProfile: Profile
+) => `You are an experienced nutritionist and a professional data analyst. Your task is to generate a detailed, actionable, and encouraging monthly nutrition and body progress analysis for the user.
 
-The analysis MUST be written **entirely in fluent Ukrainian**. The tone should be professional, precise, and empathetic, but avoid generic phrases. Base your conclusions strictly on the provided numerical data. Always refer to averages, percentages, deviations, and number of days above/below target. Be specific and fact-driven, not vague.
+The analysis MUST be provided as a structured JSON object, formatted strictly according to the schema below. The tone should be professional, precise, and empathetic, but avoid generic phrases. The language of the report's content MUST be entirely in fluent Ukrainian. Base your conclusions strictly on the provided numerical data and the user's profile information. Always refer to averages, percentages, deviations, and the number of days above/below target. Be specific and fact-driven.
 
-### Structure of the report (in Ukrainian):
-1. A concise, encouraging summary of the user's overall performance for the month (1-2 sentences with actual numbers).
-2. 
-   - Compare average calorie intake against the daily target.
-   - Specify the number of days the user was above, below, or on target.
-   - Mention the dates and values of the most significant calorie surpluses or deficits.
-3. 
-   - Compare average intake of each macro against its target.
-   - Quantify the deviations in grams and percentages.
-   - Identify trends (e.g., "Protein levels were consistently low throughout the month.").
-4. 
-   - Analyze average daily water consumption against the target.
-   - Describe the weight trend: start-of-month weight, end-of-month weight, and total change.
-5. 
-   - Provide 2-3 clear, actionable, and practical steps for improvement based on the data.
-   - Focus on one key area for improvement.
-   - Recommendations should be specific, for example, "To increase protein intake, add legumes or lean meat to your diet."
-   - Maintain a motivational and non-judgmental tone.
+### User Profile and Goals:
+- Goal: ${userProfile.goal}
+- Activity Level: ${userProfile.activity_level}
+- Gender: ${userProfile.gender}
+- Age: ${userProfile.age}
+- Height: ${userProfile.height_cm} cm
+- Starting Weight (month start): ${
+  daysData.length > 0 ? daysData[daysData.length - 1].end_of_day_weight : "N/A"
+} kg
+- **Ending Weight (month end):** ${
+  daysData.length > 0 ? daysData[0].end_of_day_weight : "N/A"
+} kg
 
 ### Data to analyze:
 ${JSON.stringify(daysData, null, 2)}
@@ -123,6 +140,61 @@ ${JSON.stringify(daysData, null, 2)}
 Your final response MUST be a complete and valid JSON object in the following format, and NOTHING else. Ensure the report is in fluent Ukrainian.
 
 {
-  "report": "Тут буде ваш детальний та структурований звіт згідно з наданою структурою."
+  "summary": {
+    "title": "Загальна оцінка прогресу",
+    "content": "Тут буде короткий, мотивуючий висновок, що посилається на цілі та результати. Наприклад: 'Протягом місяця ви показали стабільний прогрес у досягненні вашої цілі «Зменшення ваги», що свідчить про хорошу дисципліну.'"
+  },
+  "metrics": [
+    {
+      "name": "Калорії",
+      "averageConsumed": 2345,
+      "target": 2494,
+      "unit": "ккал",
+      "analysis": "Середнє споживання було на 6% нижче цілі. Ви були нижче цілі 14 днів, вище - 10 днів. Найбільший дефіцит: 785 ккал (16 серпня)."
+    },
+    {
+      "name": "Білки",
+      "averageConsumed": 159,
+      "target": 187,
+      "unit": "г",
+      "analysis": "Споживання білків було стабільно на 15% нижче цілі. Це може перешкоджати збереженню м'язової маси."
+    },
+    {
+      "name": "Жири",
+      "averageConsumed": 91,
+      "target": 83,
+      "unit": "г",
+      "analysis": "Середнє споживання жирів було на 9% вище цілі. Варто звернути увагу на джерела жирів у раціоні."
+    },
+    {
+      "name": "Вуглеводи",
+      "averageConsumed": 271,
+      "target": 249,
+      "unit": "г",
+      "analysis": "Середнє споживання вуглеводів було на 9% вище цілі. Слідкуйте за розмірами порцій."
+    },
+    {
+      "name": "Вода",
+      "averageConsumed": 2400,
+      "target": 2630,
+      "unit": "мл",
+      "analysis": "Середнє споживання води на 8% нижче цільового показника, що може впливати на загальне самопочуття."
+    }
+  ],
+  "weightAnalysis": {
+    "title": "Динаміка ваги",
+    "startWeight": 105.2,
+    "endWeight": 105.0,
+    "change": -0.2,
+    "unit": "кг",
+    "analysis": "Ваша вага знизилася на 0.2 кг, що відповідає вашій цілі. Продовжуйте в тому ж дусі!"
+  },
+  "recommendations": {
+    "title": "Персональні рекомендації",
+    "items": [
+      "Зосередьтеся на збільшенні споживання білка, щоб підтримувати м'язову масу. Додайте в раціон бобові або нежирне м'ясо.",
+      "Для ефективного зменшення ваги, вам потрібно зменшити середнє споживання жирів, замінивши їх на корисні, наприклад, авокадо чи горіхи."
+    ]
+  }
 }
 `;

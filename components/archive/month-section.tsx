@@ -7,7 +7,7 @@ type MonthData = { name: string; days: DayData[] };
 
 interface MonthSectionProps {
   month: MonthData;
-  userProfile: Profile | null;
+  userProfile: Profile;
 }
 
 export function MonthSection({ month, userProfile }: MonthSectionProps) {

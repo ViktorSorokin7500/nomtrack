@@ -11,7 +11,7 @@ interface LangSwitcherProps {
 }
 
 export const LangSwitcher = ({ lang, title, className }: LangSwitcherProps) => {
-  const targetLanguage = lang === "en" ? "uk" : "en";
+  const targetLanguage = lang === "uk" ? "uk" : "uk";
   const pathname = usePathname();
   const redirectTarget = () => {
     if (!pathname) return "/";

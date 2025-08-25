@@ -7,10 +7,13 @@ import { MonthlyReportButton } from "./monthly-report-button";
 
 interface MonthlySummaryCardProps {
   days: DayData[];
-  userProfile: Profile | null;
+  userProfile: Profile;
 }
 
-export function MonthlySummaryCard({ days }: MonthlySummaryCardProps) {
+export function MonthlySummaryCard({
+  days,
+  userProfile,
+}: MonthlySummaryCardProps) {
   // Розраховуємо загальні та середні показники
   const totals = days.reduce(
     (acc, day) => {
@@ -115,7 +118,7 @@ export function MonthlySummaryCard({ days }: MonthlySummaryCardProps) {
           </div>
         ))}
       </div>
-      <MonthlyReportButton daysData={days} />
+      <MonthlyReportButton daysData={days} userProfile={userProfile} />
     </Card>
   );
 }

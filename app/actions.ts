@@ -14,6 +14,7 @@ import {
   Ingredient,
   NormalizedIngredient,
   NutritionInfo,
+  Profile,
   TotalNutrition,
 } from "@/types";
 import {
@@ -23,6 +24,7 @@ import {
   promptWithRecipe,
 } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/utils";
+import { AiReportData } from "@/components/archive/report-display";
 
 async function getAuthUserOrError() {
   const supabase = createClient();
@@ -149,7 +151,6 @@ export async function analyzeAndSaveFoodEntry(formData: {
     };
 
     for (const item of nutritionData.items) {
-      console.log("updateNutritionTargets actions item =>", item);
       totals.calories += item.calories;
       totals.protein_g += item.protein_g;
       totals.fat_g += item.fat_total_g;
@@ -300,9 +301,6 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
     return { error: "Некоректні дані, надіслані на сервер." };
   }
 
-  console.log("--- Server Action 'addManualFoodEntry' запущено ---");
-  console.log("Отримані дані з форми:", entryData);
-
   // Перевіряємо, що ми в правильному режимі
   if (entryData.entry_mode !== "manual") {
     return { error: "Неправильний режим для цього екшену" };
@@ -350,8 +348,6 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       finalData.sugar_g = (sugar_g || 0) * servingsCount;
     }
 
-    console.log("Дані після розрахунку:", finalData);
-
     const dataToInsert = {
       user_id: user.id,
       entry_text: entry_text,
@@ -364,8 +360,6 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       water_ml: 0,
     };
 
-    console.log("Об'єкт для запису в БД:", dataToInsert);
-
     const { error } = await (await supabase)
       .from("food_entries")
       .insert([dataToInsert]);
@@ -376,7 +370,6 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
     }
 
     revalidatePath("/dashboard");
-    console.log("--- Запис успішно додано! ---");
     return { success: "Запис успішно додано!" };
   } catch (e) {
     console.error("КРИТИЧНА ПОМИЛКА В ЕКШЕНІ addManualFoodEntry:", e);
@@ -677,22 +670,29 @@ export async function searchGlobalFood(searchTerm: string) {
   }
 }
 
-export async function analyzeMonthlyData(daysData: DailySummary[]) {
-  // <-- ВИПРАВЛЕНО
-  const prompt = promptWithMonthlyReport(daysData);
+export async function analyzeMonthlyData(
+  daysData: DailySummary[],
+  userProfile: Profile
+) {
+  const prompt = promptWithMonthlyReport(daysData, userProfile);
 
   try {
-    const { data, error } = await getAiJsonResponse<{ report: string }>(prompt);
+    // ЗМІНА: ТЕПЕР МИ ОЧІКУЄМО ПОВНИЙ ОБ'ЄКТ AiReportData
+    const { data: reportData, error } = await getAiJsonResponse<AiReportData>(
+      prompt
+    );
 
     if (error) {
       return { error: `Помилка аналізу ШІ: ${error}` };
     }
 
-    if (!data || !data.report) {
+    // ЗМІНА: ПЕРЕВІРЯЄМО, ЧИ ДАНІ ПРИЙШЛИ
+    if (!reportData) {
       return { error: "ШІ не повернув звіт." };
     }
 
-    return { success: data.report };
+    // ЗМІНА: ПОВЕРТАЄМО ПОВНИЙ ОБ'ЄКТ
+    return { success: reportData };
   } catch (e) {
     console.error("Помилка в analyzeMonthlyData:", e);
     const errorMessage =

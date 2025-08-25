@@ -6,7 +6,7 @@ type YearData = { year: number; months: MonthData[] };
 
 interface YearSectionProps {
   yearData: YearData;
-  userProfile: Profile | null;
+  userProfile: Profile;
 }
 
 export function YearSection({ yearData, userProfile }: YearSectionProps) {
