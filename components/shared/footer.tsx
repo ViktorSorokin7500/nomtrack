@@ -11,7 +11,7 @@ const socialIcons = [
   },
   {
     href: "#",
-    title: "Twitter",
+    title: "Instagram",
     color: "hover:text-blue-300",
     path: (
       <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
@@ -87,64 +87,26 @@ function SocialIcon({ href, path, title, color }: SocialIconProps) {
 }
 
 export function Footer() {
-  // const footerLinks = [
-  //   {
-  //     title: "Product",
-  //     links: [
-  //       { label: "Features", href: "#" },
-  //       { label: "Pricing", href: "#pricing" },
-  //       { label: "Integrations", href: "#" },
-  //       { label: "Updates", href: "#" },
-  //     ],
-  //   },
-  //   {
-  //     title: "Resources",
-  //     links: [
-  //       { label: "Blog", href: "#" },
-  //       { label: "Guides", href: "#" },
-  //       { label: "Support", href: "#" },
-  //       { label: "API", href: "#" },
-  //     ],
-  //   },
-  //   {
-  //     title: "Company",
-  //     links: [
-  //       { label: "About", href: "#" },
-  //       { label: "Careers", href: "#" },
-  //       { label: "Press", href: "#" },
-  //       { label: "Contact", href: "#" },
-  //     ],
-  //   },
-  //   {
-  //     title: "Legal",
-  //     links: [
-  //       { label: "Privacy", href: "#" },
-  //       { label: "Terms", href: "#" },
-  //       { label: "Security", href: "#" },
-  //       { label: "Cookies", href: "#" },
-  //     ],
-  //   },
-  // ];
   const footerLinks = [
     {
-      title: "Product",
+      title: "Продукт",
       links: [
-        { label: "Updates", href: "/updates" },
-        { label: "Pricing", href: "/pricing" },
+        { label: "Оновлення", href: "/updates" },
+        { label: "Тарифи", href: "/pricing" },
       ],
     },
     {
-      title: "Resources",
+      title: "Ресурси",
       links: [
-        { label: "Support", href: "/support" },
-        { label: "Sitemap", href: "/sitemap" },
+        { label: "Підтримка", href: "/support" },
+        { label: "Карта сайту", href: "/sitemap" },
       ],
     },
     {
-      title: "Legal",
+      title: "Юридична інформація",
       links: [
-        { label: "Privacy Policy", href: "/legal/privacy" },
-        { label: "Terms of Service", href: "/legal/terms" },
+        { label: "Політика конфіденційності", href: "/legal/privacy" },
+        { label: "Умови надання послуг", href: "/legal/terms" },
       ],
     },
   ];
@@ -193,7 +155,7 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-200 mt-8 pt-8 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} Nom Track. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} NomTrack. Усі права захищено.</p>
         </div>
       </div>
     </footer>

@@ -9,10 +9,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui";
 
 const signUpSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
+  email: z
+    .string()
+    .email({ message: "Будь ласка, введіть дійсну адресу електронної пошти" }),
   password: z
     .string()
-    .min(6, { message: "Password must be at least 6 characters long" }),
+    .min(6, { message: "Пароль має містити щонайменше 6 символів" }),
 });
 
 type SignUpSchema = z.infer<typeof signUpSchema>;
@@ -34,10 +36,10 @@ export default function SignUpPage() {
     });
 
     if (error) {
-      toast.error("Sign-up error: " + error.message);
+      toast.error("Помилка реєстрації: " + error.message);
     } else {
       toast.success(
-        "Sign-up successful! Please check your email for a confirmation link.",
+        "Реєстрація успішна! Будь ласка, перевірте свою електронну пошту, щоб отримати посилання для підтвердження.",
         { duration: 6000 } // Show longer for the user to read
       );
     }
@@ -45,7 +47,9 @@ export default function SignUpPage() {
 
   return (
     <div className="w-full">
-      <h1 className="text-2xl font-bold mb-6 text-center">Create an Account</h1>
+      <h1 className="text-2xl font-bold mb-6 text-center">
+        Створити обліковий запис
+      </h1>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <div>
           <label htmlFor="email">Email</label>
@@ -60,7 +64,7 @@ export default function SignUpPage() {
           )}
         </div>
         <div>
-          <label htmlFor="password">Password</label>
+          <label htmlFor="password">Пароль</label>
           <input
             id="password"
             type="password"
@@ -74,18 +78,18 @@ export default function SignUpPage() {
           )}
         </div>
         <Button type="submit" disabled={isSubmitting} className="w-full">
-          {isSubmitting ? "Creating account..." : "Sign Up"}
+          {isSubmitting ? " Створення облікового запису..." : "Зареєструватися"}
         </Button>
       </form>
 
       {/* Sign-in link */}
       <p className="text-center text-sm text-gray-600 mt-8">
-        Already have an account?{" "}
+        Вже маєте обліковий запис?{" "}
         <Link
           href="/sign-in"
           className="font-medium text-orange-500 hover:underline"
         >
-          Sign in
+          Увійти
         </Link>
       </p>
     </div>

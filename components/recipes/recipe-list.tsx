@@ -33,7 +33,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
       (t) => (
         <div className="flex flex-col items-center gap-4">
           <p className="font-semibold">
-            Are you sure you want to delete this recipe?
+            Ви впевнені, що хочете видалити цей рецепт?
           </p>
           <div className="flex gap-3">
             <button
@@ -44,7 +44,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
                     if (res.error) {
                       toast.error(res.error); // Показуємо помилку, якщо вона є
                     } else {
-                      toast.success(res.success || "Recipe deleted!"); // Повідомлення про успіх
+                      toast.success(res.success || "Рецепт видалено!"); // Повідомлення про успіх
                     }
                   });
                 });
@@ -52,13 +52,13 @@ export function RecipeList({ recipes }: RecipeListProps) {
               }}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
             >
-              Yes, delete
+              Так, видалити
             </button>
             <button
               onClick={() => toast.dismiss(t.id)} // Просто закриваємо сповіщення
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Cancel
+              Скасувати
             </button>
           </div>
         </div>
@@ -83,9 +83,9 @@ export function RecipeList({ recipes }: RecipeListProps) {
               <div className="flex-grow">
                 <h3 className="font-bold">{recipe.recipe_name}</h3>
                 <p className="text-sm text-gray-500">
-                  Per 100g: {recipe.calories_per_100g} kcal, p:{" "}
-                  {recipe.protein_per_100g}g, f: {recipe.fat_per_100g}g, c:{" "}
-                  {recipe.carbs_per_100g}g, s: {recipe.sugar_per_100g}g
+                  На 100 г: {recipe.calories_per_100g} ккал, б:{" "}
+                  {recipe.protein_per_100g}г, ж: {recipe.fat_per_100g}г, в:{" "}
+                  {recipe.carbs_per_100g}г, ц: {recipe.sugar_per_100g}г
                 </p>
               </div>
 
@@ -114,7 +114,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
           ))
         ) : (
           <p className="text-center text-gray-500 py-10">
-            You don&apos;t have any saved recipes yet.
+            У вас ще немає збережених рецептів.
           </p>
         )}
       </div>
@@ -126,23 +126,23 @@ export function RecipeList({ recipes }: RecipeListProps) {
             <h2 className="text-2xl font-bold">{selectedRecipe.recipe_name}</h2>
 
             <div>
-              <h4 className="font-semibold">Nutrition Facts (per 100g):</h4>
+              <h4 className="font-semibold">Харчова цінність (на 100 г):</h4>
               <p className="text-gray-700">
-                {selectedRecipe.calories_per_100g} kcal | protein:{" "}
-                {selectedRecipe.protein_per_100g}g | fat:{" "}
-                {selectedRecipe.fat_per_100g}g | carbs:{" "}
-                {selectedRecipe.carbs_per_100g}g | sugar:{" "}
-                {selectedRecipe.sugar_per_100g}g
+                {selectedRecipe.calories_per_100g} ккал | білок:{" "}
+                {selectedRecipe.protein_per_100g}г | жири:{" "}
+                {selectedRecipe.fat_per_100g}г | вуглеводи:{" "}
+                {selectedRecipe.carbs_per_100g}г | цукр:{" "}
+                {selectedRecipe.sugar_per_100g}г
               </p>
             </div>
 
             <p className="text-sm text-gray-600">
-              Total Dish Weight:{" "}
-              <strong>{selectedRecipe.total_weight_g}g</strong>
+              Загальна вага страви:{" "}
+              <strong>{selectedRecipe.total_weight_g}г</strong>
             </p>
 
             <div>
-              <h4 className="font-semibold">Ingredients:</h4>
+              <h4 className="font-semibold">Інгредієнти:</h4>
               <pre className="p-3 bg-gray-100 rounded-md whitespace-pre-wrap text-sm font-sans">
                 {selectedRecipe.ingredients_text}
               </pre>

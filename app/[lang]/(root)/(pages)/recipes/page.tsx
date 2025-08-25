@@ -22,8 +22,10 @@ export default async function RecipesPage() {
     <section className="bg-orange-50 p-4">
       <div className="container max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">My Recipes</h1>
-          <p className="text-gray-500">Create and manage your own recipes.</p>
+          <h1 className="text-3xl font-bold">Мої рецепти</h1>
+          <p className="text-gray-500">
+            Створюйте та керуйте власними рецептами.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">

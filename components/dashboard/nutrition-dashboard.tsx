@@ -43,7 +43,7 @@ export function NutritionDashboard({
       const percentage = target > 0 ? Math.round((current / target) * 100) : 0;
       return `${percentage}%`;
     }
-    return `${current}g / ${target}g`;
+    return `${current}г / ${target}г`;
   };
   // Формуємо динамічний список доступних опцій для випадаючого меню
   const availableMealTypes = [
@@ -56,16 +56,18 @@ export function NutritionDashboard({
   return (
     <Card className="container mx-auto px-4 py-8 max-w-4xl">
       <header className="mb-8 text-center">
-        <h1 className="text-3xl font-light text-gray-800 mb-2">Food Log</h1>
+        <h1 className="text-3xl font-light text-gray-800 mb-2">
+          Журнал харчування
+        </h1>
         <p className="text-gray-500 font-light">
-          Track meals to follow your progress
+          Відстежуйте прийоми їжі, щоб стежити за своїм прогресом
         </p>
       </header>
 
       {/* Блок з прогресом, що використовує реальні дані */}
       <Card className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h2 className="text-xl font-light text-gray-700 mb-4">
-          Today&apos;s Summary
+          Підсумок за сьогодні
         </h2>
         <div className="flex items-center justify-between gap-4 sm:gap-6">
           <ProgressRing
@@ -130,7 +132,7 @@ export function NutritionDashboard({
               />
             </div>
             {/* Sugar */}
-            {/* <div
+            <div
               onMouseEnter={() => setHoveredMacro("sugar")}
               onMouseLeave={() => setHoveredMacro(null)}
               className="cursor-pointer"
@@ -146,7 +148,7 @@ export function NutritionDashboard({
                 target={summaryData.macros.sugar.target}
                 color="bg-sky-300"
               />
-            </div> */}
+            </div>
           </div>
         </div>
       </Card>
@@ -156,7 +158,7 @@ export function NutritionDashboard({
         {foodLogData.length > 0 && (
           <div className="space-y-3">
             <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-3">
-              Today&apos;s Log
+              Журнал за сьогодні
             </h3>
             {foodLogData.map((entry) => (
               <FoodEntryCard key={entry.id} entry={entry} />

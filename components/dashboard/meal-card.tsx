@@ -215,7 +215,7 @@ export function MealCard({
                 {...register("entry_mode")}
                 className="sr-only"
               />
-              AI Аналіз
+              ШІ Аналіз
             </label>
             <label className="flex-1 text-center cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
               <input
@@ -448,7 +448,16 @@ export function MealCard({
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Обробка..." : "Додати запис"}
+              {isPending ? (
+                <span className="flex items-center gap-[7px] animate-pulse">
+                  Обробка
+                  <div className="size-1 rounded-full bg-white animate-bounce" />
+                  <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+                  <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+                </span>
+              ) : (
+                "Додати запис"
+              )}
             </Button>
           </div>
         </form>

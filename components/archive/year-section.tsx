@@ -12,9 +12,7 @@ interface YearSectionProps {
 export function YearSection({ yearData, userProfile }: YearSectionProps) {
   return (
     <div>
-      <div className="year-marker rounded-lg p-3 mb-6 bg-orange-200 text-stone-900 font-bold text-xl">
-        {yearData.year}
-      </div>
+      <div className="year-marker rounded-lg p-1 mb-6 bg-orange-200 text-stone-900 font-bold text-xl" />
       {/* Використовуємо Object.values() для ітерації по об'єкту місяців */}
       {Object.values(yearData.months).map((month) => (
         <MonthSection

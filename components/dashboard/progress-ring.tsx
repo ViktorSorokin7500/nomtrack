@@ -74,7 +74,7 @@ export function ProgressRing({
               {current.toLocaleString()}
             </span>
             <span className="text-sm text-gray-500">
-              / {target.toLocaleString()} cal
+              / {target.toLocaleString()} ккал
             </span>
           </>
         )}

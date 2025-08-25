@@ -3,36 +3,36 @@ import React from "react";
 // 1. All card data is defined in one place, now in English.
 const cardData = [
   {
-    title: "Calories",
+    title: "Калорії",
     description:
-      "The energy that fuels your day. We help you find the right balance for your personal goals.",
+      "Енергія, що живить ваш день. Nomtrack допоможе знайти правильний баланс для досягнення ваших цілей.",
     bgColor: "bg-orange-200",
     bgBackColor: "bg-orange-300",
     textColor: "text-gray-800",
     mobilePillColor: "bg-orange-200 text-orange-600",
   },
   {
-    title: "Protein",
+    title: "Білки",
     description:
-      "Essential building blocks for muscle and tissue. Crucial for recovery, strength, and feeling full.",
+      "Основні будівельні блоки для м'язів і тканин. Важливі для відновлення, сили та відчуття ситості.",
     bgColor: "bg-green-200",
     bgBackColor: "bg-green-300",
     textColor: "text-gray-800",
     mobilePillColor: "bg-green-200 text-green-600",
   },
   {
-    title: "Carbs",
+    title: "Вуглеводи",
     description:
-      "Your body's primary fuel source. Choose complex carbs for sustained, clean energy throughout the day.",
+      "Головне джерело енергії для вашого тіла. Обирайте складні вуглеводи для стабільної, чистої енергії протягом дня.",
     bgColor: "bg-yellow-200",
     bgBackColor: "bg-yellow-300",
     textColor: "text-gray-800",
     mobilePillColor: "bg-yellow-100 text-yellow-600",
   },
   {
-    title: "Fats",
+    title: "Жири",
     description:
-      "Vital for hormone production, brain health, and absorbing vitamins. Healthy fats are your friend.",
+      "Життєво важливі для вироблення гормонів, здоров'я мозку та засвоєння вітамінів. Здорові жири — ваші друзі.",
     bgColor: "bg-white",
     bgBackColor: "bg-stone-100",
     textColor: "text-gray-800",
@@ -77,14 +77,14 @@ export function PhilosophySection() {
         <div className="lg:w-1/2 mb-8 md:mb-0 md:pr-8">
           {/* 3. Updated title and paragraph with new English content. */}
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-800">
-            🧠 Our Philosophy: Awareness Over Restriction
+            🧠 Моя філософія: усвідомленість, а не обмеження
           </h2>
           <p className="text-lg text-gray-700 mb-6">
-            We believe nutrition tracking should be empowering, not
-            overwhelming. NomTrack is built on a foundation of minimalist design
-            and core nutritional principles to bring clarity and awareness to
-            your eating habits, helping you build a healthier relationship with
-            food.
+            Відстеження харчування має надавати сили, а не бути обтяжливим.
+            NomTrack побудований на принципах мінімалістичного дизайну та
+            ключових засадах дієтології, щоб внести ясність і усвідомленість у
+            ваші харчові звички та допомогти вам побудувати здоровіші стосунки з
+            їжею.
           </p>
           {/* 4. Mobile pills are now generated from the single cardData array. */}
           <div className="flex flex-wrap gap-3 lg:hidden">

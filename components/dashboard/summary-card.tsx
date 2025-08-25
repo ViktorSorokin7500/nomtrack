@@ -38,7 +38,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
   return (
     <Card className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium text-stone-900">Weight Progress</h2>
+        <h2 className="text-xl font-medium text-stone-900">Прогрес ваги</h2>
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString()}
         </div>
@@ -51,11 +51,11 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               {/* SVG icon */}
             </div>
             <div className="flex-1">
-              <h4 className="font-medium text-stone-900">Weight Tracking</h4>
+              <h4 className="font-medium text-stone-900">Відстеження ваги</h4>
               <div className="text-xs text-gray-600 mt-1">
-                Current Weight:
+                Поточна вага:
                 <span className="font-bold ml-1">
-                  {currentWeight ? `${currentWeight} kg` : "N/A"}
+                  {currentWeight ? `${currentWeight} кг` : "N/A"}
                 </span>
               </div>
             </div>
@@ -65,7 +65,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
 
       <div className="bg-blue-50 rounded-xl p-4">
         <h3 className="font-medium text-stone-900 mb-3">
-          Log today&apos;s weight
+          Записати сьогоднішню вагу
         </h3>
         <div className="flex items-end gap-3">
           <div className="flex-grow">
@@ -73,7 +73,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               htmlFor="weightInput"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Weight (kg)
+              Вага (кг)
             </label>
             <input
               id="weightInput"
@@ -82,7 +82,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               value={weightInput}
               onChange={(e) => setWeightInput(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
-              placeholder="e.g., 85.5"
+              placeholder="85.5"
             />
           </div>
           <Button
@@ -90,7 +90,15 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
             disabled={isPending}
             className="my-1"
           >
-            {isPending ? "Saving..." : "Save"}
+            {isPending ? (
+              <span className="w-[66px] flex justify-center items-center gap-2 animate-pulse">
+                <div className="size-1 rounded-full bg-white animate-bounce" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+              </span>
+            ) : (
+              "Зберегти"
+            )}
           </Button>
         </div>
       </div>

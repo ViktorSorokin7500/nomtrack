@@ -10,6 +10,7 @@ import {
 } from "@/lib/validators";
 import {
   AiRecipeResponse,
+  DailySummary,
   Ingredient,
   NormalizedIngredient,
   NutritionInfo,
@@ -18,6 +19,7 @@ import {
 import {
   promptWithActivity,
   promptWithIngredients,
+  promptWithMonthlyReport,
   promptWithRecipe,
 } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/utils";
@@ -669,6 +671,30 @@ export async function searchGlobalFood(searchTerm: string) {
     return { success: formattedData };
   } catch (e) {
     console.error("Критична помилка в searchGlobalFood:", e);
+    const errorMessage =
+      e instanceof Error ? e.message : "Невідома помилка на сервері.";
+    return { error: errorMessage };
+  }
+}
+
+export async function analyzeMonthlyData(daysData: DailySummary[]) {
+  // <-- ВИПРАВЛЕНО
+  const prompt = promptWithMonthlyReport(daysData);
+
+  try {
+    const { data, error } = await getAiJsonResponse<{ report: string }>(prompt);
+
+    if (error) {
+      return { error: `Помилка аналізу ШІ: ${error}` };
+    }
+
+    if (!data || !data.report) {
+      return { error: "ШІ не повернув звіт." };
+    }
+
+    return { success: data.report };
+  } catch (e) {
+    console.error("Помилка в analyzeMonthlyData:", e);
     const errorMessage =
       e instanceof Error ? e.message : "Невідома помилка на сервері.";
     return { error: errorMessage };

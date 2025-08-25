@@ -64,7 +64,7 @@ export function NutritionTargetsForm({
       initialData;
     if (!current_weight_kg || !height_cm || !age) {
       toast.error(
-        "Please fill out your weight, height, and age in Personal Info first."
+        'Будь ласка, спочатку вкажіть свою вагу, зріст та вік в розділі "Особисті дані".'
       );
       return;
     }
@@ -100,7 +100,9 @@ export function NutritionTargetsForm({
     setValue("target_carbs_g", carbs);
     setValue("target_fat_g", fat);
     setValue("target_water_ml", waterTarget);
-    toast.success("Targets calculated! Click 'Save Changes' to apply them.");
+    toast.success(
+      'Цілі розраховано! Натисніть "Зберегти зміни", щоб застосувати.'
+    );
   };
 
   const onSubmit = async (data: TargetsSchema) => {
@@ -114,7 +116,9 @@ export function NutritionTargetsForm({
 
   return (
     <Card>
-      <h2 className="text-xl font-semibold mb-6">Nutrition Targets</h2>
+      <h2 className="text-xl font-semibold mb-6">
+        Цільові показники харчування
+      </h2>
       <div className="flex justify-center mb-6">
         <Button
           type="button"
@@ -122,13 +126,13 @@ export function NutritionTargetsForm({
           variant="outline"
           className="bg-lime-400 hover:bg-lime-300 text-stone-800 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
         >
-          Calculate Automatically
+          Розрахувати автоматично
         </Button>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="target_calories">Daily Calories (kcal)</label>
+            <label htmlFor="target_calories">Калорії на день (ккал)</label>
             <input
               id="target_calories"
               type="number"
@@ -142,7 +146,7 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_protein_g">Protein (g)</label>
+            <label htmlFor="target_protein_g">Білки (г)</label>
             <input
               id="target_protein_g"
               type="number"
@@ -156,7 +160,7 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_carbs_g">Carbs (g)</label>
+            <label htmlFor="target_carbs_g">Вуглеводи (г)</label>
             <input
               id="target_carbs_g"
               type="number"
@@ -170,7 +174,7 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_fat_g">Fat (g)</label>
+            <label htmlFor="target_fat_g">Жири (г)</label>
             <input
               id="target_fat_g"
               type="number"
@@ -184,7 +188,7 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_water_ml">Water (ml)</label>
+            <label htmlFor="target_water_ml">Вода (мл)</label>
             <input
               id="target_water_ml"
               type="number"
@@ -200,7 +204,16 @@ export function NutritionTargetsForm({
         </div>
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center gap-[9px] animate-pulse">
+                Зберегаю
+                <div className="size-1 rounded-full bg-white animate-bounce" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+              </span>
+            ) : (
+              "Зберегти зміни"
+            )}
           </Button>
         </div>
       </form>

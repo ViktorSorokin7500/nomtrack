@@ -70,7 +70,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
       <div className="py-2">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-medium text-stone-900">
-            Activity Tracker
+            Відстеження активності
           </h2>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -78,14 +78,22 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
             {...register("text")}
             rows={2}
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder={`Carrying a 20kg load for 60 minutes.\nLight gardening (watering) for 60 minutes.`}
+            placeholder="Легкі садові роботи (полив) протягом 60 хвилин."
           />
           {errors.text && (
             <p className="text-red-500 text-sm">{errors.text.message}</p>
           )}
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending}>
-              {isPending ? "Analyzing..." : "Add Activity"}
+              {isPending ? (
+                <span className="w-[53px] flex items-center justify-center gap-2 animate-pulse">
+                  <div className="size-1 rounded-full bg-white animate-bounce" />
+                  <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+                  <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+                </span>
+              ) : (
+                "Додати"
+              )}
             </Button>
           </div>
         </form>

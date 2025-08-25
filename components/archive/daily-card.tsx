@@ -14,22 +14,10 @@ export function DailyCard({ day, userProfile }: DailyCardProps) {
   // Стан для контролю видимості модального вікна
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  console.log(
-    day.date,
-    day.consumed_calories,
-    day.target_calories,
-    day.consumed_protein_g,
-    day.target_protein_g,
-    day.consumed_fat_g,
-    day.target_fat_g,
-    day.consumed_carbs_g,
-    day.target_carbs_g
-  );
-
   return (
     <>
       <Card
-        className="hover:cursor-pointer hover:shadow-lg transition-shadow"
+        className="hover:cursor-pointer hover:shadow-lg transition-shadow z-1"
         onClick={() => setIsModalOpen(true)}
       >
         <div className="flex justify-between items-center mb-3">
@@ -40,16 +28,16 @@ export function DailyCard({ day, userProfile }: DailyCardProps) {
         </div>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-600">Calories (consumed):</span>
+            <span className="text-gray-600">Калорій (спожито):</span>
             <span className="font-semibold text-gray-800">
               {day.consumed_calories}
             </span>
           </div>
           {day.end_of_day_weight && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Weight:</span>
+              <span className="text-gray-600">Вага:</span>
               <span className="font-semibold text-gray-800">
-                {day.end_of_day_weight} kg
+                {day.end_of_day_weight} кг
               </span>
             </div>
           )}

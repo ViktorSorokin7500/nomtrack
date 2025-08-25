@@ -1,3 +1,5 @@
+import { DailySummary } from "@/types";
+
 export const promptWithIngredients = (
   userText: string
 ) => `You are a nutritional assistant that analyzes a user's meal description and outputs a flat JSON list of ingredients with estimated weights in grams.
@@ -89,3 +91,38 @@ export const promptWithRecipe = (userText: string) => `
 
       JSON Output:
     `;
+
+export const promptWithMonthlyReport = (
+  daysData: DailySummary[]
+) => `You are an experienced nutritionist and a professional data analyst. Your task is to generate a detailed, actionable, and encouraging monthly nutrition and body progress analysis.
+
+The analysis MUST be written **entirely in fluent Ukrainian**. The tone should be professional, precise, and empathetic, but avoid generic phrases. Base your conclusions strictly on the provided numerical data. Always refer to averages, percentages, deviations, and number of days above/below target. Be specific and fact-driven, not vague.
+
+### Structure of the report (in Ukrainian):
+1. A concise, encouraging summary of the user's overall performance for the month (1-2 sentences with actual numbers).
+2. 
+   - Compare average calorie intake against the daily target.
+   - Specify the number of days the user was above, below, or on target.
+   - Mention the dates and values of the most significant calorie surpluses or deficits.
+3. 
+   - Compare average intake of each macro against its target.
+   - Quantify the deviations in grams and percentages.
+   - Identify trends (e.g., "Protein levels were consistently low throughout the month.").
+4. 
+   - Analyze average daily water consumption against the target.
+   - Describe the weight trend: start-of-month weight, end-of-month weight, and total change.
+5. 
+   - Provide 2-3 clear, actionable, and practical steps for improvement based on the data.
+   - Focus on one key area for improvement.
+   - Recommendations should be specific, for example, "To increase protein intake, add legumes or lean meat to your diet."
+   - Maintain a motivational and non-judgmental tone.
+
+### Data to analyze:
+${JSON.stringify(daysData, null, 2)}
+
+Your final response MUST be a complete and valid JSON object in the following format, and NOTHING else. Ensure the report is in fluent Ukrainian.
+
+{
+  "report": "Тут буде ваш детальний та структурований звіт згідно з наданою структурою."
+}
+`;

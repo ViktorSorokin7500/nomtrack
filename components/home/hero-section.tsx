@@ -8,17 +8,18 @@ export function HeroSection({ lang }: { lang: Locale }) {
     <section className="container mx-auto px-4 py-16 lg:py-24 flex flex-col lg:flex-row items-center">
       <div className="lg:w-1/2 mb-10 lg:mb-0">
         <h1 className="text-4xl lg:text-5xl font-bold mb-6 leading-tight">
-          Welcome to
+          Ласкаво просимо до
           <br className="sm:hidden lg:block xl:hidden" />
           <span className="bg-gradient-to-r from-orange-400 to-green-300 text-white px-4 parallelogram">
             NomTrack
-          </span>{" "}
-          — Your Smart Calorie &amp; Macro Tracker
+          </span>
+          <br />
+          Ваш розумний трекер калорій і макроелементів
         </h1>
         <p className="text-lg mb-8 text-gray-700">
-          Take control of your nutrition with the help of AI. NomTrack is a
-          modern tool designed to make healthy eating easy, personalized, and
-          enjoyable.
+          Візьміть контроль над своїм харчуванням за допомогою ШІ. NomTrack — це
+          сучасний інструмент, створений, щоб зробити здорове харчування легким,
+          персоналізованим і приємним.
         </p>
       </div>
       <div className="lg:w-1/2 flex justify-center">
@@ -26,8 +27,10 @@ export function HeroSection({ lang }: { lang: Locale }) {
           <div className="relative bg-white rounded-3xl shadow-lg overflow-hidden">
             <div className="bg-orange-400 bg-opacity-10 p-4">
               <div className="flex justify-between items-center">
-                <h3 className="font-medium text-gray-50">Todays Summary</h3>
-                <span className="text-sm text-gray-500">June 15</span>
+                <h3 className="font-medium text-gray-50">
+                  Підсумок за сьогодні
+                </h3>
+                <span className="text-sm text-gray-500">15 червня</span>
               </div>
             </div>
             <div className="p-6">
@@ -36,19 +39,19 @@ export function HeroSection({ lang }: { lang: Locale }) {
                   <div className="text-2xl font-bold text-orange-400">
                     1,450
                   </div>
-                  <div className="text-xs text-gray-500">calories</div>
+                  <div className="text-xs text-gray-500">калорії</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-500">120g</div>
-                  <div className="text-xs text-gray-500">protein</div>
+                  <div className="text-2xl font-bold text-blue-500">120г</div>
+                  <div className="text-xs text-gray-500">білки</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-green-500">45g</div>
-                  <div className="text-xs text-gray-500">fats</div>
+                  <div className="text-2xl font-bold text-green-500">40г</div>
+                  <div className="text-xs text-gray-500">жири</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-500">160g</div>
-                  <div className="text-xs text-gray-500">carbs</div>
+                  <div className="text-2xl font-bold text-yellow-500">160г</div>
+                  <div className="text-xs text-gray-500">вуглеводи</div>
                 </div>
               </div>
               <div className="space-y-4">
@@ -71,13 +74,13 @@ export function HeroSection({ lang }: { lang: Locale }) {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-medium">Breakfast</div>
+                      <div className="font-medium">Сніданок</div>
                       <div className="text-xs text-gray-500">
-                        Greek yogurt with berries
+                        Грецький йогурт з ягодами
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm font-medium">320 cal</div>
+                  <div className="text-sm font-medium">320 ккал</div>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-xl flex justify-between items-center">
                   <div className="flex items-center">
@@ -98,13 +101,11 @@ export function HeroSection({ lang }: { lang: Locale }) {
                       </svg>
                     </div>
                     <div>
-                      <div className="font-medium">Lunch</div>
-                      <div className="text-xs text-gray-500">
-                        Chicken salad with avocado
-                      </div>
+                      <div className="font-medium">Обід</div>
+                      <div className="text-xs text-gray-500">Курячий салат</div>
                     </div>
                   </div>
-                  <div className="text-sm font-medium">520 cal</div>
+                  <div className="text-sm font-medium">520 ккал</div>
                 </div>
               </div>
             </div>

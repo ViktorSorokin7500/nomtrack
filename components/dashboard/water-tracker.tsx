@@ -59,28 +59,30 @@ export function WaterTrackerCard({
 
   return (
     <Card className="bg-white rounded-2xl shadow-lg p-6">
-      <h2 className="text-xl font-medium text-stone-900 mb-4">Water Tracker</h2>
+      <h2 className="text-xl font-medium text-stone-900 mb-4">
+        Відстеження води
+      </h2>
 
       <div className="mb-4">
         <div className="flex justify-between items-baseline mb-1">
           <span className="text-lg font-bold text-blue-500">
-            {optimisticWater.toLocaleString()} ml
+            {optimisticWater.toLocaleString()} мл
           </span>
           <span className="text-sm text-gray-500">
-            Goal: {targetWater.toLocaleString()} ml
+            Ціль: {targetWater.toLocaleString()} мл
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
           <div
             className="bg-blue-400 h-2.5 rounded-full"
             style={{ width: `${progressPercent}%` }}
-          ></div>
+          />
         </div>
       </div>
 
       <div className="space-y-4">
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-2">Quick Add:</p>
+          <p className="text-sm text-gray-600 mb-2">Швидко додати:</p>
           <div className="flex justify-center gap-2">
             {quickAddAmounts.map((amount) => (
               <Button
@@ -92,7 +94,7 @@ export function WaterTrackerCard({
                 className="bg-blue-50 hover:bg-blue-100 text-blue-600 border-blue-200"
               >
                 {/* 3. Невеличке покращення: додаємо '+' для позитивних значень */}
-                {amount > 0 ? `+${amount}` : amount} ml
+                {amount > 0 ? `+${amount}` : amount} мл
               </Button>
             ))}
           </div>
@@ -103,7 +105,7 @@ export function WaterTrackerCard({
             type="number"
             value={customAmount}
             onChange={(e) => setCustomAmount(e.target.value)}
-            placeholder="e.g., 350 or -100"
+            placeholder="350"
             className="w-full px-4 py-2 border rounded-md text-center"
             disabled={isPending}
           />
@@ -112,7 +114,15 @@ export function WaterTrackerCard({
             disabled={isPending || customAmount === ""}
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
-            Add
+            {isPending ? (
+              <span className="w-[53px] flex items-center justify-center gap-2 animate-pulse">
+                <div className="size-1 rounded-full bg-white animate-bounce" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+              </span>
+            ) : (
+              "Додати"
+            )}
           </Button>
         </div>
       </div>

@@ -30,22 +30,22 @@ export async function generateMetadata({
 
   return {
     title: {
-      template: "%s | Nom Track",
-      default: "Nom Track",
+      template: "%s | NomTrack",
+      default: "NomTrack",
     },
     description: localizedMetadata[lang].description,
     keywords: localizedMetadata[lang].keywords,
     openGraph: {
-      title: "Nom Track",
+      title: "NomTrack",
       description: localizedMetadata[lang].description,
       url: `https://www.commentpulse.site/${lang}`,
       type: "website",
-      locale: lang === "en" ? "en_US" : "uk_UA",
+      locale: lang === "uk" ? "uk_UA" : "en_US",
       siteName: "Social Analyzer",
     },
     twitter: {
       card: "summary_large_image",
-      title: "Nom Track",
+      title: "NomTrack",
       description: localizedMetadata[lang].description,
     },
   };

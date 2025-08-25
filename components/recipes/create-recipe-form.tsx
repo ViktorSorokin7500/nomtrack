@@ -35,7 +35,7 @@ export function CreateRecipeForm() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Recipe created successfully!");
+        toast.success("Рецепт успішно створено!");
         reset();
       }
     });
@@ -46,20 +46,20 @@ export function CreateRecipeForm() {
       {isPending ? (
         <div className="flex flex-col items-center justify-center min-h-[487px] text-center">
           <h2 className="text-xl font-semibold mb-4">
-            Analyzing ingredients...
+            Аналіз інгредієнтів...
             <SimpleRiseSpinner />
           </h2>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="z-50">
-          <h2 className="text-xl font-semibold">Create New Recipe</h2>
+          <h2 className="text-xl font-semibold">Створити новий рецепт</h2>
 
           <div>
             <label
               htmlFor="recipeName"
               className="block text-sm font-medium text-gray-700"
             >
-              Recipe Name
+              Назва рецепту
             </label>
             <input
               {...register("recipeName")}
@@ -78,15 +78,15 @@ export function CreateRecipeForm() {
               htmlFor="ingredientsText"
               className="block text-sm font-medium text-gray-700"
             >
-              Ingredients <br />
-              <small>(enter each ingredient with its weight.)</small>
+              Інгредієнти <br />
+              <small>(введіть кожен інгредієнт із його вагою.)</small>
             </label>
             <textarea
               {...register("ingredientsText")}
               id="ingredientsText"
               rows={12}
               className="w-full p-2 border rounded-md mt-1"
-              placeholder={`150g chicken breast\n200g rice\n50g carrots`}
+              placeholder={`150г курячого філе\n200г рису\n50г моркви`}
             />
             {errors.ingredientsText && (
               <p className="text-red-500 text-sm mt-1">
@@ -96,7 +96,16 @@ export function CreateRecipeForm() {
           </div>
 
           <Button type="submit" disabled={isPending} className="w-full">
-            {isPending ? "Analyzing & saving..." : "Save Recipe"}
+            {isPending ? (
+              <span className="flex items-center gap-2 animate-pulse">
+                Аналіз і збереження
+                <div className="size-1 rounded-full bg-white animate-bounce" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+              </span>
+            ) : (
+              "Зберегти рецепт"
+            )}
           </Button>
         </form>
       )}

@@ -55,7 +55,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
 
   return (
     <Card>
-      <h2 className="text-xl font-semibold mb-6">Personal Information</h2>
+      <h2 className="text-xl font-semibold mb-6">Особисті дані</h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Поле для імені */}
@@ -64,7 +64,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="full_name"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Full Name
+              Повне ім&apos;я
             </label>
             <input
               id="full_name"
@@ -85,7 +85,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="current_weight_kg"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Weight (kg)
+              Вага (кг)
             </label>
             <input
               id="current_weight_kg"
@@ -107,7 +107,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="height_cm"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Height (cm)
+              Зріст (см)
             </label>
             <input
               id="height_cm"
@@ -128,7 +128,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="age"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Age
+              Вік
             </label>
             <input
               id="age"
@@ -147,16 +147,16 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="gender"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Gender
+              Стать
             </label>
             <select
               id="gender"
               {...register("gender")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
+              <option value="male">Стать</option>
+              <option value="female">Жіноча</option>
+              <option value="other">Інша</option>
             </select>
           </div>
 
@@ -166,18 +166,18 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="activity_level"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Activity Level
+              Рівень активності
             </label>
             <select
               id="activity_level"
               {...register("activity_level")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="sedentary">Sedentary</option>
-              <option value="light">Lightly active</option>
-              <option value="moderate">Moderately active</option>
-              <option value="active">Active</option>
-              <option value="ultra">Very active</option>
+              <option value="sedentary">Сидячий спосіб життя</option>
+              <option value="light">Низька активність</option>
+              <option value="moderate">Помірна активність</option>
+              <option value="active">Активний</option>
+              <option value="ultra">Дуже активний</option>
             </select>
           </div>
 
@@ -187,23 +187,31 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="goal"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Goal
+              Ціль
             </label>
             <select
               id="goal"
               {...register("goal")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="lose">Lose Weight</option>
-              <option value="maintain">Maintain Weight</option>
-              <option value="gain">Gain Muscle</option>
+              <option value="lose">Скинути вагу</option>
+              <option value="maintain">Підтримувати вагу</option>
+              <option value="gain">Набрати м&apos;язову масу</option>
             </select>
           </div>
         </div>
 
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Changes"}
+            {isSubmitting ? (
+              <span className="w-[67px] flex items-center justify-center gap-2 animate-pulse">
+                <div className="w-2 h-2 rounded-full bg-white animate-bounce" />
+                <div className="w-2 h-2 rounded-full bg-white animate-bounce delay-150" />
+                <div className="w-2 h-2 rounded-full bg-white animate-bounce delay-300" />
+              </span>
+            ) : (
+              "Зберегти"
+            )}
           </Button>
         </div>
       </form>

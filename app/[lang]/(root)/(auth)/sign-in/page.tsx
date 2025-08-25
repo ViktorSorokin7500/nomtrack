@@ -12,13 +12,17 @@ import { Button } from "@/components/ui";
 
 // Schema for Magic Link (email only)
 const magicLinkSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
+  email: z
+    .string()
+    .email({ message: "Будь ласка, введіть дійсну адресу електронної пошти" }),
 });
 
 // Schema for password sign-in
 const passwordSchema = z.object({
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  password: z.string().min(1, { message: "Password cannot be empty" }),
+  email: z
+    .string()
+    .email({ message: "Будь ласка, введіть дійсну адресу електронної пошти" }),
+  password: z.string().min(1, { message: "Пароль не може бути порожнім" }),
 });
 
 type MagicLinkSchema = z.infer<typeof magicLinkSchema>;
@@ -46,16 +50,19 @@ const MagicLinkForm = () => {
     if (error) {
       toast.error(`Error: ${error.message}`);
     } else {
-      toast.success("Check your email for a sign-in link!", {
-        duration: 6000,
-      });
+      toast.success(
+        "Перевірте свою електронну пошту, щоб отримати посилання для входу!",
+        {
+          duration: 6000,
+        }
+      );
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <p className="text-center text-sm text-gray-500">
-        Enter your email to receive an instant sign-in link.
+        Введіть свою електронну пошту, щоб отримати миттєве посилання для входу.
       </p>
       <div>
         <label htmlFor="email">Email</label>
@@ -71,7 +78,7 @@ const MagicLinkForm = () => {
         )}
       </div>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Sending..." : "Get Magic Link"}
+        {isSubmitting ? "Відправляю..." : "Отримати магічне посилання"}
       </Button>
     </form>
   );
@@ -96,9 +103,9 @@ const PasswordForm = () => {
     });
 
     if (error) {
-      toast.error(`Sign-in error: ${error.message}`);
+      toast.error(`Помилка входу: ${error.message}`);
     } else {
-      toast.success("Sign-in successful! Redirecting...");
+      toast.success("Вхід успішний! Виконується перенаправлення");
       router.push("/dashboard");
       router.refresh();
     }
@@ -119,7 +126,7 @@ const PasswordForm = () => {
         )}
       </div>
       <div>
-        <label htmlFor="password">Password</label>
+        <label htmlFor="password">Пароль</label>
         <input
           id="password"
           type="password"
@@ -131,7 +138,7 @@ const PasswordForm = () => {
         )}
       </div>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Signing in..." : "Sign In"}
+        {isSubmitting ? "Виконується вхід..." : "Увійти"}
       </Button>
     </form>
   );
@@ -151,14 +158,14 @@ export default function SignInPage() {
     });
 
     if (error) {
-      toast.error(`Google sign-in error: ${error.message}`);
+      toast.error(`Помилка входу через Google: ${error.message}`);
     }
   };
 
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">
-        Sign In to Your Account
+        Увійти до свого облікового запису
       </h1>
 
       {view === "magic_link" ? <MagicLinkForm /> : <PasswordForm />}
@@ -174,16 +181,16 @@ export default function SignInPage() {
           className="text-sm font-medium text-orange-500 hover:underline"
         >
           {view === "magic_link"
-            ? "Sign in with password"
-            : "Sign in with a magic link"}
+            ? "Увійти за допомогою пароля"
+            : 'Увійти за допомогою "магічного" посилання'}
         </a>
       </div>
 
       {/* Divider */}
       <div className="relative flex py-5 items-center">
-        <div className="flex-grow border-t border-gray-300"></div>
-        <span className="flex-shrink mx-4 text-gray-400 text-sm">OR</span>
-        <div className="flex-grow border-t border-gray-300"></div>
+        <div className="flex-grow border-t border-gray-300" />
+        <span className="flex-shrink mx-4 text-gray-400 text-sm">АБО</span>
+        <div className="flex-grow border-t border-gray-300" />
       </div>
 
       {/* Google Sign-In */}
@@ -210,17 +217,17 @@ export default function SignInPage() {
             d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.244,44,30.036,44,24C44,22.659,43.862,21.35,43.611,20.083z"
           ></path>
         </svg>
-        Continue with Google
+        Продовжити через Google
       </Button>
 
       {/* Sign-up link */}
       <p className="text-center text-sm text-gray-600 mt-8">
-        Don&apos;t have an account?{" "}
+        Немає облікового запису?
         <Link
           href="/sign-up"
           className="font-medium text-orange-500 hover:underline"
         >
-          Sign up
+          Зареєструватися зараз
         </Link>
       </p>
     </div>
