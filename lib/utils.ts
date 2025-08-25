@@ -20,6 +20,8 @@ export async function getAiJsonResponse<T>(
 
     const content = response.choices?.[0]?.message?.content;
 
+    console.log(content);
+
     // Цей лог допоможе побачити повну, "брудну" відповідь
     if (!content) {
       return { data: null, error: "ШІ не повернув жодного контенту." };

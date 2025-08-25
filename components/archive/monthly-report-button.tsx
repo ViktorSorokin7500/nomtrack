@@ -34,6 +34,8 @@ export function MonthlyReportButton({
     };
   }, [isModalOpen]);
 
+  // ДОДАНИЙ ЛОГ
+
   const getReport = () => {
     startTransition(async () => {
       // ЗМІНА: ПРЯМО ПРИЙМАЄМО ОБ'ЄКТ

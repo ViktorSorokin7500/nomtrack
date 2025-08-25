@@ -201,7 +201,7 @@ export function MealCard({
     <Card
       className={`meal-card bg-white rounded-xl shadow-sm overflow-hidden ${className}`}
     >
-      <div className="p-6">
+      <div className="sm:p-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <h3 className="text-lg font-medium text-gray-700">
             Додати прийом їжі

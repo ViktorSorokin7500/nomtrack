@@ -5,13 +5,6 @@ export interface AiReportData {
     title: string;
     content: string;
   };
-  metrics: {
-    name: string;
-    averageConsumed: number;
-    target: number;
-    unit: string;
-    analysis: string;
-  }[];
   weightAnalysis: {
     title: string;
     startWeight: number;
@@ -42,25 +35,6 @@ export function ReportDisplay({ reportData }: ReportDisplayProps) {
       </div>
 
       {/* Аналіз метрик (таблиця або список) */}
-
-      <h4 className="font-semibold text-xl text-gray-800 mb-4 text-center">
-        Детальний аналіз
-      </h4>
-      <div className="space-y-4">
-        {reportData.metrics.map((metric, index) => (
-          <div key={index}>
-            <h5 className="font-semibold text-lg text-sky-600">
-              {metric.name}
-            </h5>
-            <p className="text-sm">
-              <b>Спожито:</b> {metric.averageConsumed} {metric.unit}
-              <br />
-              <b>Ціль:</b> {metric.target} {metric.unit}
-            </p>
-            <p className="mt-1">{metric.analysis}</p>
-          </div>
-        ))}
-      </div>
 
       <div className="h-[2px] w-full bg-gray-200" />
 
