@@ -1,6 +1,6 @@
 "use client";
 
-import { useForm, useWatch } from "react-hook-form";
+import { Resolver, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   analyzeAndSaveFoodEntry,
@@ -13,7 +13,7 @@ import { foodEntrySchema, type FoodEntryFormSchema } from "@/lib/validators";
 import toast from "react-hot-toast";
 import { Card } from "../shared";
 import { UserRecipe } from "@/types";
-import { XCircle } from "lucide-react";
+import { Coins, XCircle } from "lucide-react";
 
 // Тип для результатів пошуку з глобальної БД
 type GlobalFoodSearchResult = {
@@ -55,7 +55,7 @@ export function MealCard({
     setValue,
     formState: { errors },
   } = useForm<FoodEntryFormSchema>({
-    resolver: zodResolver(foodEntrySchema),
+    resolver: zodResolver(foodEntrySchema) as Resolver<FoodEntryFormSchema>,
     defaultValues: {
       entry_mode: "ai",
       calc_mode: "per100g",
@@ -211,7 +211,7 @@ export function MealCard({
           </h3>
 
           <div className="flex gap-2 rounded-lg bg-gray-100 p-1">
-            <label className="flex-1 text-center cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
+            <label className="flex justify-center flex-1 text-center cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
               <input
                 type="radio"
                 value="ai"
@@ -219,6 +219,9 @@ export function MealCard({
                 className="sr-only"
               />
               ШІ Аналіз
+              <span className="flex gap-0.5 ml-1 text-green-500">
+                <Coins className="size-5" />1
+              </span>
             </label>
             <label className="flex-1 text-center cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
               <input
@@ -318,7 +321,14 @@ export function MealCard({
                   placeholder={placeholderText}
                   {...register(
                     calcMode === "serving" ? "servings" : "weight_eaten",
-                    { valueAsNumber: true }
+                    {
+                      setValueAs: (v) => {
+                        if (v === "" || v === null || v === undefined)
+                          return undefined;
+                        const num = Number(v);
+                        return Number.isNaN(num) ? undefined : num;
+                      },
+                    }
                   )}
                   className="p-2 border rounded"
                 />

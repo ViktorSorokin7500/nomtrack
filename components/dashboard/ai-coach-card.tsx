@@ -9,6 +9,7 @@ import { Card } from "../shared";
 import { Button } from "../ui";
 import { ActivityEntryCard } from "./activity-entry-card";
 import toast from "react-hot-toast";
+import { Coins } from "lucide-react";
 
 const activitySchema = z.object({
   text: z
@@ -56,7 +57,7 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
       {activityLogData.length > 0 && (
         <div className="py-2 border-b border-gray-200">
           <h3 className="text-lg font-medium text-stone-900 mb-3">
-            Today&apos;s Activities
+            Активність за сьогодні
           </h3>
           <div className="space-y-2">
             {activityLogData.map((entry) => (
@@ -68,10 +69,13 @@ export function AICoachCard({ activityLogData }: AICoachCardProps) {
 
       {/* Форма для додавання нової активності */}
       <div className="py-2">
-        <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center mb-4">
           <h2 className="text-xl font-medium text-stone-900">
-            Відстеження активності
+            Відстеження активності{" "}
           </h2>
+          <span className="flex gap-0.5 ml-1 text-green-500">
+            <Coins className="size-5" />1
+          </span>
         </div>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <textarea

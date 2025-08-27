@@ -8,6 +8,7 @@ import { Button, SimpleRiseSpinner } from "../ui";
 import { useTransition } from "react";
 import { Card } from "../shared";
 import toast from "react-hot-toast";
+import { Coins } from "lucide-react";
 
 const schema = z.object({
   recipeName: z.string().min(3, "Name must be longer"),
@@ -104,7 +105,12 @@ export function CreateRecipeForm() {
                 <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
               </span>
             ) : (
-              "Зберегти рецепт"
+              <>
+                <p>Зберегти рецепт</p>
+                <span className="flex gap-0.5 ml-1 text-white-500">
+                  <Coins className="size-5" />1
+                </span>
+              </>
             )}
           </Button>
         </form>

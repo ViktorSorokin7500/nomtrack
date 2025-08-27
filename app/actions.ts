@@ -30,7 +30,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Supabase = SupabaseClient<any, "public", any>;
 const AI_REQUEST = 1;
-const AI_ANALYZE = 10;
+const AI_ANALYZE = 5;
 
 export async function getAuthUserOrError() {
   const supabase = createClient();

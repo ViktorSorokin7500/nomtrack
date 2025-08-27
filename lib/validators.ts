@@ -1,6 +1,10 @@
 // @/lib/validators.ts
-
 import { z } from "zod";
+
+const numberOrNull = z.preprocess(
+  (val) => (val === "" ? undefined : val),
+  z.number().min(0).optional().nullable()
+);
 
 export const foodEntrySchema = z
   .object({
@@ -8,29 +12,23 @@ export const foodEntrySchema = z
     calc_mode: z.enum(["per100g", "serving"]).optional(),
 
     entry_text: z.string().optional(),
-    meal_type: z.string().min(1, "Будь ласка, оберіть прийом їжі."), // <-- ПОВЕРНУТО
+    meal_type: z.string().min(1, "Будь ласка, оберіть прийом їжі."),
 
-    // Поля для ручного вводу (min(0) дозволяє вводити нуль, наприклад для цукру)
     calories: z.coerce.number().min(0).optional().nullable(),
     protein_g: z.coerce.number().min(0).optional().nullable(),
     fat_g: z.coerce.number().min(0).optional().nullable(),
     carbs_g: z.coerce.number().min(0).optional().nullable(),
     sugar_g: z.coerce.number().min(0).optional().nullable(),
-    weight_eaten: z.coerce
-      .number()
-      .positive("Вага має бути вказана")
-      .optional()
-      .nullable(),
-    servings: z.coerce.number().positive().optional().nullable(),
 
-    // Додаємо нові опціональні поля
+    weight_eaten: numberOrNull,
+    servings: numberOrNull,
+
     selected_recipe_id: z.string().optional(),
     selected_global_food_name: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     // --- УМОВНА ВАЛІДАЦІЯ ---
 
-    // Правило 1: Якщо режим AI, то `entry_text` обов'язковий.
     if (
       data.entry_mode === "ai" &&
       (!data.entry_text || data.entry_text.trim().length === 0)
@@ -42,7 +40,6 @@ export const foodEntrySchema = z
       });
     }
 
-    // Правило 2: Якщо ручний режим І рецепт/продукт НЕ обрано, то `entry_text` обов'язковий.
     if (
       data.entry_mode === "manual" &&
       !data.selected_recipe_id &&
@@ -56,22 +53,33 @@ export const foodEntrySchema = z
       });
     }
 
-    // Правило 3: Якщо ручний режим, то поле ваги обов'язкове.
-    if (
-      data.entry_mode === "manual" &&
-      (!data.weight_eaten || data.weight_eaten <= 0)
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Будь ласка, вкажіть вагу.",
-        path: ["weight_eaten"],
-      });
+    // Нова логіка для перевірки наявності значень
+    if (data.entry_mode === "manual") {
+      if (
+        data.calc_mode === "per100g" &&
+        (!data.weight_eaten || data.weight_eaten <= 0)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Будь ласка, вкажіть вагу.",
+          path: ["weight_eaten"],
+        });
+      }
+      if (
+        data.calc_mode === "serving" &&
+        (!data.servings || data.servings <= 0)
+      ) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Будь ласка, вкажіть кількість порцій.",
+          path: ["servings"],
+        });
+      }
     }
   });
 
 export type FoodEntryFormSchema = z.infer<typeof foodEntrySchema>;
 
-// ... (інші схеми залишаються без змін)
 export const personalInfoSchema = z.object({
   full_name: z.string().optional(),
   current_weight_kg: z.coerce.number().positive(),

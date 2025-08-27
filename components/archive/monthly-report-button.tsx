@@ -9,6 +9,7 @@ import { Card } from "../shared";
 import { AiOutlineFileText } from "react-icons/ai";
 import { AiReportData, ReportDisplay } from "./report-display";
 import { useRouter } from "next/navigation";
+import { Coins } from "lucide-react";
 
 interface MonthlyReportButtonProps {
   daysData: DailySummary[];
@@ -71,7 +72,12 @@ export function MonthlyReportButton({
             <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
           </span>
         ) : (
-          "Згенерувати звіт від ШІ"
+          <>
+            <p>Згенерувати звіт від ШІ</p>
+            <span className="flex gap-0.5 ml-1 text-white-500">
+              <Coins className="size-5" />5
+            </span>
+          </>
         )}{" "}
       </Button>{" "}
       {isModalOpen && report && (
