@@ -1,6 +1,5 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import {
   type FoodEntryFormSchema,
@@ -25,14 +24,75 @@ import {
 } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/utils";
 import { AiReportData } from "@/components/archive/report-display";
+import { createClient } from "@/lib/supabase/server";
+import { SupabaseClient } from "@supabase/supabase-js";
 
-async function getAuthUserOrError() {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Supabase = SupabaseClient<any, "public", any>;
+const AI_REQUEST = 1;
+const AI_ANALYZE = 10;
+
+export async function getAuthUserOrError() {
   const supabase = createClient();
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
   if (!user) throw new Error("Ви не авторизовані");
   return { supabase: await supabase, user };
+}
+
+export async function checkPremiumStatus(user_id: string, supabase: Supabase) {
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("premium_expires_at")
+    .eq("id", user_id)
+    .single();
+
+  if (error) {
+    throw new Error("Не вдалося перевірити статус підписки.");
+  }
+
+  // Перевіряємо, чи підписка існує і чи вона ще не вичерпана
+  if (
+    !profile?.premium_expires_at ||
+    new Date(profile.premium_expires_at) < new Date()
+  ) {
+    throw new Error("Ваша підписка вичерпана. Будь ласка, оновіть її.");
+  }
+}
+
+export async function checkCreditsAndDeduct(
+  user_id: string,
+  cost: number,
+  supabase: Supabase
+) {
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("ai_credits_left")
+    .eq("id", user_id)
+    .single();
+
+  if (error) {
+    throw new Error("Не вдалося перевірити кількість токенів.");
+  }
+
+  if ((profile?.ai_credits_left || 0) < cost) {
+    throw new Error(
+      `Недостатньо токенів. Потрібно: ${cost}, доступно: ${
+        profile?.ai_credits_left || 0
+      }.`
+    );
+  }
+
+  const newCredits = (profile?.ai_credits_left || 0) - cost;
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ ai_credits_left: newCredits })
+    .eq("id", user_id);
+
+  if (updateError) {
+    throw new Error("Не вдалося оновити кількість токенів.");
+  }
 }
 
 // Наша Server Action для оновлення особистих даних
@@ -104,6 +164,8 @@ export async function analyzeAndSaveFoodEntry(formData: {
   const { supabase, user } = await getAuthUserOrError();
 
   try {
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_REQUEST, supabase);
     const ingredientPrompt = promptWithIngredients(text);
 
     const { data, error } = await getAiJsonResponse<{
@@ -255,6 +317,8 @@ export async function analyzeAndSaveActivityEntry(text: string) {
   const prompt = promptWithActivity(text);
 
   try {
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_REQUEST, supabase);
     const { data, error } = await getAiJsonResponse<{
       calories_burned: number;
     }>(prompt);
@@ -307,6 +371,15 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
   }
 
   const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+  } catch (e) {
+    let errorMessage = "Не вдалося перевірити підписку.";
+    if (e instanceof Error) errorMessage = e.message;
+    console.error("Помилка перевірки підписки в addManualFoodEntry:", e);
+    return { error: errorMessage };
+  }
 
   try {
     const {
@@ -385,6 +458,7 @@ export async function createAndAnalyzeRecipe(formData: {
   ingredientsText: string;
 }) {
   const { recipeName, ingredientsText } = formData;
+
   if (!recipeName.trim() || !ingredientsText.trim()) {
     return { error: "Назва та інгредієнти не можуть бути порожніми." };
   }
@@ -392,6 +466,8 @@ export async function createAndAnalyzeRecipe(formData: {
   const { supabase, user } = await getAuthUserOrError();
 
   try {
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_REQUEST, supabase);
     const initialIngredientLines = ingredientsText
       .split(/,|\n/)
       .map((line) => line.trim())
@@ -630,9 +706,10 @@ export async function searchGlobalFood(searchTerm: string) {
     return { success: [] };
   }
 
-  const { supabase } = await getAuthUserOrError();
+  const { supabase, user } = await getAuthUserOrError();
 
   try {
+    await checkPremiumStatus(user.id, supabase);
     const { data, error } = await supabase.rpc("search_products", {
       search_term: searchTerm,
     });
@@ -663,9 +740,10 @@ export async function searchGlobalFood(searchTerm: string) {
 
     return { success: formattedData };
   } catch (e) {
-    console.error("Критична помилка в searchGlobalFood:", e);
-    const errorMessage =
-      e instanceof Error ? e.message : "Невідома помилка на сервері.";
+    let errorMessage = "Не вдалося перевірити підписку.";
+    if (e instanceof Error) errorMessage = e.message;
+    console.error("Повна помилка в searchGlobalFood:", e);
+    // ЗМІНА: Повертаємо об'єкт з помилкою
     return { error: errorMessage };
   }
 }
@@ -675,9 +753,11 @@ export async function analyzeMonthlyData(
   userProfile: Profile
 ) {
   const prompt = promptWithMonthlyReport(daysData, userProfile);
+  const { supabase, user } = await getAuthUserOrError();
 
   try {
-    // ЗМІНА: ТЕПЕР МИ ОЧІКУЄМО ПОВНИЙ ОБ'ЄКТ AiReportData
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_ANALYZE, supabase);
     const { data: reportData, error } = await getAiJsonResponse<AiReportData>(
       prompt
     );

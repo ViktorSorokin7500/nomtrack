@@ -79,9 +79,12 @@ export function MealCard({
         return;
       }
       setSearchLoading(true);
-      const { success } = await searchGlobalFood(searchTerm);
-      if (success) {
-        setGlobalSearchResults(success as GlobalFoodSearchResult[]);
+      const result = await searchGlobalFood(searchTerm);
+      if (result.error) {
+        toast.error(`Помилка: ${result.error}`);
+        setGlobalSearchResults([]);
+      } else if (result.success) {
+        setGlobalSearchResults(result.success as GlobalFoodSearchResult[]);
       }
       setSearchLoading(false);
     };

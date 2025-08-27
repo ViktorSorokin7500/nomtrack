@@ -1,16 +1,21 @@
 import React from "react";
-// import { LangSwitcher } from "./lang-switcher";
 import { Locale } from "@/i18n.config";
 import { Dropdown } from "../ui";
+import { Coins } from "lucide-react";
 
-export default function NavMenu({ lang }: { lang: Locale }) {
+export default function NavMenu({
+  lang,
+  aiCreditsLeft,
+}: {
+  lang: Locale;
+  aiCreditsLeft: number;
+}) {
   return (
     <div className="flex items-center gap-2">
-      {/* <LangSwitcher
-        lang={lang}
-        title="language"
-        className="hover:text-orange-400"
-      /> */}
+      <div className="flex items-center gap-1 text-sm text-green-600">
+        <Coins className="size-5" />
+        <strong>{aiCreditsLeft}</strong>
+      </div>
       <Dropdown.Menu>
         <Dropdown.Trigger className="cursor-pointer">
           <span className="text-stone-700 hover:text-orange-500">Меню</span>
@@ -36,9 +41,6 @@ export default function NavMenu({ lang }: { lang: Locale }) {
           </div>
         </Dropdown.Content>
       </Dropdown.Menu>
-      {/* <form action="/auth/sign-out" method="post">
-        <Button type="submit">Вийти</Button>
-      </form> */}
     </div>
   );
 }

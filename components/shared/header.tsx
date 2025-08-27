@@ -2,26 +2,27 @@ import { Locale } from "@/i18n.config";
 import NavMenu from "./nav-menu";
 import { NavLink } from "./nav-link";
 import { createClient } from "@/lib/supabase/server";
-// import { LangSwitcher } from "./lang-switcher";
-
-// async function getDictionary(lang: Locale) {
-//   const dictionary = await import(`@/dictionaries/${lang}.json`);
-//   return dictionary.default;
-// }
+import { PremiumCountdown } from "./premium-countdown";
 
 export async function Header({ lang }: { lang: Locale }) {
-  // const dictionary = await getDictionary(lang);
-  // const t = dictionary.header;
-
   const supabase = createClient();
 
-  // Отримуємо дані про поточного користувача
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
 
+  const { data: profile } = await (await supabase)
+    .from("profiles")
+    .select("premium_expires_at, ai_credits_left")
+    .eq("id", user?.id)
+    .single();
+
+  const premiumExpiresAt = profile?.premium_expires_at || null;
+  const aiCreditsLeft = profile?.ai_credits_left || 0;
+
   return (
     <header>
+      {user && <PremiumCountdown expiresAt={premiumExpiresAt} />}
       <nav className="container flex items-center justify-between py-4 px-2 lg:px-8 mx-auto">
         <div className="flex lg:flex-1 group">
           <NavLink
@@ -51,7 +52,9 @@ export async function Header({ lang }: { lang: Locale }) {
         </div>
 
         {user ? (
-          <NavMenu lang={lang} />
+          <>
+            <NavMenu lang={lang} aiCreditsLeft={aiCreditsLeft} />
+          </>
         ) : (
           <>
             <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">

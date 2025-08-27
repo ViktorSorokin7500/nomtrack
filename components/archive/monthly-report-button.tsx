@@ -8,6 +8,7 @@ import { DailySummary, Profile } from "@/types"; // <-- ОНОВЛЕНИЙ ІМ�
 import { Card } from "../shared";
 import { AiOutlineFileText } from "react-icons/ai";
 import { AiReportData, ReportDisplay } from "./report-display";
+import { useRouter } from "next/navigation";
 
 interface MonthlyReportButtonProps {
   daysData: DailySummary[];
@@ -21,6 +22,7 @@ export function MonthlyReportButton({
   const [isPending, startTransition] = useTransition();
   const [report, setReport] = useState<AiReportData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (isModalOpen) {
@@ -46,6 +48,7 @@ export function MonthlyReportButton({
       } else {
         // ЗМІНА: НЕМАЄ НЕОБХІДНОСТІ В JSON.parse()
         setReport(result?.success || null);
+        router.refresh();
         setIsModalOpen(true);
       }
     });
@@ -60,7 +63,16 @@ export function MonthlyReportButton({
         className="w-full justify-center gap-2 mt-4"
       >
         <AiOutlineFileText size={20} />{" "}
-        {isPending ? "Аналізуємо..." : "Згенерувати звіт від ШІ"}{" "}
+        {isPending ? (
+          <span className="flex items-center justify-center gap-2 animate-pulse">
+            Аналізуємо
+            <div className="size-1 rounded-full bg-white animate-bounce" />
+            <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
+            <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
+          </span>
+        ) : (
+          "Згенерувати звіт від ШІ"
+        )}{" "}
       </Button>{" "}
       {isModalOpen && report && (
         <div
