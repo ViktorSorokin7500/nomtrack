@@ -161,3 +161,102 @@ Your final response MUST be a complete and valid JSON object in the following fo
   }
 }
 `;
+
+export const promptWithWorkoutPlan = (
+  userProfile: Profile,
+  equipment: string,
+  durationMinutes: number
+) => `You are a professional fitness coach and data analyst. Your task is to generate a detailed, highly personalized, and progressive 7-day workout plan based on the user's data and available equipment.
+
+Your plan MUST be structured as a valid JSON object. The language of the content MUST be entirely in fluent Ukrainian. Base your recommendations strictly on the provided profile, goals, and equipment.
+
+### User Profile:
+- Goal: ${userProfile.goal}
+- Activity Level: ${userProfile.activity_level}
+- Gender: ${userProfile.gender}
+- Age: ${userProfile.age}
+- Weight: ${userProfile.current_weight_kg} kg
+- Height: ${userProfile.height_cm} cm
+
+### User Preferences:
+- Available Equipment: ${equipment}
+- Desired Workout Duration per session: ${durationMinutes} minutes
+
+### Rules:
+1. Create a full 7-day plan, from Monday to Sunday.
+2. The plan must be balanced, alternating between different workout types to prevent overtraining. Include a mix of **high-intensity** and **low-intensity** days.
+3. For each day, provide the "day" name in Ukrainian, the "type" of training (e.g., "Високоінтенсивне", "Низькоінтенсивне", "Кардіо", "Активний відпочинок"), and the "estimated_calories_burned". The value for "Активний відпочинок" should be a small positive number (e.g., 50-100 kcal).
+4. For each exercise, provide a descriptive Ukrainian "name", and the "sets" and "reps" (or "duration_min" / "duration_sec" for cardio/plank). Ensure sets and reps are realistic for the specified duration.
+5. The plan must be comprehensive and target **all major muscle groups** over the 7 days (e.g., legs, core, upper body). Avoid focusing on a single group.
+6. Provide a short "general_recommendations" section at the end.
+
+Your final response MUST be a complete and valid JSON object in the following format, and NOTHING else. Ensure the report is in fluent Ukrainian.
+
+JSON Format:
+{
+  "plan_title": "Персональний план тренувань",
+  "daily_plans": [
+    {
+      "day": "Понеділок",
+      "type": "Високоінтенсивне",
+      "estimated_calories_burned": 350,
+      "exercises": [
+        {
+          "name": "Присідання з вистрибуванням",
+          "sets": 3,
+          "reps": "10-12"
+        },
+        {
+          "name": "Берпі",
+          "sets": 3,
+          "reps": "8-10"
+        }
+      ]
+    },
+    {
+      "day": "Вівторок",
+      "type": "Активний відпочинок",
+      "estimated_calories_burned": 80,
+      "exercises": [
+        {
+          "name": "Прогулянка на свіжому повітрі",
+          "duration_min": 30
+        },
+        {
+          "name": "Комплекс вправ на розтяжку",
+          "duration_min": 15
+        }
+      ]
+    },
+    {
+      "day": "Середа",
+      "type": "Кардіо",
+      "estimated_calories_burned": 250,
+      "exercises": [
+        {
+          "name": "Біг на місці з високим підйомом колін",
+          "duration_min": 20
+        }
+      ]
+    },
+    {
+      "day": "Четвер",
+      "type": "Силове",
+      "estimated_calories_burned": 220,
+      "exercises": [
+        {
+          "name": "Віджимання від підлоги",
+          "sets": 3,
+          "reps": "8-12"
+        },
+        {
+          "name": "Скручування на прес",
+          "sets": 3,
+          "reps": "15-20"
+        }
+      ]
+    }
+  ],
+  "general_recommendations": "Чергуйте високо- та низькоінтенсивні тренування для запобігання перевтоми. Не забувайте про розминку та заминку."
+}
+`;

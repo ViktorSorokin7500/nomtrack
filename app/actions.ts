@@ -21,11 +21,13 @@ import {
   promptWithIngredients,
   promptWithMonthlyReport,
   promptWithRecipe,
+  promptWithWorkoutPlan,
 } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/utils";
 import { AiReportData } from "@/components/archive/report-display";
 import { createClient } from "@/lib/supabase/server";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { WorkoutPlan } from "./[lang]/(root)/(pages)/coach/page";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Supabase = SupabaseClient<any, "public", any>;
@@ -779,4 +781,101 @@ export async function analyzeMonthlyData(
       e instanceof Error ? e.message : "Невідома помилка на сервері.";
     return { error: errorMessage };
   }
+}
+export async function createAndAnalyzeWorkoutPlan(formData: {
+  equipmentText: string;
+  durationMinutes: number;
+}) {
+  const { equipmentText, durationMinutes } = formData;
+  if (!equipmentText.trim() || !durationMinutes || durationMinutes <= 0) {
+    return { error: "Будь ласка, вкажіть наявний інвентар та тривалість." };
+  }
+
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_ANALYZE, supabase);
+
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (!userProfile) {
+      throw new Error("Не вдалося завантажити профіль користувача.");
+    }
+
+    const prompt = promptWithWorkoutPlan(
+      userProfile,
+      equipmentText,
+      durationMinutes
+    );
+
+    const { data: workoutPlan, error: aiError } =
+      await getAiJsonResponse<WorkoutPlan>(prompt);
+
+    if (aiError) {
+      return { error: `Помилка аналізу ШІ: ${aiError}` };
+    }
+
+    if (!workoutPlan) {
+      return {
+        error: "ШІ не повернув жодного плану тренувань. Спробуйте ще раз.",
+      };
+    } // Зберігаємо план у новій таблиці
+
+    const { error: insertError } = await supabase.from("workout_plans").insert([
+      {
+        user_id: user.id,
+        plan_data: workoutPlan, // Зберігаємо JSON об'єкт
+      },
+    ]);
+
+    if (insertError) {
+      throw new Error("Помилка збереження плану в БД: " + insertError.message);
+    }
+
+    revalidatePath("/coach"); // Оновлюємо сторінку
+    return { success: "План тренувань успішно згенеровано та збережено!" };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Невідома помилка на сервері.";
+    console.error("Помилка в createAndAnalyzeWorkoutPlan:", error);
+    return { error: errorMessage };
+  }
+}
+
+export async function logPlannedWorkout(entryData: {
+  entryText: string;
+  caloriesBurned: number;
+}) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+  } catch (e) {
+    let errorMessage = "Не вдалося додати тренування. Ваша підписка вичерпана.";
+    if (e instanceof Error) errorMessage = e.message;
+    return { error: errorMessage };
+  }
+
+  const { error: insertError } = await (await supabase)
+    .from("activity_entries")
+    .insert([
+      {
+        user_id: user.id,
+        entry_text: entryData.entryText,
+        calories_burned: entryData.caloriesBurned,
+      },
+    ]);
+
+  if (insertError) {
+    console.error("Помилка збереження активності з плану:", insertError);
+    return { error: "Не вдалося додати тренування з плану." };
+  }
+
+  revalidatePath("/dashboard");
+  return { success: "Тренування успішно додано!" };
 }

@@ -124,6 +124,33 @@ export default async function Dashboard({
     },
   };
 
+  const { data: latestPlan } = await (await supabase)
+    .from("workout_plans")
+    .select("plan_data")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .single();
+
+  const workoutPlan = latestPlan?.plan_data;
+
+  const todayDayIndex = new Date().getDay();
+  const daysOfWeek = [
+    "Неділя",
+    "Понеділок",
+    "Вівторок",
+    "Середа",
+    "Четвер",
+    "П'ятниця",
+    "Субота",
+  ];
+  const todayDayName = daysOfWeek[todayDayIndex]; // Додаткова перевірка, яка усуне помилку
+
+  const todaysWorkout = workoutPlan?.daily_plans.find(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (day: any) => day.day === todayDayName && day.estimated_calories_burned > 0
+  );
+
   return (
     <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -143,7 +170,10 @@ export default async function Dashboard({
             targetWater={profile.target_water_ml || 2500}
             key={totalWater}
           />
-          <AICoachCard activityLogData={activityEntries || []} />
+          <AICoachCard
+            activityLogData={activityEntries || []}
+            todaysWorkout={todaysWorkout}
+          />
         </div>
       </div>
     </div>
