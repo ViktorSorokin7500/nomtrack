@@ -27,7 +27,7 @@ export default function NavMenu({
           <Dropdown.Item href={`/${lang}/settings`}>Налаштування</Dropdown.Item>
           <Dropdown.Item href={`/${lang}/archive`}>Історія </Dropdown.Item>
           <Dropdown.Item href={`/${lang}/recipes`}>Мої рецепти</Dropdown.Item>
-          <Dropdown.Item href={`/${lang}/help`}>Допомога</Dropdown.Item>
+          <Dropdown.Item href={`/${lang}/coach`}>Мої тренування</Dropdown.Item>
           <Dropdown.Separator />
           <div className="text-sm py-1 px-2">
             <form action="/auth/sign-out" method="POST">

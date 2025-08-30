@@ -3,23 +3,23 @@ import { ArrowRight, CheckIcon, Star } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 
-// 1. A single plan object with all copy in English.
 const planData = {
   id: "pro",
-  name: "NomTrack Pro",
+  name: "NomTrack",
   price: 199,
-  specialPrice: 50, // The early-bird price
+  specialPrice: 50,
   trialDays: 7,
   description:
     "Повний набір інструментів для досягнення ваших цілей у харчуванні та оздоровленні.",
   items: [
+    "450 токенів для запитів",
     "Персональний ШІ-коуч для інсайтів і порад",
     "Розширені звіти про прогрес та аналітика",
-    "Аналіз рецептів та персональна база даних на більше ніж 160'000 продуктів",
+    "Аналіз рецептів та персональна база даних",
     "Відстеження споживання води та активності",
     "Досвід без жодної реклами",
   ],
-  paymentLink: "/sign-up", // Link to your sign-up page to start the trial
+  paymentLink: "/sign-up",
   cta: "Почати 7-денний безкоштовний пробний період",
   month: "місяць",
 };
@@ -71,7 +71,6 @@ const PricingCard = ({
 }) => {
   return (
     <div className="relative w-full max-w-md bg-white">
-      {/* 3. Early-bird offer badge. */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20">
         <div className="flex items-center gap-2 px-4 py-2 bg-orange-400 text-white rounded-full font-semibold text-sm shadow-lg">
           <Star size={16} className="fill-white" />

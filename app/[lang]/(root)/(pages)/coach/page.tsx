@@ -58,7 +58,7 @@ export default async function CoachPage() {
     <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-stone-900">
-          Ваш Персональний AI Тренер
+          Ваш Персональний ШІ Тренер
         </h1>
         <WorkoutPlanForm />
         {plans.length > 0 ? (

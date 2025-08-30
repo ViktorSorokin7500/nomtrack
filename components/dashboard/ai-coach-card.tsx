@@ -3,7 +3,11 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { analyzeAndSaveActivityEntry, logPlannedWorkout } from "@/app/actions";
+import {
+  analyzeAndSaveActivityEntry,
+  deleteActivity,
+  logPlannedWorkout,
+} from "@/app/actions";
 import { useTransition, useState } from "react";
 import { Card } from "../shared";
 import { Button } from "../ui";
@@ -30,9 +34,7 @@ interface AICoachCardProps {
 }
 
 const activitySchema = z.object({
-  text: z
-    .string()
-    .min(3, { message: "Опишіть, будь ласка, активність детальніше" }),
+  text: z.string(),
 });
 type ActivitySchema = z.infer<typeof activitySchema>;
 
@@ -53,6 +55,8 @@ export function AICoachCard({
   });
 
   const onSubmit = async (data: ActivitySchema) => {
+    console.log("click");
+
     startTransition(async () => {
       let result;
       if (usePlanned && todaysWorkout) {
@@ -76,6 +80,47 @@ export function AICoachCard({
     });
   };
 
+  const handleDeleteActivity = (activityId: number) => {
+    toast(
+      (t) => (
+        <div className="flex flex-col items-center gap-4">
+          <p className="font-semibold">
+            Ви впевнені, що хочете видалити цю активність?
+          </p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => {
+                startTransition(() => {
+                  // Викликаємо серверну дію при підтвердженні
+                  deleteActivity(activityId).then((res) => {
+                    if (res.error) {
+                      toast.error(res.error); // Показуємо помилку, якщо вона є
+                    } else {
+                      toast.success(res.success || "Рецепт видалено!"); // Повідомлення про успіх
+                    }
+                  });
+                });
+                toast.dismiss(t.id); // Закриваємо поточне сповіщення
+              }}
+              className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
+            >
+              Так, видалити
+            </button>
+            <button
+              onClick={() => toast.dismiss(t.id)} // Просто закриваємо сповіщення
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            >
+              Скасувати
+            </button>
+          </div>
+        </div>
+      ),
+      {
+        duration: 6000, // Сповіщення буде висіти 6 секунд, якщо нічого не робити
+      }
+    );
+  };
+
   return (
     <Card>
       {activityLogData.length > 0 && (
@@ -85,7 +130,12 @@ export function AICoachCard({
           </h3>
           <div className="space-y-2">
             {activityLogData.map((entry) => (
-              <ActivityEntryCard key={entry.id} entry={entry} />
+              <ActivityEntryCard
+                key={entry.id}
+                entry={entry}
+                handleDeleteActivity={handleDeleteActivity}
+                isPending={isPending}
+              />
             ))}
           </div>
         </div>

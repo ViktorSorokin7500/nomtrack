@@ -879,3 +879,27 @@ export async function logPlannedWorkout(entryData: {
   revalidatePath("/dashboard");
   return { success: "Тренування успішно додано!" };
 }
+
+export async function deleteActivity(activityId: number) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    const { error } = await (await supabase)
+      .from("activity_entries")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("id", activityId);
+
+    if (error) {
+      return { error: "Помилка бази даних: " + error.message };
+    }
+    revalidatePath("/dashboard");
+
+    return { success: "Запис видалено!" };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { error: `Невідома помилка на сервері: ${e.message}` };
+    }
+    return { error: "Невідома помилка на сервері." };
+  }
+}
