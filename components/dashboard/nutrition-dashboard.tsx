@@ -10,6 +10,7 @@ import { useState } from "react";
 
 // Тип для одного запису їжі, що приходить з сервера
 import type { FoodEntry } from "@/types";
+import { Accordion } from "../ui";
 
 // Типи для пропсів, які компонент отримує від сторінки
 interface NutritionDashboardProps {
@@ -156,14 +157,27 @@ export function NutritionDashboard({
       <div className="space-y-6">
         {/* Рендеримо вже існуючі записи, якщо вони є */}
         {foodLogData.length > 0 && (
-          <div className="space-y-3">
-            <h3 className="text-lg font-semibold text-gray-800 border-b pb-2 mb-3">
-              Журнал за сьогодні
-            </h3>
-            {foodLogData.map((entry) => (
-              <FoodEntryCard key={entry.id} entry={entry} />
-            ))}
-          </div>
+          <Accordion.Accordion
+            type="single"
+            collapsible
+            defaultValue="food-log"
+          >
+            <Accordion.Item
+              value="food-log"
+              className="border-b-2 border-orange-100"
+            >
+              <Accordion.Trigger className="font-semibold text-gray-800 text-lg hover:no-underline">
+                Журнал за сьогодні
+              </Accordion.Trigger>
+              <Accordion.Content className="pt-2">
+                <div className="space-y-3">
+                  {foodLogData.map((entry) => (
+                    <FoodEntryCard key={entry.id} entry={entry} />
+                  ))}
+                </div>
+              </Accordion.Content>
+            </Accordion.Item>
+          </Accordion.Accordion>
         )}
 
         {/* Завжди показуємо одну універсальну картку для додавання нового запису */}

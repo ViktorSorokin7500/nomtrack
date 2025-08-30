@@ -36,7 +36,7 @@ export default async function Home({
       <FeatureSection />
       <PhilosophySection />
       <div className="bg-orange-50">
-        <PricingSection lang={lang} />
+        <PricingSection />
       </div>
     </>
   );

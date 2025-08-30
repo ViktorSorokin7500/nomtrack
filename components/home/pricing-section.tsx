@@ -1,4 +1,3 @@
-import { Locale } from "@/i18n.config";
 import { ArrowRight, CheckIcon, Star } from "lucide-react";
 import Link from "next/link";
 import React from "react";
@@ -12,7 +11,7 @@ const planData = {
   description:
     "Повний набір інструментів для досягнення ваших цілей у харчуванні та оздоровленні.",
   items: [
-    "450 токенів для запитів",
+    "500 токенів для запитів",
     "Персональний ШІ-коуч для інсайтів і порад",
     "Розширені звіти про прогрес та аналітика",
     "Аналіз рецептів та персональна база даних",
@@ -24,10 +23,7 @@ const planData = {
   month: "місяць",
 };
 
-export function PricingSection({ lang }: { lang: Locale }) {
-  // lang is available for future localization
-  console.log(lang);
-
+export function PricingSection() {
   return (
     <section className="relative overflow-hidden" id="pricing">
       <div className="py-12 sm:py-16 lg:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

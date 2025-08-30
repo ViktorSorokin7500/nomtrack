@@ -1,98 +1,101 @@
-// app/(root)/(pages)/pricing/page.tsx
-
-import { headers } from "next/headers";
-import { Button } from "@/components/ui/button";
-
-// Наша "податкова карта". В реальному проєкті її можна винести в окремий файл.
-const vatRates: { [key: string]: number } = {
-  // Європа
-  DE: 0.19, // Німеччина
-  FR: 0.2, // Франція
-  IT: 0.22, // Італія
-  CZ: 0.21, // Чехія
-  UA: 0.2, // Україна
-  GB: 0.2, // Англія
-  // Інші
-  CA: 0.05, // Канада (базова GST, може бути вище в деяких провінціях)
-  IN: 0.18, // Індія
-  // Для США податок складний, тому зазвичай його показує вже сама платіжна система.
-  // Для всіх інших країн, де ми не знаємо податок, будемо рахувати 0%.
-};
+import { Button } from "@/components/ui";
+import { ArrowRight, CheckIcon } from "lucide-react";
+import Link from "next/link";
 
 export default async function PricingPage() {
-  // 1. Отримуємо країну користувача з заголовків запиту (це працює на Vercel)
-  const headersList = headers();
-  const countryCode = (await headersList).get("x-vercel-ip-country") || "US"; // За замовчуванням США
-
-  // 2. Розраховуємо ціни
-  const basePriceMonthly = 2.99;
-  const basePriceYearly = 29.99; // Припустимо, річна ціна така
-
-  const taxRate = vatRates[countryCode] || 0;
-
-  const finalPriceMonthly = basePriceMonthly * (1 + taxRate);
-  const finalPriceYearly = basePriceYearly * (1 + taxRate);
-
-  // Функція для красивого форматування ціни
-  const formatPrice = (price: number) => price.toFixed(2);
-
+  const planData = {
+    id: "month",
+    name: "NomTrack",
+    price: 50,
+    description:
+      "Повний набір інструментів для досягнення ваших цілей у харчуванні та оздоровленні.",
+    items: [
+      "500 токенів для запитів",
+      "Персональний ШІ-коуч для інсайтів і порад",
+      "Розширені звіти про прогрес та аналітика",
+      "Аналіз рецептів та персональна база даних",
+      "Відстеження споживання води та активності",
+      "Досвід без жодної реклами",
+    ],
+    paymentLink: "/sign-up",
+    cta: "Перейти до оплати",
+    month: "місяць",
+  };
   return (
-    <div className="container mx-auto max-w-4xl py-16 px-4">
-      <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">
-          Просте та прозоре ціноутворення
-        </h1>
-        <p className="text-lg text-gray-600">
-          Обери план, який підходить саме тобі. Ніяких прихованих платежів.
-        </p>
-      </header>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-        {/* Картка місячного плану */}
-        <div className="border rounded-lg p-6 flex flex-col">
-          <h3 className="text-xl font-bold mb-4">Місяць</h3>
-          <div className="mb-6">
-            <span className="text-4xl font-extrabold">
-              ${formatPrice(finalPriceMonthly)}
-            </span>
-            <span className="text-gray-500"> / місяць</span>
-          </div>
-          <ul className="space-y-3 mb-8 text-gray-600 flex-grow">
-            <li>✅ Усі базові функції</li>
-            <li>✅ Необмежений аналіз через ШІ</li>
-            <li>✅ Можливість скасувати будь-коли</li>
-          </ul>
-          <Button>Почати 7 днів безкоштовно</Button>
+    <section className="relative overflow-hidden" id="pricing">
+      <div className="py-12 sm:py-16 lg:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-12">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
+            Один план. Усі можливості.
+          </h2>
+          <p className="mt-4 text-lg text-gray-600">
+            Спробуйте всі функції NomTrack. Скасуйте підписку в будь-який час.
+          </p>
         </div>
-
-        {/* Картка річного плану */}
-        <div className="border-2 border-orange-500 rounded-lg p-6 flex flex-col relative">
-          <div className="absolute top-0 -translate-y-1/2 bg-orange-500 text-white px-3 py-1 rounded-full text-sm font-semibold">
-            Найкраща пропозиція
-          </div>
-          <h3 className="text-xl font-bold mb-4">Рік</h3>
-          <div className="mb-6">
-            <span className="text-4xl font-extrabold">
-              ${formatPrice(finalPriceYearly)}
-            </span>
-            <span className="text-gray-500"> / рік</span>
-          </div>
-          <ul className="space-y-3 mb-8 text-gray-600 flex-grow">
-            <li>✅ Усі переваги місячного плану</li>
-            <li className="font-bold text-orange-600">
-              ✅ Економія 17% (2 місяці в подарунок)
-            </li>
-          </ul>
-          <Button>Почати 7 днів безкоштовно</Button>
+        {/* 2. Centering the single pricing card. */}
+        <div className="flex justify-center">
+          <PricingCard {...planData} />
         </div>
       </div>
-
-      {taxRate > 0 && (
-        <p className="text-center text-sm text-gray-500 mt-8">
-          *Ціна для вашої країни ({countryCode}) включає ПДВ у розмірі{" "}
-          {(taxRate * 100).toFixed(0)}%.
-        </p>
-      )}
-    </div>
+    </section>
   );
 }
+
+const PricingCard = ({
+  name,
+  price,
+  description,
+  items,
+  paymentLink,
+  cta,
+  month,
+}: {
+  name: string;
+  price: number;
+  description: string;
+  items: string[];
+  paymentLink: string;
+  cta: string;
+  month: string;
+}) => {
+  return (
+    <div className="relative w-full max-w-md bg-white">
+      <div className="relative flex flex-col h-full gap-5 p-8 border-2 border-orange-400 rounded-2xl shadow-lg">
+        <div className="flex-grow">
+          <h5 className="text-lg lg:text-xl font-bold text-gray-800">{name}</h5>
+          <p className="text-gray-600 mt-2">{description}</p>
+        </div>
+
+        {/* Price display */}
+        <div className="my-4">
+          <div className="flex items-end gap-2">
+            <p className="text-5xl tracking-tight font-extrabold text-gray-900">
+              ₴{price}
+            </p>
+            <p className="text-gray-500">/ {month}</p>
+          </div>
+        </div>
+
+        {/* Features list */}
+        <ul className="space-y-3 leading-relaxed text-base flex-1">
+          {items.map((item, i) => (
+            <li key={i} className="flex items-center gap-3">
+              <CheckIcon size={18} className="text-orange-500" />
+              <span className="text-gray-700">{item}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Call to action */}
+        <Button asChild className="mt-6">
+          <Link
+            href={paymentLink}
+            className="w-full -lg flex items-center justify-center gap-2 px-6 py-4 text-lg font-semibold transition-all duration-300 bg-orange-500 text-white hover:bg-orange-600 shadow-md"
+          >
+            {cta} <ArrowRight size={18} />
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+};
