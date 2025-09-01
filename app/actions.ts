@@ -99,7 +99,6 @@ export async function checkCreditsAndDeduct(
   }
 }
 
-// Наша Server Action для оновлення особистих даних
 export async function updatePersonalInfo(formData: {
   full_name?: string;
   current_weight_kg: number;
@@ -971,5 +970,53 @@ export async function createAndAnalyzeWorkout(formData: {
     if (error instanceof Error) errorMessage = error.message;
     console.error("Повна помилка в createAndAnalyzeWorkout:", error);
     return { error: errorMessage };
+  }
+}
+
+export async function deleteWorkoutPlan(planId: number) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    const { error } = await (await supabase)
+      .from("workout_plans")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("id", planId);
+
+    if (error) {
+      return { error: "Помилка бази даних: " + error.message };
+    }
+    revalidatePath("/dashboard");
+
+    return { success: "Запис видалено!" };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { error: `Невідома помилка на сервері: ${e.message}` };
+    }
+    return { error: "Невідома помилка на сервері." };
+  }
+}
+
+export async function deleteUserWorkout(workoutId: number) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    const { error } = await (await supabase)
+      .from("user_workouts")
+      .delete()
+      .eq("user_id", user.id)
+      .eq("id", workoutId);
+
+    if (error) {
+      return { error: "Помилка бази даних: " + error.message };
+    }
+    revalidatePath("/dashboard");
+
+    return { success: "Запис видалено!" };
+  } catch (e) {
+    if (e instanceof Error) {
+      return { error: `Невідома помилка на сервері: ${e.message}` };
+    }
+    return { error: "Невідома помилка на сервері." };
   }
 }

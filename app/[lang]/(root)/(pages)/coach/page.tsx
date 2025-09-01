@@ -3,9 +3,13 @@ import { redirect } from "next/navigation";
 import { Accordion } from "@/components/ui";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
-import { Dumbbell, Flame } from "lucide-react";
 import { DbSavedWorkout, DbWorkoutPlan } from "@/types";
-import { CoachFormSwitcher, WorkoutPlanCard } from "@/components/coach";
+import {
+  CoachFormSwitcher,
+  DeleteWorkoutUser,
+  WorkoutPlanCard,
+} from "@/components/coach";
+import { Dumbbell, Flame } from "lucide-react";
 
 // Типи для даних, що будуть завантажуватися з БД
 
@@ -104,6 +108,10 @@ export default async function CoachPage() {
                             </li>
                           ))}
                         </ul>
+                        <div className="flex justify-between mt-2">
+                          <div />
+                          <DeleteWorkoutUser id={workout.id} />
+                        </div>
                       </div>
                     ))}
                   </Accordion.Content>
@@ -128,7 +136,7 @@ export default async function CoachPage() {
                             locale: uk,
                           })}
                         </h3>
-                        <WorkoutPlanCard plan={plan.plan_data} />
+                        <WorkoutPlanCard id={plan.id} plan={plan.plan_data} />
                       </div>
                     ))}
                   </Accordion.Content>
