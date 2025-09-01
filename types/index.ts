@@ -1,4 +1,5 @@
 // Archive
+import { SupabaseClient } from "@supabase/supabase-js";
 
 export type DayData = DailySummary & { fullDate: string; date?: string };
 type MonthData = { name: string; days: DayData[] };
@@ -175,3 +176,6 @@ export type DbWorkoutPlan = {
   created_at: string;
   plan_data: WorkoutPlan;
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type Supabase = SupabaseClient<any, "public", any>;

@@ -1,0 +1,240 @@
+"use server";
+import {
+  getAuthUserOrError,
+  checkPremiumStatus,
+  checkCreditsAndDeduct,
+} from "@/lib/billing";
+import { AI_REQUEST } from "@/lib/const";
+import { promptWithRecipe } from "@/lib/prompts";
+import { getAiJsonResponse } from "@/lib/utils";
+import {
+  AiRecipeResponse,
+  NormalizedIngredient,
+  TotalNutrition,
+  NutritionInfo,
+} from "@/types";
+import { revalidatePath } from "next/cache";
+
+export async function createAndAnalyzeRecipe(formData: {
+  recipeName: string;
+  ingredientsText: string;
+}) {
+  const { recipeName, ingredientsText } = formData;
+
+  if (!recipeName.trim() || !ingredientsText.trim()) {
+    return { error: "Назва та інгредієнти не можуть бути порожніми." };
+  }
+
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_REQUEST, supabase);
+    const initialIngredientLines = ingredientsText
+      .split(/,|\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    if (initialIngredientLines.length === 0) {
+      return { error: "Список інгредієнтів порожній або некоректний." };
+    }
+
+    // Крок 1: Робимо запит до ШІ з нашим безпечним типом AiRecipeResponse
+    const batchPrompt = promptWithRecipe(initialIngredientLines.join("\n"));
+    const { data: aiData, error: aiError } =
+      await getAiJsonResponse<AiRecipeResponse>(batchPrompt);
+
+    if (aiError) {
+      return { error: `Помилка аналізу ШІ: ${aiError}` };
+    }
+
+    // Крок 2: Визначаємо масив інгредієнтів, незалежно від формату відповіді ШІ
+    let normalizedIngredients: NormalizedIngredient[];
+
+    if (aiData === null) {
+      // Спочатку перевіряємо на null, щоб уникнути помилок
+      throw new Error("ШІ повернув порожню відповідь (null).");
+    }
+
+    if (Array.isArray(aiData)) {
+      // Випадок 1: ШІ повернув просто масив [...]
+      // Тут все безпечно, TypeScript знає, що aiData - це масив.
+      normalizedIngredients = aiData;
+    } else {
+      // Випадок 2: ШІ повернув об'єкт {...}
+      // TypeScript тепер знає, що aiData - це об'єкт, а не null.
+
+      // Шукаємо назву ключа, за яким знаходиться масив
+      const arrayKey = Object.keys(aiData).find((key) =>
+        Array.isArray(aiData[key])
+      );
+
+      if (arrayKey) {
+        // Якщо ключ знайдено, безпечно отримуємо масив за цим ключем.
+        // Завдяки індексній сигнатурі в типі ця помилка зникає.
+        normalizedIngredients = aiData[arrayKey];
+      } else {
+        // Якщо в об'єкті немає жодного масиву
+        throw new Error("Не вдалося знайти масив інгредієнтів у відповіді ШІ.");
+      }
+    }
+
+    if (!normalizedIngredients || normalizedIngredients.length === 0) {
+      return {
+        error: "Не вдалося розпізнати інгредієнти у вашому запиті.",
+      };
+    }
+
+    // Крок 3: Отримуємо дані про харчування для кожного інгредієнта
+    const nutritionPromises = normalizedIngredients.map(
+      async (item): Promise<TotalNutrition> => {
+        const actualWeight = item.weightGrams;
+        if (!item.ingredientName || actualWeight <= 0) {
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: 0,
+          };
+        }
+
+        const nutritionResponse = await fetch(
+          `https://api.calorieninjas.com/v1/nutrition?query=${encodeURIComponent(
+            item.ingredientName
+          )}`,
+          { headers: { "X-Api-Key": process.env.CALORIENINJAS_API_KEY! } }
+        );
+
+        if (!nutritionResponse.ok) {
+          console.warn(
+            `Помилка CalorieNinjas для '${item.ingredientName}', ігноруємо.`
+          );
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: actualWeight,
+          };
+        }
+
+        const nutritionData: { items: NutritionInfo[] } =
+          await nutritionResponse.json();
+        if (nutritionData.items.length === 0) {
+          console.warn(
+            `CalorieNinjas не розпізнав '${item.ingredientName}', ігноруємо.`
+          );
+          return {
+            calories: 0,
+            protein_g: 0,
+            fat_g: 0,
+            carbs_g: 0,
+            sugar_g: 0,
+            total_weight_g: actualWeight,
+          };
+        }
+
+        const nutritionPer100g = nutritionData.items[0];
+        const multiplier = actualWeight / 100.0;
+
+        return {
+          calories: (nutritionPer100g.calories || 0) * multiplier,
+          protein_g: (nutritionPer100g.protein_g || 0) * multiplier,
+          fat_g: (nutritionPer100g.fat_total_g || 0) * multiplier,
+          carbs_g: (nutritionPer100g.carbohydrates_total_g || 0) * multiplier,
+          sugar_g: (nutritionPer100g.sugar_g || 0) * multiplier,
+          total_weight_g: actualWeight,
+        };
+      }
+    );
+
+    const allNutritionData = await Promise.all(nutritionPromises);
+
+    // Крок 4: Підсумовуємо всі поживні речовини
+    const finalTotals = allNutritionData.reduce(
+      (acc, item) => {
+        acc.calories += item.calories;
+        acc.protein_g += item.protein_g;
+        acc.fat_g += item.fat_g;
+        acc.carbs_g += item.carbs_g;
+        acc.sugar_g += item.sugar_g;
+        acc.total_weight_g += item.total_weight_g;
+        return acc;
+      },
+      {
+        calories: 0,
+        protein_g: 0,
+        fat_g: 0,
+        carbs_g: 0,
+        sugar_g: 0,
+        total_weight_g: 0,
+      }
+    );
+
+    if (finalTotals.total_weight_g < 1) {
+      return { error: "Не вдалося визначити вагу інгредієнтів." };
+    }
+
+    // Крок 5: Розраховуємо значення на 100г і готуємо дані для збереження
+    const multiplier = 100 / finalTotals.total_weight_g;
+    const recipeData = {
+      user_id: user.id,
+      recipe_name: recipeName,
+      total_weight_g: Math.round(finalTotals.total_weight_g),
+      calories_per_100g: Math.round(finalTotals.calories * multiplier),
+      protein_per_100g: parseFloat(
+        (finalTotals.protein_g * multiplier).toFixed(1)
+      ),
+      fat_per_100g: parseFloat((finalTotals.fat_g * multiplier).toFixed(1)),
+      carbs_per_100g: parseFloat((finalTotals.carbs_g * multiplier).toFixed(1)),
+      sugar_per_100g: parseFloat((finalTotals.sugar_g * multiplier).toFixed(1)),
+      ingredients_text: ingredientsText,
+    };
+
+    // Крок 6: Зберігаємо рецепт в базу даних
+    const { error: insertError } = await supabase
+      .from("user_recipes")
+      .insert([recipeData]);
+
+    if (insertError) {
+      throw new Error(
+        "Помилка збереження рецепта в БД: " + insertError.message
+      );
+    }
+
+    revalidatePath("/recipes");
+    return { success: `Рецепт "${recipeName}" успішно збережено!` };
+  } catch (error) {
+    let errorMessage = "Сталася невідома помилка.";
+    if (error instanceof Error) errorMessage = error.message;
+    console.error("Повна помилка в createAndAnalyzeRecipe:", error);
+    return { error: errorMessage };
+  }
+}
+
+export async function deleteRecipe(recipeId: string) {
+  if (!recipeId) {
+    return { error: "ID рецепта не вказано." };
+  }
+
+  const { supabase, user } = await getAuthUserOrError();
+
+  const { error } = await supabase
+    .from("user_recipes")
+    .delete()
+    .eq("id", recipeId)
+    .eq("user_id", user.id);
+
+  if (error) {
+    console.error("Помилка видалення рецепта:", error);
+    return { error: "Не вдалося видалити рецепт." };
+  }
+
+  // Оновлюємо кеш сторінки, щоб список оновився
+  revalidatePath("/recipes");
+
+  return { success: "Рецепт успішно видалено." };
+}
