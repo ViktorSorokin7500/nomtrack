@@ -260,3 +260,43 @@ JSON Format:
   "general_recommendations": "Чергуйте високо- та низькоінтенсивні тренування для запобігання перевтоми. Не забувайте про розминку та заминку."
 }
 `;
+
+export const promptWithSingleWorkout = (
+  userText: string,
+  userProfile: Profile
+) => `You are a fitness coach and data analyst. Your task is to analyze a single workout description and estimate the total calories burned, then return a structured JSON object. The language of the content MUST be entirely in fluent Ukrainian.
+
+### User Profile:
+- Goal: ${userProfile.goal}
+- Activity Level: ${userProfile.activity_level}
+- Gender: ${userProfile.gender}
+- Age: ${userProfile.age}
+- Weight: ${userProfile.current_weight_kg} kg
+- Height: ${userProfile.height_cm} cm
+
+Follow these rules:
+1. Use the user's profile data (weight, age, etc.) to estimate the calories burned.
+2. If the input is not in Ukrainian, translate it before analysis.
+3. If the input is vague, make a realistic assumption.
+4. If the text is NOT a workout description, return 0 for estimated_calories_burned.
+5. Provide a simple JSON object with the total calories and a list of exercises.
+
+Your response MUST be a valid JSON object without any additional text.
+
+JSON Format:
+{
+  "estimated_calories_burned": <integer>,
+  "exercises": [
+    {
+      "name": "<назва вправи>",
+      "sets": <кількість підходів>,
+      "reps": "<кількість повторень, напр., '10-12'>",
+      "duration_min": <тривалість в хвилинах>,
+      "duration_sec": <тривалість в секундах>
+    }
+  ]
+}
+
+--- Now analyze the following ---
+User Text: "${userText}"
+Your JSON Response:`;

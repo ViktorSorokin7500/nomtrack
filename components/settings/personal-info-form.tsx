@@ -154,9 +154,9 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               {...register("gender")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="male">Стать</option>
-              <option value="female">Жіноча</option>
-              <option value="other">Інша</option>
+              <option value="male">Чоловік</option>
+              <option value="female">Жінка</option>
+              <option value="other">Інше</option>
             </select>
           </div>
 

@@ -117,3 +117,61 @@ export interface FoodEntry {
   carbs_g: number;
   sugar_g?: number | null;
 }
+
+// Тип для даних, що повертає ШІ для одного тренування
+export type AiWorkoutResponse = {
+  estimated_calories_burned: number;
+  exercises: {
+    name: string;
+    sets?: number;
+    reps?: string;
+    duration_min?: number;
+    duration_sec?: number;
+  }[];
+};
+
+// Тип для збереження в базу даних
+export type UserWorkout = {
+  user_id: string;
+  workout_name: string;
+  estimated_calories_burned: number;
+  workout_data: AiWorkoutResponse["exercises"];
+};
+
+// coach
+export type DbSavedWorkout = {
+  id: number;
+  created_at: string;
+  workout_name: string;
+  estimated_calories_burned: number;
+  workout_data: AiWorkoutResponse["exercises"];
+};
+
+export interface WorkoutListProps {
+  savedWorkouts: DbSavedWorkout[];
+  plans: DbWorkoutPlan[];
+}
+
+export type WorkoutPlan = {
+  plan_title: string;
+  daily_plans: {
+    day: string;
+    type: string;
+    estimated_calories_burned: number;
+    exercises: {
+      name: string;
+      sets?: number;
+      reps?: string;
+      duration_min?: number;
+      duration_sec?: number;
+    }[];
+  }[];
+  general_recommendations: string;
+};
+
+// Додамо новий тип для даних з бази, що включає id та created_at
+export type DbWorkoutPlan = {
+  id: number;
+  created_at: string;
+  plan_data: WorkoutPlan;
+};

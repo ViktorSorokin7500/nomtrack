@@ -9,25 +9,27 @@ import {
 } from "@/lib/validators";
 import {
   AiRecipeResponse,
+  AiWorkoutResponse,
   DailySummary,
   Ingredient,
   NormalizedIngredient,
   NutritionInfo,
   Profile,
   TotalNutrition,
+  WorkoutPlan,
 } from "@/types";
 import {
   promptWithActivity,
   promptWithIngredients,
   promptWithMonthlyReport,
   promptWithRecipe,
+  promptWithSingleWorkout,
   promptWithWorkoutPlan,
 } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/utils";
 import { AiReportData } from "@/components/archive/report-display";
 import { createClient } from "@/lib/supabase/server";
 import { SupabaseClient } from "@supabase/supabase-js";
-import { WorkoutPlan } from "./[lang]/(root)/(pages)/coach/page";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Supabase = SupabaseClient<any, "public", any>;
@@ -760,6 +762,7 @@ export async function analyzeMonthlyData(
   try {
     await checkPremiumStatus(user.id, supabase);
     await checkCreditsAndDeduct(user.id, AI_ANALYZE, supabase);
+
     const { data: reportData, error } = await getAiJsonResponse<AiReportData>(
       prompt
     );
@@ -901,5 +904,72 @@ export async function deleteActivity(activityId: number) {
       return { error: `Невідома помилка на сервері: ${e.message}` };
     }
     return { error: "Невідома помилка на сервері." };
+  }
+}
+
+export async function createAndAnalyzeWorkout(formData: {
+  workoutName: string;
+  workoutText: string;
+}) {
+  const { workoutName, workoutText } = formData;
+  if (!workoutName.trim() || !workoutText.trim()) {
+    return { error: "Назва та опис тренування не можуть бути порожніми." };
+  }
+
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+    await checkCreditsAndDeduct(user.id, AI_REQUEST, supabase);
+
+    const { data: userProfile } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (!userProfile) {
+      throw new Error("Не вдалося завантажити профіль користувача.");
+    }
+
+    const prompt = promptWithSingleWorkout(workoutText, userProfile);
+    const { data: aiWorkout, error: aiError } =
+      await getAiJsonResponse<AiWorkoutResponse>(prompt);
+
+    if (aiError) {
+      return { error: `Помилка аналізу ШІ: ${aiError}` };
+    }
+
+    if (!aiWorkout || aiWorkout.estimated_calories_burned === 0) {
+      return {
+        error:
+          "Не вдалося розпізнати тренування. Спробуйте описати його інакше.",
+      };
+    }
+
+    const { error: insertError } = await (await supabase)
+      .from("user_workouts")
+      .insert([
+        {
+          user_id: user.id,
+          workout_name: workoutName,
+          estimated_calories_burned: aiWorkout.estimated_calories_burned,
+          workout_data: aiWorkout.exercises,
+        },
+      ]);
+
+    if (insertError) {
+      throw new Error(
+        "Помилка збереження тренування в БД: " + insertError.message
+      );
+    }
+
+    revalidatePath("/coach"); // Оновлюємо сторінку коуча після збереження
+    return { success: `Тренування "${workoutName}" успішно збережено!` };
+  } catch (error) {
+    let errorMessage = "Сталася невідома помилка.";
+    if (error instanceof Error) errorMessage = error.message;
+    console.error("Повна помилка в createAndAnalyzeWorkout:", error);
+    return { error: errorMessage };
   }
 }

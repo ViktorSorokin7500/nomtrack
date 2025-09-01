@@ -1,3 +1,4 @@
+// components/dashboard/ai-coach-card.tsx
 "use client";
 
 import { useForm, useWatch } from "react-hook-form";
@@ -14,13 +15,15 @@ import { Button } from "../ui";
 import { ActivityEntryCard } from "./activity-entry-card";
 import toast from "react-hot-toast";
 import { Coins, Dumbbell, Flame } from "lucide-react";
+import { DbSavedWorkout } from "@/types";
 
 // ---- schema ----
 const activitySchema = z
   .object({
-    mode: z.enum(["ai", "manual", "planned"]),
+    mode: z.enum(["ai", "manual", "planned", "saved"]), // <-- Додаємо 'saved'
     text: z.string().optional(),
     calories: z.coerce.number().optional(),
+    selected_workout_id: z.string().optional(), // <-- Нове поле для ID
   })
   .superRefine((data, ctx) => {
     if (data.mode === "ai" && (!data.text || data.text.trim().length < 3)) {
@@ -37,10 +40,17 @@ const activitySchema = z
         path: ["calories"],
       });
     }
+    if (data.mode === "saved" && !data.selected_workout_id) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Будь ласка, оберіть збережене тренування.",
+        path: ["selected_workout_id"],
+      });
+    }
   });
+
 type ActivitySchema = z.infer<typeof activitySchema>;
 
-// ---- props ----
 type ActivityEntry = {
   id: number;
   entry_text: string;
@@ -54,12 +64,14 @@ interface AICoachCardProps {
     estimated_calories_burned: number;
     exercises: { name: string }[];
   } | null;
+  savedWorkouts: DbSavedWorkout[]; // <-- Додаємо новий prop
 }
 
 // ---- component ----
 export function AICoachCard({
   activityLogData,
   todaysWorkout,
+  savedWorkouts, // <-- Отримуємо новий prop
 }: AICoachCardProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -77,12 +89,13 @@ export function AICoachCard({
       mode: "ai",
       text: "",
       calories: undefined,
+      selected_workout_id: "",
     },
   });
 
   const currentMode = useWatch({ control, name: "mode" });
+  const selectedWorkoutId = useWatch({ control, name: "selected_workout_id" });
 
-  // вибір режиму при маунті/оновленні
   useEffect(() => {
     if (todaysWorkout && todaysWorkout.estimated_calories_burned > 0) {
       setValue("mode", "planned");
@@ -104,6 +117,20 @@ export function AICoachCard({
           entryText: `Ручний запис (${data.calories} ккал)`,
           caloriesBurned: data.calories!,
         });
+      } else if (data.mode === "saved") {
+        // <-- НОВА ЛОГІКА ДЛЯ 'SAVED'
+        const selectedWorkout = savedWorkouts.find(
+          (w) => String(w.id) === data.selected_workout_id
+        );
+        if (selectedWorkout) {
+          result = await logPlannedWorkout({
+            entryText: selectedWorkout.workout_name,
+            caloriesBurned: selectedWorkout.estimated_calories_burned,
+          });
+        } else {
+          toast.error("Вибране тренування не знайдено.");
+          return;
+        }
       } else {
         result = await analyzeAndSaveActivityEntry(data.text!);
       }
@@ -112,7 +139,12 @@ export function AICoachCard({
         toast.error(result.error);
       } else {
         toast.success("Активність успішно додано!");
-        reset({ mode: "ai", text: "", calories: undefined });
+        reset({
+          mode: "ai",
+          text: "",
+          calories: undefined,
+          selected_workout_id: "",
+        });
       }
     });
   };
@@ -155,7 +187,10 @@ export function AICoachCard({
     );
   };
 
-  const isButtonDisabled = isPending || (currentMode !== "planned" && !isValid);
+  const isButtonDisabled =
+    isPending ||
+    (currentMode !== "planned" && currentMode !== "saved" && !isValid) ||
+    (currentMode === "saved" && !selectedWorkoutId);
 
   return (
     <Card>
@@ -205,6 +240,20 @@ export function AICoachCard({
               />
               Ввести вручну
             </label>
+
+            {/* НОВА РАДІОКНОПКА */}
+            {savedWorkouts.length > 0 && (
+              <label className="flex-1 cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm flex justify-center items-center">
+                <input
+                  type="radio"
+                  value="saved"
+                  {...register("mode")}
+                  checked={currentMode === "saved"}
+                  className="sr-only"
+                />
+                Мій запис
+              </label>
+            )}
           </div>
 
           {todaysWorkout && todaysWorkout.estimated_calories_burned > 0 && (
@@ -253,9 +302,25 @@ export function AICoachCard({
               type="number"
               step="1"
               placeholder="Спалені калорії"
-              {...register("calories")}
+              {...register("calories", { valueAsNumber: true })}
               className="w-full p-3 border rounded-lg"
             />
+          )}
+
+          {/* НОВИЙ ВИПАДАЮЧИЙ СПИСОК */}
+          {currentMode === "saved" && savedWorkouts.length > 0 && (
+            <select
+              {...register("selected_workout_id")}
+              className="w-full p-3 border rounded-lg"
+            >
+              <option value="">-- Оберіть збережене тренування --</option>
+              {savedWorkouts.map((workout) => (
+                <option key={workout.id} value={workout.id}>
+                  {workout.workout_name} ({workout.estimated_calories_burned}{" "}
+                  ккал)
+                </option>
+              ))}
+            </select>
           )}
 
           {/* errors */}
@@ -264,6 +329,11 @@ export function AICoachCard({
           )}
           {errors.calories && currentMode === "manual" && (
             <p className="text-red-500 text-sm">{errors.calories.message}</p>
+          )}
+          {errors.selected_workout_id && currentMode === "saved" && (
+            <p className="text-red-500 text-sm">
+              {errors.selected_workout_id.message}
+            </p>
           )}
 
           <div className="flex justify-end">

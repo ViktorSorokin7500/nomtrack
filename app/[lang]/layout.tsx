@@ -63,7 +63,7 @@ export default async function RootLayout({
   console.log(lang);
 
   return (
-    <html lang="en">
+    <html lang="uk">
       <body className={`${poppins.variable} font-sans antialiased`}>
         {children}
         <Toaster />

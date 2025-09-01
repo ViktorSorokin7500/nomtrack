@@ -3,10 +3,10 @@
 
 import { Card } from "../shared/card";
 import { Accordion } from "../ui";
-import { WorkoutPlan } from "@/app/[lang]/(root)/(pages)/coach/page";
 import { Flame, Dumbbell, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { uk } from "date-fns/locale";
+import { WorkoutPlan } from "@/types";
 
 interface WorkoutPlanCardProps {
   plan: WorkoutPlan;

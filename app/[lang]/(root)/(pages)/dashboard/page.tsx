@@ -8,6 +8,7 @@ import {
   WaterTrackerCard,
 } from "@/components/dashboard";
 import { Locale } from "@/i18n.config";
+import { DbSavedWorkout } from "@/types";
 
 export default async function Dashboard({
   params,
@@ -42,26 +43,35 @@ export default async function Dashboard({
   tomorrow.setDate(today.getDate() + 1);
 
   // --- ЗАВАНТАЖУЄМО ВСІ СЬОГОДНІШНІ ДАНІ ---
-  const [foodEntriesResult, activityEntriesResult, userRecipesResult] =
-    await Promise.all([
-      (await supabase)
-        .from("food_entries")
-        .select("*")
-        .eq("user_id", user.id)
-        .gte("created_at", today.toISOString())
-        .lt("created_at", tomorrow.toISOString()),
-      (await supabase)
-        .from("activity_entries")
-        .select("*")
-        .eq("user_id", user.id)
-        .gte("created_at", today.toISOString())
-        .lt("created_at", tomorrow.toISOString()),
-      (await supabase).from("user_recipes").select("*").eq("user_id", user.id),
-    ]);
+  const [
+    foodEntriesResult,
+    activityEntriesResult,
+    userRecipesResult,
+    savedWorkoutsResult,
+  ] = await Promise.all([
+    (await supabase)
+      .from("food_entries")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("created_at", today.toISOString())
+      .lt("created_at", tomorrow.toISOString()),
+    (await supabase)
+      .from("activity_entries")
+      .select("*")
+      .eq("user_id", user.id)
+      .gte("created_at", today.toISOString())
+      .lt("created_at", tomorrow.toISOString()),
+    (await supabase).from("user_recipes").select("*").eq("user_id", user.id),
+    (await supabase)
+      .from("user_workouts")
+      .select("id, workout_name, estimated_calories_burned")
+      .eq("user_id", user.id),
+  ]);
 
   const foodEntries = foodEntriesResult.data;
   const activityEntries = activityEntriesResult.data;
   const userRecipes = userRecipesResult.data || [];
+  const savedWorkouts = savedWorkoutsResult.data || [];
 
   // --- РОЗРАХОВУЄМО ПІДСУМКИ СПОЖИТОГО/СПАЛЕНОГО ---
   const consumedCalories =
@@ -173,6 +183,7 @@ export default async function Dashboard({
           <AICoachCard
             activityLogData={activityEntries || []}
             todaysWorkout={todaysWorkout}
+            savedWorkouts={savedWorkouts as DbSavedWorkout[]}
           />
         </div>
       </div>
