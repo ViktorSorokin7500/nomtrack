@@ -2,7 +2,7 @@
 
 import { useOptimistic, useTransition, useState } from "react";
 import { Card } from "../shared";
-import { Button } from "../ui";
+import { Button, SimpleRiseSpinner } from "../ui";
 import { addWaterEntry } from "@/app/actions";
 import toast from "react-hot-toast";
 
@@ -115,11 +115,7 @@ export function WaterTrackerCard({
             className="bg-blue-500 hover:bg-blue-600 text-white"
           >
             {isPending ? (
-              <span className="w-[53px] flex items-center justify-center gap-2 animate-pulse">
-                <div className="size-1 rounded-full bg-white animate-bounce" />
-                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
-                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
-              </span>
+              <SimpleRiseSpinner className="bg-blue-500 w-[53px]" />
             ) : (
               "Додати"
             )}

@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { Card } from "../shared/card";
 import { Button } from "../ui/button";
 import { Coins } from "lucide-react";
+import { SimpleRiseSpinner } from "../ui";
 
 const formSchema = z.object({
   equipmentText: z
@@ -82,9 +83,7 @@ export function WorkoutPlanForm() {
           <div />
           <Button type="submit" disabled={isPending}>
             {isPending ? (
-              <span className="w-[100px] flex items-center justify-center animate-pulse">
-                Генерація...
-              </span>
+              <SimpleRiseSpinner className="w-[174px]" />
             ) : (
               <span className="flex items-center gap-2">
                 Згенерувати план <Coins className="size-5" />5

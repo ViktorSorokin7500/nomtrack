@@ -11,7 +11,7 @@ import {
   logPlannedWorkout,
 } from "@/app/actions";
 import { Card } from "../shared";
-import { Button } from "../ui";
+import { Button, SimpleRiseSpinner } from "../ui";
 import { ActivityEntryCard } from "./activity-entry-card";
 import toast from "react-hot-toast";
 import { Coins, Dumbbell, Flame } from "lucide-react";
@@ -338,7 +338,11 @@ export function AICoachCard({
 
           <div className="flex justify-end">
             <Button type="submit" disabled={isButtonDisabled}>
-              {isPending ? "..." : "Додати"}
+              {isPending ? (
+                <SimpleRiseSpinner className="w-[53px]" />
+              ) : (
+                "Додати"
+              )}
             </Button>
           </div>
         </form>

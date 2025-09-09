@@ -22,11 +22,11 @@ export const SimpleRiseSpinner = ({
       role="status"
       aria-label="Завантаження..."
     >
-      <div className="spinner-bar"></div>
-      <div className="spinner-bar"></div>
-      <div className="spinner-bar"></div>
-      <div className="spinner-bar"></div>
-      <div className="spinner-bar"></div>
+      <div className="spinner-bar" />
+      <div className="spinner-bar" />
+      <div className="spinner-bar" />
+      <div className="spinner-bar" />
+      <div className="spinner-bar" />
     </div>
   );
 };

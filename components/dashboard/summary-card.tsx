@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Card } from "../shared";
-import { Button } from "../ui";
+import { Button, SimpleRiseSpinner } from "../ui";
 import { addWeightEntry } from "@/app/actions"; // Імпортуємо нову дію
 import toast from "react-hot-toast";
 
@@ -91,11 +91,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
             className="my-1"
           >
             {isPending ? (
-              <span className="w-[66px] flex justify-center items-center gap-2 animate-pulse">
-                <div className="size-1 rounded-full bg-white animate-bounce" />
-                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
-                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
-              </span>
+              <SimpleRiseSpinner className="w-[67px]" />
             ) : (
               "Зберегти"
             )}

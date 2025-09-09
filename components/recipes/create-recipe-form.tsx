@@ -98,12 +98,7 @@ export function CreateRecipeForm() {
 
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending ? (
-              <span className="flex items-center gap-2 animate-pulse">
-                Аналіз і збереження
-                <div className="size-1 rounded-full bg-white animate-bounce" />
-                <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
-                <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
-              </span>
+              <SimpleRiseSpinner />
             ) : (
               <>
                 <p>Зберегти рецепт</p>

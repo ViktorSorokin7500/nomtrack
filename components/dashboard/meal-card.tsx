@@ -7,7 +7,7 @@ import {
   addManualFoodEntry,
   searchGlobalFood,
 } from "@/app/actions";
-import { Button } from "../ui";
+import { Button, SimpleRiseSpinner } from "../ui";
 import { useEffect, useTransition, useState } from "react";
 import { foodEntrySchema, type FoodEntryFormSchema } from "@/lib/validators";
 import toast from "react-hot-toast";
@@ -15,7 +15,6 @@ import { Card } from "../shared";
 import { UserRecipe } from "@/types";
 import { Coins, XCircle } from "lucide-react";
 
-// Тип для результатів пошуку з глобальної БД
 type GlobalFoodSearchResult = {
   id: number;
   name: string;
@@ -462,12 +461,7 @@ export function MealCard({
           <div className="flex justify-end">
             <Button type="submit" disabled={isPending}>
               {isPending ? (
-                <span className="flex items-center gap-[7px] animate-pulse">
-                  Обробка
-                  <div className="size-1 rounded-full bg-white animate-bounce" />
-                  <div className="size-1 rounded-full bg-white animate-bounce delay-150" />
-                  <div className="size-1 rounded-full bg-white animate-bounce delay-300" />
-                </span>
+                <SimpleRiseSpinner className="w-[98px]" />
               ) : (
                 "Додати запис"
               )}

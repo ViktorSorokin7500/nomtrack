@@ -9,6 +9,7 @@ import { Card } from "../shared/card";
 import { Button } from "../ui/button";
 import { Coins } from "lucide-react";
 import { createAndAnalyzeWorkout } from "@/app/actions"; // Імпортуємо наш новий екшен
+import { SimpleRiseSpinner } from "../ui";
 
 const schema = z.object({
   workoutName: z.string().min(3, "Назва має бути довшою."),
@@ -84,9 +85,7 @@ export function CreateWorkoutForm() {
         <div className="flex justify-end">
           <Button type="submit" disabled={isPending}>
             {isPending ? (
-              <span className="w-[100px] flex items-center justify-center animate-pulse">
-                Аналіз...
-              </span>
+              <SimpleRiseSpinner className="w-[195px]" />
             ) : (
               <span className="flex items-center gap-2">
                 Зберегти тренування <Coins className="size-5" />1

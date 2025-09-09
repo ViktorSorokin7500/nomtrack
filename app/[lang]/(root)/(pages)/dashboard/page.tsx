@@ -6,9 +6,11 @@ import {
   SummaryCard,
   AICoachCard,
   WaterTrackerCard,
+  DashboardSkeleton,
 } from "@/components/dashboard";
 import { Locale } from "@/i18n.config";
 import { DbSavedWorkout } from "@/types";
+import { Suspense } from "react";
 
 export default async function Dashboard({
   params,
@@ -162,31 +164,33 @@ export default async function Dashboard({
   );
 
   return (
-    <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
-      <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 lg:order-2">
-          <NutritionDashboard
-            summaryData={summaryData}
-            foodLogData={
-              foodEntries?.filter((e) => e.meal_type !== "water") || []
-            }
-            userRecipes={userRecipes}
-          />
-        </div>
-        <div className="lg:col-span-1 space-y-6 lg:order-1">
-          <SummaryCard currentWeight={profile.current_weight_kg} />
-          <WaterTrackerCard
-            currentWater={totalWater}
-            targetWater={profile.target_water_ml || 2500}
-            key={totalWater}
-          />
-          <AICoachCard
-            activityLogData={activityEntries || []}
-            todaysWorkout={todaysWorkout}
-            savedWorkouts={savedWorkouts as DbSavedWorkout[]}
-          />
+    <Suspense fallback={<DashboardSkeleton />}>
+      <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
+        <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2 lg:order-2">
+            <NutritionDashboard
+              summaryData={summaryData}
+              foodLogData={
+                foodEntries?.filter((e) => e.meal_type !== "water") || []
+              }
+              userRecipes={userRecipes}
+            />
+          </div>
+          <div className="lg:col-span-1 space-y-6 lg:order-1">
+            <SummaryCard currentWeight={profile.current_weight_kg} />
+            <WaterTrackerCard
+              currentWater={totalWater}
+              targetWater={profile.target_water_ml || 2500}
+              key={totalWater}
+            />
+            <AICoachCard
+              activityLogData={activityEntries || []}
+              todaysWorkout={todaysWorkout}
+              savedWorkouts={savedWorkouts as DbSavedWorkout[]}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </Suspense>
   );
 }

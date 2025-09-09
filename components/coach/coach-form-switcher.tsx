@@ -15,7 +15,7 @@ export function CoachFormSwitcher() {
           className={`flex-1 p-4 md:rounded-l-lg font-semibold transition-all ${
             activeForm === "workout"
               ? "bg-orange-600 text-white shadow-md"
-              : "bg-white text-gray-800 hover:bg-orange-100"
+              : "bg-white text-gray-800 hover:bg-orange-100 cursor-pointer"
           }`}
         >
           Створити разове тренування
@@ -25,7 +25,7 @@ export function CoachFormSwitcher() {
           className={`flex-1 p-4 md:rounded-r-lg font-semibold transition-all ${
             activeForm === "plan"
               ? "bg-orange-600 text-white shadow-md"
-              : "bg-white text-gray-800 hover:bg-orange-100"
+              : "bg-white text-gray-800 hover:bg-orange-100 cursor-pointer"
           }`}
         >
           Створити план на тиждень

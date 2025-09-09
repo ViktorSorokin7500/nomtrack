@@ -118,7 +118,7 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
           aria-label="Видалити запис"
         >
           {isPending ? (
-            <div className="size-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+            <div className="size-4 border-2 border-gray-300 border-t-transparent rounded-full animate-spin" />
           ) : (
             <TrashIcon className="size-4 text-red-500" />
           )}

@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "../shared";
-import { Button } from "../ui";
+import { Button, SimpleRiseSpinner } from "../ui";
 import { updatePersonalInfo } from "@/app/actions";
 import toast from "react-hot-toast";
 
@@ -204,11 +204,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
         <div className="flex justify-end">
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? (
-              <span className="w-[67px] flex items-center justify-center gap-2 animate-pulse">
-                <div className="w-2 h-2 rounded-full bg-white animate-bounce" />
-                <div className="w-2 h-2 rounded-full bg-white animate-bounce delay-150" />
-                <div className="w-2 h-2 rounded-full bg-white animate-bounce delay-300" />
-              </span>
+              <SimpleRiseSpinner className="w-[67px]" />
             ) : (
               "Зберегти"
             )}
