@@ -20,10 +20,14 @@ export interface AiReportData {
 }
 
 interface ReportDisplayProps {
-  reportData: AiReportData;
+  reportData: AiReportData | null;
 }
 
 export function ReportDisplay({ reportData }: ReportDisplayProps) {
+  if (!reportData) {
+    return null;
+  }
+
   return (
     <div className="space-y-8 text-gray-700">
       {/* Загальна оцінка прогресу */}
