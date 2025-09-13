@@ -29,24 +29,13 @@ export default async function Dashboard({
     redirect("/sign-in");
   }
 
-  let profile = null;
+  const { data: profile } = await (await supabase)
+    .from("profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
 
-  try {
-    const { data, error } = await (await supabase)
-      .from("profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-    if (error) {
-      throw error;
-    }
-    profile = data;
-  } catch (e) {
-    console.error("Помилка при отриманні профілю:", e);
-  }
-
-  if (!profile || profile.current_weight_kg === null) {
+  if (profile.current_weight_kg === null) {
     redirect("/settings");
   }
 
@@ -192,7 +181,6 @@ export default async function Dashboard({
             <WaterTrackerCard
               currentWater={totalWater}
               targetWater={profile.target_water_ml || 2500}
-              key={totalWater}
             />
             <AICoachCard
               activityLogData={activityEntries || []}
