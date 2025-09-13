@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
-  // NutritionDashboard,
+  NutritionDashboard,
   SummaryCard,
   AICoachCard,
   WaterTrackerCard,
@@ -78,65 +78,65 @@ export default async function Dashboard({
   console.log(userRecipes);
 
   // --- РОЗРАХОВУЄМО ПІДСУМКИ СПОЖИТОГО/СПАЛЕНОГО ---
-  // const consumedCalories =
-  //   foodEntries?.reduce((sum, entry) => sum + (entry.calories || 0), 0) || 0;
-  // const consumedProtein =
-  //   foodEntries?.reduce((sum, entry) => sum + (entry.protein_g || 0), 0) || 0;
-  // const consumedFat =
-  //   foodEntries?.reduce((sum, entry) => sum + (entry.fat_g || 0), 0) || 0;
-  // const consumedCarbs =
-  //   foodEntries?.reduce((sum, entry) => sum + (entry.carbs_g || 0), 0) || 0;
-  // const consumedSugar =
-  //   foodEntries?.reduce((sum, entry) => sum + (entry.sugar_g || 0), 0) || 0;
+  const consumedCalories =
+    foodEntries?.reduce((sum, entry) => sum + (entry.calories || 0), 0) || 0;
+  const consumedProtein =
+    foodEntries?.reduce((sum, entry) => sum + (entry.protein_g || 0), 0) || 0;
+  const consumedFat =
+    foodEntries?.reduce((sum, entry) => sum + (entry.fat_g || 0), 0) || 0;
+  const consumedCarbs =
+    foodEntries?.reduce((sum, entry) => sum + (entry.carbs_g || 0), 0) || 0;
+  const consumedSugar =
+    foodEntries?.reduce((sum, entry) => sum + (entry.sugar_g || 0), 0) || 0;
   const totalWater =
     foodEntries?.reduce((sum, entry) => sum + (entry.water_ml || 0), 0) || 0;
-  // const burnedCalories =
-  //   activityEntries?.reduce(
-  //     (sum, entry) => sum + (entry.calories_burned || 0),
-  //     0
-  //   ) || 0;
+  const burnedCalories =
+    activityEntries?.reduce(
+      (sum, entry) => sum + (entry.calories_burned || 0),
+      0
+    ) || 0;
 
   // --- РОЗРАХУНОК ДИНАМІЧНИХ ЦІЛЕЙ (НОВА ЛОГІКА) ---
   // 1. Беремо базові цілі з профілю
-  // const baseTargetCalories = profile.target_calories || 2000;
-  // const baseTargetProtein = profile.target_protein_g || 120;
-  // const baseTargetCarbs = profile.target_carbs_g || 250;
-  // const baseTargetFat = profile.target_fat_g || 70;
-  // const baseTargetSugar = profile.target_sugar_g || 30;
+  const baseTargetCalories = profile.target_calories || 2000;
+  const baseTargetProtein = profile.target_protein_g || 120;
+  const baseTargetCarbs = profile.target_carbs_g || 250;
+  const baseTargetFat = profile.target_fat_g || 70;
+  const baseTargetSugar = profile.target_sugar_g || 30;
 
   // 2. Розраховуємо нову ціль по калоріях
-  // const adjustedTargetCalories = baseTargetCalories + burnedCalories;
+  const adjustedTargetCalories = baseTargetCalories + burnedCalories;
 
   // 3. Визначаємо процентний розподіл БЖВ на основі БАЗОВИХ цілей
-  // const proteinPercentage = (baseTargetProtein * 4) / baseTargetCalories;
-  // const carbsPercentage = (baseTargetCarbs * 4) / baseTargetCalories;
-  // const fatPercentage = (baseTargetFat * 9) / baseTargetCalories;
+  const proteinPercentage = (baseTargetProtein * 4) / baseTargetCalories;
+  const carbsPercentage = (baseTargetCarbs * 4) / baseTargetCalories;
+  const fatPercentage = (baseTargetFat * 9) / baseTargetCalories;
 
   // 4. Розраховуємо нові цілі по БЖВ на основі нової цілі по калоріях
-  // const adjustedTargetProtein = Math.round(
-  //   (adjustedTargetCalories * proteinPercentage) / 4
-  // );
-  // const adjustedTargetCarbs = Math.round(
-  //   (adjustedTargetCalories * carbsPercentage) / 4
-  // );
-  // const adjustedTargetFat = Math.round(
-  //   (adjustedTargetCalories * fatPercentage) / 9
-  // );
+  const adjustedTargetProtein = Math.round(
+    (adjustedTargetCalories * proteinPercentage) / 4
+  );
+  const adjustedTargetCarbs = Math.round(
+    (adjustedTargetCalories * carbsPercentage) / 4
+  );
+  const adjustedTargetFat = Math.round(
+    (adjustedTargetCalories * fatPercentage) / 9
+  );
 
   // 5. Готуємо фінальний об'єкт з ДИНАМІЧНИМИ цілями
-  // const summaryData = {
-  //   calories: {
-  //     consumed: consumedCalories,
-  //     burned: burnedCalories,
-  //     target: adjustedTargetCalories, // <-- Використовуємо нову ціль
-  //   },
-  //   macros: {
-  //     protein: { current: consumedProtein, target: adjustedTargetProtein }, // <-- Нова ціль
-  //     fat: { current: consumedFat, target: adjustedTargetFat }, // <-- Нова ціль
-  //     carbs: { current: consumedCarbs, target: adjustedTargetCarbs }, // <-- Нова ціль
-  //     sugar: { current: consumedSugar, target: baseTargetSugar },
-  //   },
-  // };
+  const summaryData = {
+    calories: {
+      consumed: consumedCalories,
+      burned: burnedCalories,
+      target: adjustedTargetCalories, // <-- Використовуємо нову ціль
+    },
+    macros: {
+      protein: { current: consumedProtein, target: adjustedTargetProtein }, // <-- Нова ціль
+      fat: { current: consumedFat, target: adjustedTargetFat }, // <-- Нова ціль
+      carbs: { current: consumedCarbs, target: adjustedTargetCarbs }, // <-- Нова ціль
+      sugar: { current: consumedSugar, target: baseTargetSugar },
+    },
+  };
 
   const { data: latestPlan } = await (await supabase)
     .from("workout_plans")
@@ -170,13 +170,13 @@ export default async function Dashboard({
       <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
         <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 lg:order-2">
-            {/* <NutritionDashboard
+            <NutritionDashboard
               summaryData={summaryData}
               foodLogData={
                 foodEntries?.filter((e) => e.meal_type !== "water") || []
               }
               userRecipes={userRecipes}
-            /> */}
+            />
           </div>
           <div className="lg:col-span-1 space-y-6 lg:order-1">
             <SummaryCard currentWeight={profile.current_weight_kg} />
