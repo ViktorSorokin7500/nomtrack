@@ -29,11 +29,22 @@ export default async function Dashboard({
     redirect("/sign-in");
   }
 
-  const { data: profile } = await (await supabase)
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
+  let profile = null;
+
+  try {
+    const { data, error } = await (await supabase)
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (error) {
+      throw error;
+    }
+    profile = data;
+  } catch (e) {
+    console.error("Помилка при отриманні профілю:", e);
+  }
 
   if (!profile || profile.current_weight_kg === null) {
     redirect("/settings");

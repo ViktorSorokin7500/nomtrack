@@ -74,7 +74,7 @@ export function PremiumCountdown({ expiresAt }: PremiumCountdownProps) {
         <span>
           Ваша підписка вичерпана.{" "}
           <Link
-            href="/price"
+            href="/pricing"
             className="underline text-blue-400 hover:text-sky-600"
           >
             Продовжіть
