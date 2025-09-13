@@ -55,7 +55,9 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               <div className="text-xs text-gray-600 mt-1">
                 Поточна вага:
                 <span className="font-bold ml-1">
-                  {currentWeight ? `${currentWeight} кг` : "N/A"}
+                  {currentWeight
+                    ? `${currentWeight.toLocaleString("uk-UA")} кг`
+                    : "N/A"}
                 </span>
               </div>
             </div>

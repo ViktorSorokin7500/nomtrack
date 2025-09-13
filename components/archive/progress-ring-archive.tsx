@@ -77,10 +77,10 @@ export function ProgressRingArchive({
           ) : (
             <>
               <span className="text-2xl font-semibold text-stone-900">
-                {current.toLocaleString()}
+                {current.toLocaleString("uk-UA")}
               </span>
               <span className="text-sm text-gray-500">
-                / {target.toLocaleString()}
+                / {target.toLocaleString("uk-UA")}
               </span>
             </>
           )}
