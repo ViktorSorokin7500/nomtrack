@@ -5,7 +5,7 @@ import {
   // NutritionDashboard,
   // SummaryCard,
   AICoachCard,
-  // WaterTrackerCard,
+  WaterTrackerCard,
   DashboardSkeleton,
 } from "@/components/dashboard";
 import { Locale } from "@/i18n.config";
@@ -75,7 +75,7 @@ export default async function Dashboard({
   const userRecipes = userRecipesResult.data || [];
   const savedWorkouts = savedWorkoutsResult.data || [];
 
-  console.log(foodEntries, userRecipes);
+  console.log(userRecipes);
 
   // --- РОЗРАХОВУЄМО ПІДСУМКИ СПОЖИТОГО/СПАЛЕНОГО ---
   // const consumedCalories =
@@ -88,8 +88,8 @@ export default async function Dashboard({
   //   foodEntries?.reduce((sum, entry) => sum + (entry.carbs_g || 0), 0) || 0;
   // const consumedSugar =
   //   foodEntries?.reduce((sum, entry) => sum + (entry.sugar_g || 0), 0) || 0;
-  // const totalWater =
-  //   foodEntries?.reduce((sum, entry) => sum + (entry.water_ml || 0), 0) || 0;
+  const totalWater =
+    foodEntries?.reduce((sum, entry) => sum + (entry.water_ml || 0), 0) || 0;
   // const burnedCalories =
   //   activityEntries?.reduce(
   //     (sum, entry) => sum + (entry.calories_burned || 0),
@@ -180,10 +180,10 @@ export default async function Dashboard({
           </div>
           <div className="lg:col-span-1 space-y-6 lg:order-1">
             {/* <SummaryCard currentWeight={profile.current_weight_kg} /> */}
-            {/* <WaterTrackerCard
+            <WaterTrackerCard
               currentWater={totalWater}
               targetWater={profile.target_water_ml || 2500}
-            /> */}
+            />
             <AICoachCard
               activityLogData={activityEntries || []}
               todaysWorkout={todaysWorkout}
