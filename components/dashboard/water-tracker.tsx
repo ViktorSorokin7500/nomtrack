@@ -66,10 +66,10 @@ export function WaterTrackerCard({
       <div className="mb-4">
         <div className="flex justify-between items-baseline mb-1">
           <span className="text-lg font-bold text-blue-500">
-            {optimisticWater.toLocaleString()} мл
+            {optimisticWater.toLocaleString("en-US")} мл
           </span>
           <span className="text-sm text-gray-500">
-            Ціль: {targetWater.toLocaleString()} мл
+            Ціль: {targetWater.toLocaleString("en-US")} мл
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
