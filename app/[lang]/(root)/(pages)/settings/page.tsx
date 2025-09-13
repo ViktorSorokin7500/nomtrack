@@ -58,7 +58,6 @@ export default async function Settings({
           </div>
         </div>
       </Suspense>
-      <SettingsSkeleton />
     </section>
   );
 }

@@ -105,8 +105,8 @@ export function Footer() {
     {
       title: "Юридична інформація",
       links: [
-        { label: "Політика конфіденційності", href: "/legal/privacy" },
-        { label: "Умови надання послуг", href: "/legal/terms" },
+        { label: "Політика конфіденційності", href: "/privacy-security" },
+        { label: "Умови надання послуг", href: "/help" },
       ],
     },
   ];

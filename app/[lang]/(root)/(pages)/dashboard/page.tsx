@@ -9,7 +9,7 @@ import {
   DashboardSkeleton,
 } from "@/components/dashboard";
 import { Locale } from "@/i18n.config";
-import { DbSavedWorkout } from "@/types";
+import { DbSavedWorkout, WorkoutPlan } from "@/types";
 import { Suspense } from "react";
 
 export default async function Dashboard({
@@ -159,8 +159,8 @@ export default async function Dashboard({
   const todayDayName = daysOfWeek[todayDayIndex]; // Додаткова перевірка, яка усуне помилку
 
   const todaysWorkout = workoutPlan?.daily_plans.find(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (day: any) => day.day === todayDayName && day.estimated_calories_burned > 0
+    (day: WorkoutPlan["daily_plans"][0]) =>
+      day.day === todayDayName && day.estimated_calories_burned > 0
   );
 
   return (
