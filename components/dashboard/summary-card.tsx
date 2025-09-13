@@ -26,11 +26,9 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
       const result = await addWeightEntry(weightValue);
       if (result?.error) {
         toast.success("Error: " + result.error);
-        // alert("Помилка: " + result.error);
       } else {
         setWeightInput(""); // Очищуємо поле після успішного збереження
         toast.success(result.success || "Weight saved successfully!");
-        // alert(result.success);
       }
     });
   };
@@ -40,7 +38,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-xl font-medium text-stone-900">Прогрес ваги</h2>
         <div className="text-sm text-gray-500">
-          {new Date().toLocaleDateString()}
+          {new Date().toLocaleDateString("uk-UA")}
         </div>
       </div>
 
