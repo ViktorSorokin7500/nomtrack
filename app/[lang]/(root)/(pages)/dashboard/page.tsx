@@ -33,7 +33,7 @@ export default async function Dashboard({
     .from("profiles")
     .select("*")
     .eq("id", user.id)
-    .single();
+    .maybeSingle();
 
   if (profile.current_weight_kg === null) {
     redirect("/settings");
