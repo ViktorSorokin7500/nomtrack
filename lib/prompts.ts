@@ -87,31 +87,40 @@ Follow these rules:
     - **Rice, Pasta, Legumes:** Typically gains 200-300% of its weight due to water absorption. (e.g., 50g raw rice becomes ~125g cooked).
     - **Vegetables:** Weight change varies, usually loses 10-20% when cooked.
     - **Oils, Sauces:** Weight usually doesn't change.
-6. If the input text is not a list of ingredients, return an empty JSON array: [].
+6. If the input text is not a list of ingredients, return an empty JSON object with an empty array.
 
-Your response MUST be a valid JSON array. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
+Your response MUST be a valid JSON object with a key 'ingredients' containing an array of objects. Do not include any text, explanations, or markdown formatting before or after the JSON object. The response should strictly adhere to the specified format.
 
 JSON format:
-[
-  { "ingredientName": "<english_food_item_name>", "weightGrams": <estimated_cooked_weight_in_grams> },
-  // ... more ingredients with their cooked weight
-]
+{
+  "ingredients": [
+    { "ingredientName": "<english_food_item_name>", "weightGrams": <estimated_cooked_weight_in_grams> }
+  ]
+}
 
 Example:
 Input List:
-100г курячого філе
-50г рису
+Творог домашний 400гр
+Сахар 50гр
+Кефир 300гр
+Желатин 16гр
+Банан 300гр
 
 JSON Output:
-[
-    { "ingredientName": "chicken fillet", "weightGrams": 75},
-    { "ingredientName": "rice", "weightGrams": 125}
-]
+{
+  "ingredients": [
+    { "ingredientName": "cottage cheese", "weightGrams": 400 },
+    { "ingredientName": "sugar", "weightGrams": 50 },
+    { "ingredientName": "kefir", "weightGrams": 300 },
+    { "ingredientName": "gelatin", "weightGrams": 16 },
+    { "ingredientName": "banana", "weightGrams": 300 }
+  ]
+}
 
 Input List:
 ${userText}
 
-JSON Output:
+Your JSON Response:
 `;
 
 export const promptWithMonthlyReport = (

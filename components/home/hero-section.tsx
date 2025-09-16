@@ -1,9 +1,6 @@
-import { Locale } from "@/i18n.config";
 import React from "react";
 
-export function HeroSection({ lang }: { lang: Locale }) {
-  console.log(lang);
-
+export function HeroSection() {
   return (
     <section className="container mx-auto px-4 py-16 lg:py-24 flex flex-col lg:flex-row items-center">
       <div className="lg:w-1/2 mb-10 lg:mb-0">

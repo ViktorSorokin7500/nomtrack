@@ -53,15 +53,9 @@ export async function generateMetadata({
 
 export default async function RootLayout({
   children,
-  params,
 }: Readonly<{
   children: React.ReactNode;
-  params: Promise<{ lang: Locale }>;
 }>) {
-  const { lang } = await params;
-
-  console.log(lang);
-
   return (
     <html lang="uk">
       <body className={`${poppins.variable} font-sans antialiased`}>

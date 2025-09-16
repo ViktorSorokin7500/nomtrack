@@ -33,7 +33,6 @@ export default async function Settings({
     .eq("id", user.id) // Ось тут ми використовуємо id юзера
     .maybeSingle();
 
-  // console.log("Результат пошуку профілю:", profile);
   if (error) {
     console.error("Could not load profile:", error);
   }

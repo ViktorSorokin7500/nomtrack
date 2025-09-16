@@ -30,7 +30,7 @@ export default async function Home({
     <>
       {/* <SplashCursor /> */}
       <div className="bg-orange-50">
-        <HeroSection lang={lang} />
+        <HeroSection />
       </div>
       <CtaSection lang={lang} />
       <FeatureSection />

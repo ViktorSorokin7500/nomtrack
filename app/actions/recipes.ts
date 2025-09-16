@@ -48,35 +48,24 @@ export async function createAndAnalyzeRecipe(formData: {
       return { error: `Помилка аналізу ШІ: ${aiError}` };
     }
 
-    // Крок 2: Визначаємо масив інгредієнтів, незалежно від формату відповіді ШІ
-    let normalizedIngredients: NormalizedIngredient[];
+    // Крок 2: ОНОВЛЕНА ЛОГІКА: універсальна обробка відповіді AI
+    let normalizedIngredients: NormalizedIngredient[] = [];
 
-    if (aiData === null) {
-      // Спочатку перевіряємо на null, щоб уникнути помилок
+    if (!aiData) {
       throw new Error("ШІ повернув порожню відповідь (null).");
     }
 
     if (Array.isArray(aiData)) {
-      // Випадок 1: ШІ повернув просто масив [...]
-      // Тут все безпечно, TypeScript знає, що aiData - це масив.
       normalizedIngredients = aiData;
+    } else if (
+      typeof aiData === "object" &&
+      "ingredients" in aiData &&
+      Array.isArray(aiData.ingredients)
+    ) {
+      normalizedIngredients = aiData.ingredients;
     } else {
-      // Випадок 2: ШІ повернув об'єкт {...}
-      // TypeScript тепер знає, що aiData - це об'єкт, а не null.
-
-      // Шукаємо назву ключа, за яким знаходиться масив
-      const arrayKey = Object.keys(aiData).find((key) =>
-        Array.isArray(aiData[key])
-      );
-
-      if (arrayKey) {
-        // Якщо ключ знайдено, безпечно отримуємо масив за цим ключем.
-        // Завдяки індексній сигнатурі в типі ця помилка зникає.
-        normalizedIngredients = aiData[arrayKey];
-      } else {
-        // Якщо в об'єкті немає жодного масиву
-        throw new Error("Не вдалося знайти масив інгредієнтів у відповіді ШІ.");
-      }
+      // Якщо AI повернув один об'єкт, поміщаємо його в масив
+      normalizedIngredients = [aiData as unknown as NormalizedIngredient];
     }
 
     if (!normalizedIngredients || normalizedIngredients.length === 0) {

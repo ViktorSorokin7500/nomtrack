@@ -1,10 +1,8 @@
+import { Card } from "@/components/shared";
 import {
   ClipboardList,
   Smartphone,
-  BookOpenText,
   LineChart,
-  Bike,
-  Pencil,
   Watch,
   Users,
   Bot,
@@ -22,28 +20,10 @@ export default function UpdatesPage() {
         "Розробка додатків для iOS та Android для максимальної зручності.",
     },
     {
-      icon: <BookOpenText />,
-      title: "Збереження рецептів та страв",
-      description:
-        "Можливість зберегти свої улюблені страви, щоб додавати їх в один клік.",
-    },
-    {
       icon: <LineChart />,
       title: "Розширений аналіз та звіти",
       description:
         "Створення тижневих та місячних звітів з візуальними графіками.",
-    },
-    {
-      icon: <Bike />,
-      title: "Деталізація активностей",
-      description:
-        "Розширення видів активностей та більш точний розрахунок калорій.",
-    },
-    {
-      icon: <Pencil />,
-      title: "Редагування записів",
-      description:
-        "Можливість легко редагувати або видаляти вже додані записи.",
     },
   ];
 
@@ -89,7 +69,7 @@ export default function UpdatesPage() {
     title: string;
     description: string;
   }) => (
-    <div className="bg-white/50 hover:bg-white cursor-default backdrop-blur-sm p-6 rounded-lg shadow-sm hover:shadow-lg border border-gray-200/50 transition-all duration-150">
+    <div className="bg-orange-50/50 hover:bg-orange-100/50 cursor-default backdrop-blur-sm p-6 rounded-lg shadow-sm hover:shadow-lg border border-gray-200/50 transition-all duration-150">
       <div className="flex items-center gap-4 mb-3">
         <div className="text-orange-500">{icon}</div>
         <h3 className="font-bold text-gray-800 text-md">{title}</h3>
@@ -110,9 +90,9 @@ export default function UpdatesPage() {
           </p>
         </header>
 
-        <main className="space-y-12">
+        <Card>
           {/* --- Секція "Заплановано" --- */}
-          <section>
+          <section className="mb-12">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
               <ClipboardList className="text-orange-500" />
               Заплановано
@@ -136,7 +116,7 @@ export default function UpdatesPage() {
               ))}
             </div>
           </section>
-        </main>
+        </Card>
       </div>
     </div>
   );

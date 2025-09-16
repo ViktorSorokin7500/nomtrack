@@ -20,7 +20,7 @@ export async function getAiJsonResponse<T>(
 
     const content = response.choices?.[0]?.message?.content;
 
-    console.log(content);
+    console.log("Повна відповідь ШІ:", content);
 
     // Цей лог допоможе побачити повну, "брудну" відповідь
     if (!content) {
