@@ -1,14 +1,6 @@
-// app/api/dashboard/route.ts
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { FoodEntry, UserRecipe, DbSavedWorkout, WorkoutPlan } from "@/types";
-
-type ActivityEntry = {
-  id: string;
-  user_id: string;
-  calories_burned: number | null;
-  created_at: string;
-};
 
 export async function GET() {
   try {
@@ -19,20 +11,18 @@ export async function GET() {
       return NextResponse.json({ error: "unauthorized" }, { status: 401 });
     }
 
-    // Сьогоднішній діапазон дат
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const tomorrow = new Date(today);
     tomorrow.setDate(today.getDate() + 1);
 
-    // Всі запити паралельно
     const [
-      { data: profile },
-      foodEntriesResult,
-      activityEntriesResult,
-      userRecipesResult,
-      savedWorkoutsResult,
-      { data: latestPlan },
+      profileRes,
+      foodEntriesRes,
+      activityEntriesRes,
+      userRecipesRes,
+      savedWorkoutsRes,
+      latestPlanRes,
     ] = await Promise.all([
       supabase.from("profiles").select("*").eq("id", user.id).single(),
       supabase
@@ -50,9 +40,7 @@ export async function GET() {
       supabase.from("user_recipes").select("*").eq("user_id", user.id),
       supabase
         .from("user_workouts")
-        .select(
-          "id, workout_name, estimated_calories_burned, created_at, workout_data"
-        )
+        .select("id, workout_name, estimated_calories_burned")
         .eq("user_id", user.id),
       supabase
         .from("workout_plans")
@@ -63,37 +51,56 @@ export async function GET() {
         .single(),
     ]);
 
-    // Якщо профіль порожній — редірект
+    const profile = profileRes?.data ?? null;
     if (!profile || profile.current_weight_kg == null) {
       return NextResponse.json({ redirectTo: "/settings" }, { status: 200 });
     }
 
-    // Дані з таблиць
-    const foodEntries: FoodEntry[] = foodEntriesResult.data ?? [];
-    const activityEntries: ActivityEntry[] = activityEntriesResult.data ?? [];
-    const userRecipes: UserRecipe[] = userRecipesResult.data ?? [];
-    const savedWorkouts: DbSavedWorkout[] = savedWorkoutsResult.data ?? [];
+    const foodEntries = foodEntriesRes?.data ?? [];
+    const activityEntries = activityEntriesRes?.data ?? [];
+    const userRecipes = userRecipesRes?.data ?? [];
+    const savedWorkouts = savedWorkoutsRes?.data ?? [];
+    const latestPlan = latestPlanRes?.data ?? null;
 
-    // Підрахунки
+    // Безпечні підрахунки: приводимо до чисел і замінюємо null/undefined на 0
+    const toNum = (v: unknown) => {
+      if (typeof v === "number") return v;
+      if (typeof v === "string" && v.trim() !== "") {
+        const n = Number(v);
+        return Number.isFinite(n) ? n : 0;
+      }
+      return 0;
+    };
+
     const consumedCalories = foodEntries.reduce(
-      (s, e) => s + (e.calories ?? 0),
+      (s: number, e: any) => s + toNum(e?.calories),
       0
     );
     const consumedProtein = foodEntries.reduce(
-      (s, e) => s + (e.protein_g ?? 0),
+      (s: number, e: any) => s + toNum(e?.protein_g),
       0
     );
-    const consumedFat = foodEntries.reduce((s, e) => s + (e.fat_g ?? 0), 0);
-    const consumedCarbs = foodEntries.reduce((s, e) => s + (e.carbs_g ?? 0), 0);
-    const consumedSugar = foodEntries.reduce((s, e) => s + (e.sugar_g ?? 0), 0);
-    const totalWater = foodEntries.reduce((s, e) => s + (e.water_ml ?? 0), 0);
-
+    const consumedFat = foodEntries.reduce(
+      (s: number, e: any) => s + toNum(e?.fat_g),
+      0
+    );
+    const consumedCarbs = foodEntries.reduce(
+      (s: number, e: any) => s + toNum(e?.carbs_g),
+      0
+    );
+    const consumedSugar = foodEntries.reduce(
+      (s: number, e: any) => s + toNum(e?.sugar_g),
+      0
+    );
+    const totalWater = foodEntries.reduce(
+      (s: number, e: any) => s + toNum(e?.water_ml),
+      0
+    );
     const burnedCalories = activityEntries.reduce(
-      (s, e) => s + (e.calories_burned ?? 0),
+      (s: number, e: any) => s + toNum(e?.calories_burned),
       0
     );
 
-    // Цілі
     const baseTargetCalories = profile.target_calories ?? 2000;
     const baseTargetProtein = profile.target_protein_g ?? 120;
     const baseTargetCarbs = profile.target_carbs_g ?? 250;
@@ -128,7 +135,6 @@ export async function GET() {
       },
     };
 
-    // Тренування
     const daysOfWeek = [
       "Неділя",
       "Понеділок",
@@ -140,14 +146,12 @@ export async function GET() {
     ];
     const todayDayName = daysOfWeek[new Date().getDay()];
     const workoutPlan = latestPlan?.plan_data ?? null;
-
     const todaysWorkout =
-      workoutPlan?.daily_plans?.find(
-        (d: WorkoutPlan["daily_plans"][0]) =>
-          d.day === todayDayName && d.estimated_calories_burned > 0
+      (workoutPlan?.daily_plans ?? []).find(
+        (d: any) =>
+          d?.day === todayDayName && toNum(d?.estimated_calories_burned) > 0
       ) ?? null;
 
-    // Відповідь
     const payload = {
       profile,
       foodEntries,
@@ -160,11 +164,14 @@ export async function GET() {
     };
 
     return NextResponse.json(payload, {
-      headers: { "Cache-Control": "no-store" },
+      headers: {
+        "Content-Type": "application/json",
+        "Cache-Control": "no-store",
+      },
       status: 200,
     });
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (e) {
+  } catch (err) {
+    console.error("API /api/dashboard error:", err);
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }
