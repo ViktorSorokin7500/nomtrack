@@ -109,6 +109,7 @@ export type GlobalFoodSearchResult = {
 };
 
 export interface FoodEntry {
+  water_ml: number;
   id: number;
   meal_type: "breakfast" | "lunch" | "dinner" | "snack";
   entry_text: string;
