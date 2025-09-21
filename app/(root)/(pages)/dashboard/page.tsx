@@ -7,8 +7,15 @@ import {
   SummaryCard,
 } from "@/components/dashboard";
 import { DbSavedWorkout, WorkoutPlan } from "@/types";
+import { Suspense } from "react";
+import {
+  NutritionSkeleton,
+  SummarySkeleton,
+  WaterSkeleton,
+  AiCoachSkeleton,
+} from "@/components/skeletons";
 
-export async function DashboardContent() {
+export default async function Dashboard() {
   const supabase = await createClient();
 
   // 1) Користувач
@@ -143,25 +150,33 @@ export async function DashboardContent() {
     <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 lg:order-2">
-          <NutritionDashboard
-            summaryData={summaryData}
-            foodLogData={
-              foodEntries?.filter((e) => e.meal_type !== "water") || []
-            }
-            userRecipes={userRecipes}
-          />
+          <Suspense fallback={<NutritionSkeleton />}>
+            <NutritionDashboard
+              summaryData={summaryData}
+              foodLogData={
+                foodEntries?.filter((e) => e.meal_type !== "water") || []
+              }
+              userRecipes={userRecipes}
+            />
+          </Suspense>
         </div>
         <div className="lg:col-span-1 space-y-6 lg:order-1">
-          <SummaryCard currentWeight={profile.current_weight_kg} />
-          <WaterTrackerCard
-            currentWater={totalWater}
-            targetWater={profile.target_water_ml || 2500}
-          />
-          <AICoachCard
-            activityLogData={activityEntries || []}
-            todaysWorkout={todaysWorkout}
-            savedWorkouts={savedWorkouts as DbSavedWorkout[]}
-          />
+          <Suspense fallback={<SummarySkeleton />}>
+            <SummaryCard currentWeight={profile.current_weight_kg} />
+          </Suspense>
+          <Suspense fallback={<WaterSkeleton />}>
+            <WaterTrackerCard
+              currentWater={totalWater}
+              targetWater={profile.target_water_ml || 2500}
+            />
+          </Suspense>
+          <Suspense fallback={<AiCoachSkeleton />}>
+            <AICoachCard
+              activityLogData={activityEntries || []}
+              todaysWorkout={todaysWorkout}
+              savedWorkouts={savedWorkouts as DbSavedWorkout[]}
+            />
+          </Suspense>
         </div>
       </div>
     </div>

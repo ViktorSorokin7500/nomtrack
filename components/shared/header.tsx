@@ -1,10 +1,9 @@
-import { Locale } from "@/i18n.config";
 import NavMenu from "./nav-menu";
 import { NavLink } from "./nav-link";
 import { createClient } from "@/lib/supabase/server";
 import { PremiumCountdown } from "./premium-countdown";
 
-export async function Header({ lang }: { lang: Locale }) {
+export async function Header() {
   const supabase = createClient();
 
   const {
@@ -26,7 +25,7 @@ export async function Header({ lang }: { lang: Locale }) {
       <nav className="container flex items-center justify-between py-4 px-2 lg:px-8 mx-auto">
         <div className="flex lg:flex-1 group">
           <NavLink
-            href={user ? `/${lang}/dashboard` : `/${lang}`}
+            href={user ? `/dashboard` : `/`}
             className="flex items-center gap-1 lg:gap-2 shrink-0"
           >
             <svg
@@ -53,23 +52,18 @@ export async function Header({ lang }: { lang: Locale }) {
 
         {user ? (
           <>
-            <NavMenu lang={lang} aiCreditsLeft={aiCreditsLeft} />
+            <NavMenu aiCreditsLeft={aiCreditsLeft} />
           </>
         ) : (
           <>
             <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
-              <NavLink href={`/${lang}#pricing`}>Тарифи</NavLink>
+              <NavLink href={`#pricing`}>Тарифи</NavLink>
             </div>
 
             <div className="flex lg:justify-end lg:flex-1">
               <div className="flex items-center gap-1">
-                {/* <LangSwitcher
-                  lang={lang}
-                  title="language"
-                  className="hover:text-orange-400"
-                /> */}
                 <NavLink
-                  href={`/${lang}/sign-in`}
+                  href={`/sign-in`}
                   className="border border-orange-300 bg-orange-300 hover:bg-orange-400 text-white hover:text-gray-100 px-3 py-1 rounded-full"
                 >
                   Увійти

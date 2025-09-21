@@ -1,22 +1,17 @@
 import { MetadataRoute } from "next";
-import { i18n } from "@/i18n.config";
 
 const pages = ["", "pricing", "updates", "privacy-security", "help", "support"];
 
-// This function will generate the sitemap
+// Генерує sitemap тільки для однієї мови (без i18n)
 export default function sitemap(): MetadataRoute.Sitemap {
-  const locales = i18n.locales;
-  const baseUrl = "https://www.nomtrack.site"; // Replace with your domain
+  const baseUrl = "https://www.nomtrack.site"; // заміни на свій домен
 
-  // Generate a sitemap entry for each page and locale
-  const sitemapEntries: MetadataRoute.Sitemap = locales.flatMap((locale) =>
-    pages.map((page) => ({
-      url: `${baseUrl}/${locale}/${page}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: page === "" ? 1.0 : 0.8, // Prioritize the homepage
-    }))
-  );
+  const sitemapEntries: MetadataRoute.Sitemap = pages.map((page) => ({
+    url: `${baseUrl}/${page}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly",
+    priority: page === "" ? 1.0 : 0.8, // головна сторінка найважливіша
+  }));
 
   return sitemapEntries;
 }

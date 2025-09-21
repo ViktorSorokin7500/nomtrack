@@ -1,6 +1,9 @@
 "use client";
+import dynamic from "next/dynamic";
+const Line = dynamic(() => import("react-chartjs-2").then((m) => m.Line), {
+  ssr: false,
+});
 
-import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
