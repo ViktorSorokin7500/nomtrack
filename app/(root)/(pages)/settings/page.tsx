@@ -39,8 +39,8 @@ export default async function Settings() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
               <ProfileSidebar
-                username={profile.full_name}
-                useremail={profile.email}
+                userName={profile.full_name}
+                userEmail={profile.email}
               />
             </div>
             <div className="lg:col-span-2 space-y-8">

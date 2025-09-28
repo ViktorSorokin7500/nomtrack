@@ -9,7 +9,6 @@ import {
   GlassWater,
   ShoppingCart,
 } from "lucide-react";
-export const revalidate = 86400;
 
 export default function UpdatesPage() {
   // Дані для нашої дорожньої карти

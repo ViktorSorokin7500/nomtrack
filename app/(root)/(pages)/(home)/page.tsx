@@ -7,7 +7,6 @@ import {
 } from "@/components/home";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-// import SplashCursor from "@/components/ui/splash-cursor";
 
 export default async function Home() {
   const supabase = createClient();
@@ -17,7 +16,7 @@ export default async function Home() {
   } = await (await supabase).auth.getUser();
 
   if (user) {
-    redirect(`/dashboard`);
+    redirect("dashboard");
   }
 
   return (

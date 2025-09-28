@@ -133,7 +133,7 @@ export function NutritionDashboard({
               />
             </div>
             {/* Sugar */}
-            <div
+            {/* <div
               onMouseEnter={() => setHoveredMacro("sugar")}
               onMouseLeave={() => setHoveredMacro(null)}
               className="cursor-pointer"
@@ -149,7 +149,7 @@ export function NutritionDashboard({
                 target={summaryData.macros.sugar.target}
                 color="bg-sky-300"
               />
-            </div>
+            </div> */}
           </div>
         </div>
       </Card>

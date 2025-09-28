@@ -24,7 +24,7 @@ export function CtaSection() {
             className="px-8 py-6 rounded-full bg-orange-500 hover:bg-orange-600 text-white text-lg font-semibold transition-all duration-300 hover:shadow-lg transform hover:scale-105"
           >
             {/* Посилання веде на сторінку реєстрації для тріалу */}
-            <Link href={`/sign-in`}>Почати безкоштовний пробний період</Link>
+            <Link href="/sign-in">Почати безкоштовний пробний період</Link>
           </Button>
         </div>
       </div>

@@ -14,11 +14,11 @@ export default function NavMenu({ aiCreditsLeft }: { aiCreditsLeft: number }) {
           <span className="text-stone-700 hover:text-orange-500">Меню</span>
         </Dropdown.Trigger>
         <Dropdown.Content className="scale-115">
-          <Dropdown.Item href={`/dashboard`}>Особистий кабінет</Dropdown.Item>
-          <Dropdown.Item href={`/settings`}>Налаштування</Dropdown.Item>
-          <Dropdown.Item href={`/archive`}>Історія </Dropdown.Item>
-          <Dropdown.Item href={`/recipes`}>Мої рецепти</Dropdown.Item>
-          <Dropdown.Item href={`/coach`}>Мої тренування</Dropdown.Item>
+          <Dropdown.Item href="/dashboard">Особистий кабінет</Dropdown.Item>
+          <Dropdown.Item href="/settings">Налаштування</Dropdown.Item>
+          <Dropdown.Item href="/archive">Історія </Dropdown.Item>
+          <Dropdown.Item href="/recipes">Мої рецепти</Dropdown.Item>
+          <Dropdown.Item href="/coach">Мої тренування</Dropdown.Item>
           <Dropdown.Separator />
           <div className="text-sm py-1 px-2">
             <form action="/auth/sign-out" method="POST">

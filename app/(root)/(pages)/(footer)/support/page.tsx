@@ -2,9 +2,8 @@ import React from "react";
 import { Card } from "@/components/shared";
 import { Rocket, HeartHandshake } from "lucide-react";
 import Link from "next/link";
-export const revalidate = 86400;
 
-export default async function SupportPage() {
+export default function SupportPage() {
   return (
     <section className="bg-orange-50 min-h-screen py-16">
       <div className="container mx-auto px-4 max-w-2xl">

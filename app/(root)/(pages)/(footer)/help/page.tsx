@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, HelpCopy } from "@/components/shared";
 import { MessageCircle, Bug, HeartHandshake } from "lucide-react";
-export const revalidate = 86400;
 
 export default function Help() {
   return (

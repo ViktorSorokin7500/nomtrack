@@ -16,8 +16,7 @@ export default async function RecipesPage() {
       "id, recipe_name, calories_per_100g, protein_per_100g, fat_per_100g, carbs_per_100g, ingredients_text, sugar_per_100g, total_weight_g" // <-- Додаємо поля
     )
     .eq("user_id", user?.id || "")
-    .order("created_at", { ascending: false })
-    .limit(20);
+    .order("created_at", { ascending: false });
 
   return (
     <section className="bg-orange-50 p-4">

@@ -99,7 +99,7 @@ export function Footer() {
       title: "Ресурси",
       links: [
         { label: "Підтримка", href: "/support" },
-        { label: "Карта сайту", href: "/mapofsite" },
+        { label: "Карта сайту", href: "/sitemap-page" },
       ],
     },
     {

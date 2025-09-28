@@ -1,9 +1,9 @@
+// ggg/app/[lang]/(root)/(pages)/(footer)/sitemap/page.tsx
 import React from "react";
 import { Card } from "@/components/shared";
 import Link from "next/link";
-export const revalidate = 86400;
 
-export default async function SitemapPage() {
+export default function SitemapPage() {
   return (
     <section className="bg-orange-50 min-h-screen py-16">
       <div className="container mx-auto px-4 max-w-4xl">

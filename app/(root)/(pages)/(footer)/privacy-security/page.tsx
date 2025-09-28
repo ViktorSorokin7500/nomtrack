@@ -1,6 +1,6 @@
+// ggg/app/[lang]/(root)/(pages)/(footer)/privacy-security/page.tsx
 import React from "react";
 import { Card } from "@/components/shared";
-export const revalidate = 86400;
 
 export default function PrivacySecurity() {
   return (
