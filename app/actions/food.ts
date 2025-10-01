@@ -6,7 +6,7 @@ import {
 } from "@/lib/billing";
 import { AI_REQUEST } from "@/lib/const";
 import { promptWithIngredients } from "@/lib/prompts";
-import { getAiJsonResponse } from "@/lib/utils";
+import { getAiJsonResponse } from "@/lib/ai";
 import { FoodEntryFormSchema, foodEntrySchema } from "@/lib/validators";
 import { Ingredient, NutritionInfo } from "@/types";
 import { revalidatePath } from "next/cache";

@@ -10,7 +10,7 @@ import {
   promptWithWorkoutPlan,
   promptWithSingleWorkout,
 } from "@/lib/prompts";
-import { getAiJsonResponse } from "@/lib/utils";
+import { getAiJsonResponse } from "@/lib/ai";
 import { WorkoutPlan, AiWorkoutResponse } from "@/types";
 import { revalidatePath } from "next/cache";
 

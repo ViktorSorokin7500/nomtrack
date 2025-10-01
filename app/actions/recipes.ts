@@ -6,7 +6,7 @@ import {
 } from "@/lib/billing";
 import { AI_REQUEST } from "@/lib/const";
 import { promptWithRecipe } from "@/lib/prompts";
-import { getAiJsonResponse } from "@/lib/utils";
+import { getAiJsonResponse } from "@/lib/ai";
 import {
   AiRecipeResponse,
   NormalizedIngredient,

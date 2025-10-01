@@ -7,7 +7,7 @@ import {
 } from "@/lib/billing";
 import { AI_ANALYZE } from "@/lib/const";
 import { promptWithMonthlyReport } from "@/lib/prompts";
-import { getAiJsonResponse } from "@/lib/utils";
+import { getAiJsonResponse } from "@/lib/ai";
 import { DailySummary, Profile } from "@/types";
 
 export async function analyzeMonthlyData(

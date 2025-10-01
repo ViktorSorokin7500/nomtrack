@@ -10,11 +10,18 @@ export async function Header() {
     data: { user },
   } = await (await supabase).auth.getUser();
 
-  const { data: profile } = await (await supabase)
-    .from("profiles")
-    .select("premium_expires_at, ai_credits_left")
-    .eq("id", user?.id)
-    .single();
+  let profile: {
+    premium_expires_at: string | null;
+    ai_credits_left: number | null;
+  } | null = null;
+  if (user) {
+    const { data } = await (await supabase)
+      .from("profiles")
+      .select("premium_expires_at, ai_credits_left")
+      .eq("id", user.id)
+      .single();
+    profile = data ?? null;
+  }
 
   const premiumExpiresAt = profile?.premium_expires_at || null;
   const aiCreditsLeft = profile?.ai_credits_left || 0;

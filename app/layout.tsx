@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import { Toaster } from "react-hot-toast";
+import { LazyToaster } from "@/components/shared";
 
 const poppins = Poppins({
   variable: "--font-poppins",
   subsets: ["latin"],
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  weight: ["400", "600", "700"],
+  display: "swap",
 });
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,7 +43,7 @@ export default function RootLayout({
     <html lang="uk">
       <body className={`${poppins.variable} font-sans antialiased`}>
         {children}
-        <Toaster />
+        <LazyToaster />
       </body>
     </html>
   );
