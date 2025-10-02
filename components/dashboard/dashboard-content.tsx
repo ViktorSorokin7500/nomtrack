@@ -1,13 +1,13 @@
-// ggg/components/dashboard/dashboard-content.tsx
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import {
-  NutritionDashboard,
-  AICoachCard,
-  WaterTrackerCard,
-  SummaryCard,
-} from "@/components/dashboard";
+
 import { DbSavedWorkout, WorkoutPlan } from "@/types";
+import {
+  LazyAICoachCard,
+  LazyNutritionDashboard,
+  LazySummaryCard,
+  LazyWaterTracker,
+} from ".";
 
 export async function DashboardContent() {
   const supabase = createClient();
@@ -146,7 +146,7 @@ export async function DashboardContent() {
   return (
     <div className="container mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
       <div className="lg:col-span-2 lg:order-2">
-        <NutritionDashboard
+        <LazyNutritionDashboard
           summaryData={summaryData}
           foodLogData={
             foodEntries?.filter((e) => e.meal_type !== "water") || []
@@ -155,12 +155,12 @@ export async function DashboardContent() {
         />
       </div>
       <div className="lg:col-span-1 space-y-6 lg:order-1">
-        <SummaryCard currentWeight={profile.current_weight_kg} />
-        <WaterTrackerCard
+        <LazySummaryCard currentWeight={profile.current_weight_kg} />
+        <LazyWaterTracker
           currentWater={totalWater}
           targetWater={profile.target_water_ml || 2500}
         />
-        <AICoachCard
+        <LazyAICoachCard
           activityLogData={activityEntries || []}
           todaysWorkout={todaysWorkout}
           savedWorkouts={savedWorkouts as DbSavedWorkout[]}

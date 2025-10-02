@@ -6,10 +6,9 @@ import { analyzeMonthlyData } from "@/app/actions";
 import toast from "react-hot-toast";
 import { DailySummary, Profile } from "@/types"; // <-- ОНОВЛЕНИЙ ІМПОРТ
 import { Card } from "../shared";
-import { AiOutlineFileText } from "react-icons/ai";
 import { AiReportData, ReportDisplay } from "./report-display";
 import { useRouter } from "next/navigation";
-import { Coins } from "lucide-react";
+import { Coins, FileText } from "lucide-react";
 
 interface MonthlyReportButtonProps {
   daysData: DailySummary[];
@@ -65,7 +64,7 @@ export function MonthlyReportButton({
           <SimpleRiseSpinner />
         ) : (
           <>
-            <AiOutlineFileText size={20} />
+            <FileText size={20} />
             <p>Згенерувати звіт від ШІ</p>
             <span className="flex gap-0.5 ml-1 text-white-500">
               <Coins className="size-5" />5

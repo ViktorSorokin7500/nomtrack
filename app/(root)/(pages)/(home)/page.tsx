@@ -5,23 +5,12 @@ import {
   PhilosophySection,
   PricingSection,
 } from "@/components/home";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+export const dynamic = "force-static";
+export const revalidate = false;
 
 export default async function Home() {
-  const supabase = createClient();
-
-  const {
-    data: { user },
-  } = await (await supabase).auth.getUser();
-
-  if (user) {
-    redirect("dashboard");
-  }
-
   return (
     <>
-      {/* <SplashCursor /> */}
       <div className="bg-orange-50">
         <HeroSection />
       </div>

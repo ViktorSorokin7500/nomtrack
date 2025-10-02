@@ -1,3 +1,4 @@
+// nmt/lib/ai.ts
 "use server";
 import Together from "together-ai";
 
@@ -5,6 +6,10 @@ export async function getAiJsonResponse<T>(
   prompt: string
 ): Promise<{ data: T | null; error: string | null }> {
   try {
+    if (!process.env.TOGETHER_AI_API_KEY) {
+      return { data: null, error: "API KEY для Together AI не налаштовано." };
+    }
+
     const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
 
     const response = await together.chat.completions.create({
@@ -15,46 +20,33 @@ export async function getAiJsonResponse<T>(
 
     const content = response.choices?.[0]?.message?.content;
 
-    console.log("Повна відповідь ШІ:", content);
-
-    // Цей лог допоможе побачити повну, "брудну" відповідь
     if (!content) {
       return { data: null, error: "ШІ не повернув жодного контенту." };
     }
 
-    // Крок 1: Знаходимо початок першого JSON об'єкта або масиву
-    const firstBrace = content.indexOf("{");
-    const firstBracket = content.indexOf("[");
+    // --- ВИПРАВЛЕННЯ КРИТИЧНОЇ ПОМИЛКИ ПАРСИНГУ ---
+    // Замість ненадійного підрахунку дужок:
+    let jsonString = content.trim();
 
-    if (firstBrace === -1 && firstBracket === -1) {
+    // 1. Знаходимо початок ({ або [)
+    const firstBrace = jsonString.indexOf("{");
+    const firstBracket = jsonString.indexOf("[");
+
+    if (firstBrace > -1 || firstBracket > -1) {
+      const startIndex =
+        firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)
+          ? firstBrace
+          : firstBracket;
+
+      jsonString = jsonString.substring(startIndex);
+    } else {
       return { data: null, error: "У відповіді від ШІ не знайдено JSON." };
     }
 
-    const startIndex =
-      firstBrace !== -1 && (firstBracket === -1 || firstBrace < firstBracket)
-        ? firstBrace
-        : firstBracket;
-
-    const jsonText = content.substring(startIndex);
-    const startChar = jsonText[0];
-    const endChar = startChar === "{" ? "}" : "]";
-
-    let openCount = 0;
-    let endIndex = -1;
-
-    // Крок 2: Рахуємо дужки, щоб знайти кінець першого повного JSON
-    for (let i = 0; i < jsonText.length; i++) {
-      if (jsonText[i] === startChar) {
-        openCount++;
-      } else if (jsonText[i] === endChar) {
-        openCount--;
-      }
-
-      if (openCount === 0) {
-        endIndex = i;
-        break; // Знайшли кінець, виходимо
-      }
-    }
+    // 2. Знаходимо кінець, обрізаючи все, що після нього
+    const lastBrace = jsonString.lastIndexOf("}");
+    const lastBracket = jsonString.lastIndexOf("]");
+    const endIndex = Math.max(lastBrace, lastBracket);
 
     if (endIndex === -1) {
       return {
@@ -63,8 +55,8 @@ export async function getAiJsonResponse<T>(
       };
     }
 
-    // Крок 3: Вирізаємо чистий, одиночний JSON і парсимо його
-    const jsonString = jsonText.substring(0, endIndex + 1);
+    jsonString = jsonString.substring(0, endIndex + 1);
+    // ------------------------------------------
 
     const parsedJson = JSON.parse(jsonString) as T;
     return { data: parsedJson, error: null };

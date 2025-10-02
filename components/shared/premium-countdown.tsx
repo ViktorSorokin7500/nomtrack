@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link"; // <-- ІМПОРТ КОМПОНЕНТА Link
-import { IoDiamondOutline } from "react-icons/io5";
+import { Gem } from "lucide-react";
 
 interface PremiumCountdownProps {
   expiresAt: string | null;
@@ -68,7 +68,7 @@ export function PremiumCountdown({ expiresAt }: PremiumCountdownProps) {
 
   return (
     <div className="flex justify-center items-center gap-1 text-sm text-yellow-600 font-semibold bg-yellow-100 px-3 py-1 rounded-full">
-      <IoDiamondOutline className="size-4" />
+      <Gem size={4} />
       {/* Умовний рендеринг залежно від статусу */}
       {isExpired ? (
         <span>

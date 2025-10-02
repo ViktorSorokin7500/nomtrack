@@ -4,7 +4,7 @@ import { DayData, Profile } from "@/types";
 import { YearSection } from "./year-section";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AiOutlineArrowLeft, AiOutlineArrowRight } from "react-icons/ai";
+import { MoveLeft, MoveRight } from "lucide-react";
 
 type MonthData = { name: string; days: DayData[] };
 type YearData = { year: number; months: MonthData[] };
@@ -99,7 +99,7 @@ export function NutritionArchive({
           className="p-2 rounded-full hover:bg-gray-200 transition-colors"
           aria-label="Попередній місяць"
         >
-          <AiOutlineArrowLeft size={24} />
+          <MoveLeft size={24} />
         </button>
         <div className="text-center">
           <h1 className="text-3xl font-bold text-gray-800 mb-2">
@@ -115,7 +115,7 @@ export function NutritionArchive({
           }`}
           aria-label="Наступний місяць"
         >
-          <AiOutlineArrowRight size={24} />
+          <MoveRight size={24} />
         </button>
       </header>
 

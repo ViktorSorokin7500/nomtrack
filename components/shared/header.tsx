@@ -9,7 +9,6 @@ export async function Header() {
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
-
   let profile: {
     premium_expires_at: string | null;
     ai_credits_left: number | null;
