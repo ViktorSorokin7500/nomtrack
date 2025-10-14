@@ -8,12 +8,14 @@ import toast from "react-hot-toast";
 import { Card } from "../shared/card";
 import { Button } from "../ui/button";
 import { Coins } from "lucide-react";
-import { createAndAnalyzeWorkout } from "@/app/actions"; // Імпортуємо наш новий екшен
+import { createAndAnalyzeWorkout } from "@/app/actions";
 import { SimpleRiseSpinner } from "../ui";
+import { AI_REQUEST } from "@/lib/const";
+import { COACH_TEXTS } from "./coach-text";
 
 const schema = z.object({
-  workoutName: z.string().min(3, "Назва має бути довшою."),
-  workoutText: z.string().min(10, "Будь ласка, детально опишіть вправи."),
+  workoutName: z.string().min(3, COACH_TEXTS.CREATE_WORKOUT_FORM.NAME_ERROR),
+  workoutText: z.string().min(10, COACH_TEXTS.CREATE_WORKOUT_FORM.TEXT_ERROR),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -35,7 +37,7 @@ export function CreateWorkoutForm() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Тренування успішно створено!");
+        toast.success(COACH_TEXTS.CREATE_WORKOUT_FORM.SUCCESS);
         reset();
       }
     });
@@ -45,20 +47,20 @@ export function CreateWorkoutForm() {
     <Card>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <h2 className="text-xl font-semibold text-stone-800">
-          Створити нове тренування
+          {COACH_TEXTS.CREATE_WORKOUT_FORM.TITLE}
         </h2>
         <div className="space-y-2">
           <label
             htmlFor="workoutName"
             className="block text-sm font-medium text-gray-700"
           >
-            Назва тренування
+            {COACH_TEXTS.CREATE_WORKOUT_FORM.LABEL_NAME}
           </label>
           <input
             {...register("workoutName")}
             id="workoutName"
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder="Напр., 'Пробіжка + підтягування'"
+            placeholder={COACH_TEXTS.CREATE_WORKOUT_FORM.LABEL_NAME_PLACEHOLDER}
           />
           {errors.workoutName && (
             <p className="text-red-500 text-sm">{errors.workoutName.message}</p>
@@ -69,14 +71,16 @@ export function CreateWorkoutForm() {
             htmlFor="workoutText"
             className="block text-sm font-medium text-gray-700"
           >
-            Опис тренування
+            {COACH_TEXTS.CREATE_WORKOUT_FORM.LABEL_DESCRIPTION}
           </label>
           <textarea
             {...register("workoutText")}
             id="workoutText"
             rows={4}
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder="Опишіть ваше тренування для аналізу ШІ. Напр., 'Пробіжка 30 хв, 3 підходи по 10 віджимань'."
+            placeholder={
+              COACH_TEXTS.CREATE_WORKOUT_FORM.LABEL_DESCRIPTION_PLACEHOLDER
+            }
           />
           {errors.workoutText && (
             <p className="text-red-500 text-sm">{errors.workoutText.message}</p>
@@ -88,7 +92,9 @@ export function CreateWorkoutForm() {
               <SimpleRiseSpinner className="w-[195px]" />
             ) : (
               <span className="flex items-center gap-2">
-                Зберегти тренування <Coins className="size-5" />1
+                {COACH_TEXTS.CREATE_WORKOUT_FORM.SUBMIT_BUTTON}{" "}
+                <Coins className="size-5" />
+                {AI_REQUEST}
               </span>
             )}
           </Button>

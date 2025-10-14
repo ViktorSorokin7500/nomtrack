@@ -1,4 +1,5 @@
 "use server";
+import { ACTIONS_TEXTS } from "@/components/shared/(texts)/actions-texts";
 import { getAuthUserOrError } from "@/lib/billing";
 import { nutritionTargetsSchema, personalInfoSchema } from "@/lib/validators";
 import { revalidatePath } from "next/cache";
@@ -15,24 +16,23 @@ export async function updatePersonalInfo(formData: {
 
   const result = personalInfoSchema.safeParse(formData);
   if (!result.success) {
-    return { error: "Неправильні дані: " + result.error.flatten().fieldErrors };
+    return {
+      error: ACTIONS_TEXTS.UNCORRECT_DATA + result.error.flatten().fieldErrors,
+    };
   }
 
-  const { error } = await (
-    await supabase
-  )
+  const { error } = await (await supabase)
     .from("profiles")
-    .update(formData) // Оновлюємо переданими даними з форми
-    .eq("id", user.id); // Тільки для поточного користувача
+    .update(formData)
+    .eq("id", user.id);
 
   if (error) {
-    return { error: "Не вдалося зберегти профіль: " + error.message };
+    return { error: ACTIONS_TEXTS.CANNOT_SAVE + error.message };
   }
 
-  // Очищуємо кеш, щоб сторінка показала оновлені дані
   revalidatePath("/settings");
 
-  return { success: "Профіль успішно оновлено!" };
+  return { success: ACTIONS_TEXTS.PROFILE_REFRESH };
 }
 
 export async function updateNutritionTargets(formData: unknown) {
@@ -41,7 +41,7 @@ export async function updateNutritionTargets(formData: unknown) {
   // Валідація даних
   const result = nutritionTargetsSchema.safeParse(formData);
   if (!result.success) {
-    return { error: "Неправильні дані. " + result.error.message };
+    return { error: ACTIONS_TEXTS.UNCORRECT_DATA + result.error.message };
   }
 
   // Оновлення даних в таблиці profiles
@@ -51,17 +51,17 @@ export async function updateNutritionTargets(formData: unknown) {
     .eq("id", user.id);
 
   if (error) {
-    return { error: "Не вдалося зберегти цілі: " + error.message };
+    return { error: ACTIONS_TEXTS.CANNOT_SAVE + error.message };
   }
 
   revalidatePath("/settings");
 
-  return { success: "Харчові цілі успішно оновлено!" };
+  return { success: ACTIONS_TEXTS.PROFILE.UPDATE_SUCCESS };
 }
 
 export async function addWeightEntry(weight: number) {
   if (weight <= 0) {
-    return { error: "Вага має бути позитивним числом." };
+    return { error: ACTIONS_TEXTS.PROFILE.WEIGHT_POSITIVE };
   }
 
   const { supabase, user } = await getAuthUserOrError();
@@ -75,20 +75,20 @@ export async function addWeightEntry(weight: number) {
   ]);
 
   if (error) {
-    return { error: "Не вдалося зберегти вагу: " + error.message };
+    return { error: ACTIONS_TEXTS.CANNOT_SAVE + error.message };
   }
 
-  // Також оновлюємо поточну вагу в профілі користувача
   const { error: profileError } = await (await supabase)
     .from("profiles")
     .update({ current_weight_kg: weight })
     .eq("id", user.id);
 
   if (profileError) {
-    // Ця помилка менш критична, можна просто залогувати
-    console.error("Не вдалося оновити вагу в профілі:", profileError);
+    console.error(profileError);
   }
 
   revalidatePath("/dashboard");
-  return { success: `Вагу ${weight} кг збережено!` };
+  return {
+    success: `${ACTIONS_TEXTS.PROFILE.WEIGHT_START} ${weight} ${ACTIONS_TEXTS.PROFILE.WEIGHT_END}`,
+  };
 }

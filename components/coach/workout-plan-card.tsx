@@ -9,6 +9,7 @@ import { WorkoutPlan } from "@/types";
 import toast from "react-hot-toast";
 import { useTransition } from "react";
 import { deleteWorkoutPlan } from "@/app/actions";
+import { COACH_TEXTS } from "./coach-text";
 
 interface WorkoutPlanCardProps {
   id: number;
@@ -26,7 +27,9 @@ export function WorkoutPlanCard({
   const formattedDate = createdAt
     ? format(new Date(createdAt), "d MMMM yyyy", { locale: uk })
     : "";
-  const header = isHistory ? `План від ${formattedDate}` : plan.plan_title;
+  const header = isHistory
+    ? `${COACH_TEXTS.WORKOUT_PLAN_CARD.PLAN_FROM} ${formattedDate}`
+    : plan.plan_title;
 
   const [isPending, startTransition] = useTransition();
 
@@ -35,7 +38,7 @@ export function WorkoutPlanCard({
       (t) => (
         <div className="flex flex-col items-center gap-4">
           <p className="font-semibold">
-            Ви впевнені, що хочете видалити цей план тренувань?
+            {COACH_TEXTS.WORKOUT_PLAN_CARD.DELETE_TRAINING}
           </p>
           <div className="flex gap-3">
             <button
@@ -45,7 +48,10 @@ export function WorkoutPlanCard({
                     if (res.error) {
                       toast.error(res.error);
                     } else {
-                      toast.success(res.success || "Активність видалено!");
+                      toast.success(
+                        res.success ||
+                          COACH_TEXTS.WORKOUT_PLAN_CARD.DELETE_SUCCESS
+                      );
                     }
                   });
                 });
@@ -53,13 +59,13 @@ export function WorkoutPlanCard({
               }}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
             >
-              Так, видалити
+              {COACH_TEXTS.WORKOUT_PLAN_CARD.CONFIRM_DELETE}
             </button>
             <button
               onClick={() => toast.dismiss(t.id)}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50"
             >
-              Скасувати
+              {COACH_TEXTS.WORKOUT_PLAN_CARD.CANCEL}
             </button>
           </div>
         </div>
@@ -99,7 +105,8 @@ export function WorkoutPlanCard({
               {dayPlan.estimated_calories_burned > 0 && (
                 <div className="flex items-center text-sm text-red-500">
                   <Flame className="size-4 mr-1" />
-                  {dayPlan.estimated_calories_burned} ккал
+                  {dayPlan.estimated_calories_burned}{" "}
+                  {COACH_TEXTS.WORKOUT_PLAN_CARD.UNIT_KILOCALORIE}
                 </div>
               )}
             </Accordion.Trigger>
@@ -119,22 +126,26 @@ export function WorkoutPlanCard({
                         <p className="text-sm text-gray-500">
                           {exercise.sets && exercise.reps && (
                             <span>
-                              {exercise.sets} підходи по {exercise.reps}
-                              повторень
+                              {exercise.sets}{" "}
+                              {COACH_TEXTS.WORKOUT_PLAN_CARD.TIMES}{" "}
+                              {exercise.reps}
+                              {COACH_TEXTS.WORKOUT_PLAN_CARD.REPS}
                             </span>
                           )}
 
                           {exercise.duration_min && (
                             <span className="flex items-center">
                               <Clock className="size-4 mr-1" />
-                              {exercise.duration_min} хв
+                              {exercise.duration_min}{" "}
+                              {COACH_TEXTS.WORKOUT_PLAN_CARD.UNIT_MINUTES}
                             </span>
                           )}
 
                           {exercise.duration_sec && (
                             <span className="flex items-center">
                               <Clock className="size-4 mr-1" />
-                              {exercise.duration_sec} сек
+                              {exercise.duration_sec}{" "}
+                              {COACH_TEXTS.WORKOUT_PLAN_CARD.UNIT_SECONDS}
                             </span>
                           )}
                         </p>
@@ -142,7 +153,9 @@ export function WorkoutPlanCard({
                     </li>
                   ))
                 ) : (
-                  <p className="text-gray-500">Відпочинок</p>
+                  <p className="text-gray-500">
+                    {COACH_TEXTS.WORKOUT_PLAN_CARD.REST}
+                  </p>
                 )}
               </ul>
             </Accordion.Content>
@@ -157,7 +170,7 @@ export function WorkoutPlanCard({
           className="rounded scale-110 text-white disabled:opacity-50 transition-colors cursor-pointer z-50 bg-red-500 p-1 hover:bg-red-600"
           aria-label="Delete Activity"
         >
-          Видалити
+          {COACH_TEXTS.WORKOUT_PLAN_CARD.DELETE}
         </button>
       </div>
     </Card>

@@ -7,8 +7,8 @@ import { Card } from "../shared";
 import { Button, SimpleRiseSpinner } from "../ui";
 import { updateNutritionTargets } from "@/app/actions";
 import toast from "react-hot-toast";
+import { SETTINGS_TEXTS } from "./settings-text";
 
-// Схема Zod для валідації полів самої форми
 const targetsSchema = z.object({
   target_calories: z.coerce.number().positive().int(),
   target_protein_g: z.coerce.number().positive().int(),
@@ -36,7 +36,6 @@ type Profile = {
   target_water_ml?: number | null;
 };
 
-// ВИПРАВЛЕННЯ 1: Використовуємо наш новий тип у пропсах
 export function NutritionTargetsForm({
   initialData,
 }: {
@@ -49,7 +48,6 @@ export function NutritionTargetsForm({
     formState: { errors, isSubmitting },
   } = useForm<TargetsSchema>({
     resolver: zodResolver(targetsSchema),
-    // Використовуємо initialData для заповнення форми
     defaultValues: {
       target_calories: initialData?.target_calories || 0,
       target_protein_g: initialData?.target_protein_g || 0,
@@ -63,9 +61,7 @@ export function NutritionTargetsForm({
     const { gender, current_weight_kg, height_cm, age, activity_level, goal } =
       initialData;
     if (!current_weight_kg || !height_cm || !age) {
-      toast.error(
-        'Будь ласка, спочатку вкажіть свою вагу, зріст та вік в розділі "Особисті дані".'
-      );
+      toast.error(SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.TOAST_ERROR);
       return;
     }
 
@@ -100,9 +96,7 @@ export function NutritionTargetsForm({
     setValue("target_carbs_g", carbs);
     setValue("target_fat_g", fat);
     setValue("target_water_ml", waterTarget);
-    toast.success(
-      'Цілі розраховано! Натисніть "Зберегти зміни", щоб застосувати.'
-    );
+    toast.success(SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.TOAST_SUCCESS);
   };
 
   const onSubmit = async (data: TargetsSchema) => {
@@ -117,7 +111,7 @@ export function NutritionTargetsForm({
   return (
     <Card>
       <h2 className="text-xl font-semibold mb-6">
-        Цільові показники харчування
+        {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.TITLE}
       </h2>
       <div className="flex justify-center mb-6">
         <Button
@@ -126,13 +120,17 @@ export function NutritionTargetsForm({
           variant="outline"
           className="bg-lime-400 hover:bg-lime-300 text-stone-800 font-semibold py-2 px-4 rounded-xl transition duration-300 ease-in-out transform hover:-translate-y-1 hover:scale-100!"
         >
-          Розрахувати автоматично
+          {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.COUNT_BUTTON}
         </Button>
       </div>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <label htmlFor="target_calories">Калорії на день (ккал)</label>
+            <label htmlFor="target_calories">
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.CALORIES}{" "}
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.PER_DAY} (
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.UNIT_KILOCALORIE})
+            </label>
             <input
               id="target_calories"
               type="number"
@@ -146,7 +144,10 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_protein_g">Білки (г)</label>
+            <label htmlFor="target_protein_g">
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.PROTEIN} (
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.UNIT_GRAM})
+            </label>
             <input
               id="target_protein_g"
               type="number"
@@ -160,7 +161,10 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_carbs_g">Вуглеводи (г)</label>
+            <label htmlFor="target_carbs_g">
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.CARBOHYDRATE} (
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.UNIT_GRAM})
+            </label>
             <input
               id="target_carbs_g"
               type="number"
@@ -174,7 +178,10 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_fat_g">Жири (г)</label>
+            <label htmlFor="target_fat_g">
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.FAT} (
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.UNIT_GRAM})
+            </label>
             <input
               id="target_fat_g"
               type="number"
@@ -188,7 +195,10 @@ export function NutritionTargetsForm({
             )}
           </div>
           <div>
-            <label htmlFor="target_water_ml">Вода (мл)</label>
+            <label htmlFor="target_water_ml">
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.WATER} (
+              {SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.UNIT_ML})
+            </label>
             <input
               id="target_water_ml"
               type="number"
@@ -207,7 +217,7 @@ export function NutritionTargetsForm({
             {isSubmitting ? (
               <SimpleRiseSpinner className="w-[109px]" />
             ) : (
-              "Зберегти зміни"
+              SETTINGS_TEXTS.NUTRITION_TARGETS_FORM.SAVE_BUTTON
             )}
           </Button>
         </div>

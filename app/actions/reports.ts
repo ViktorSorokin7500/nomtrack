@@ -9,6 +9,7 @@ import { AI_ANALYZE } from "@/lib/const";
 import { promptWithMonthlyReport } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/ai";
 import { DailySummary, Profile } from "@/types";
+import { ACTIONS_TEXTS } from "@/components/shared/(texts)/actions-texts";
 
 export async function analyzeMonthlyData(
   daysData: DailySummary[],
@@ -26,20 +27,19 @@ export async function analyzeMonthlyData(
     );
 
     if (error) {
-      return { error: `Помилка аналізу ШІ: ${error}` };
+      return { error: ACTIONS_TEXTS.AI_ERROR + error };
     }
 
     // ЗМІНА: ПЕРЕВІРЯЄМО, ЧИ ДАНІ ПРИЙШЛИ
     if (!reportData) {
-      return { error: "ШІ не повернув звіт." };
+      return { error: ACTIONS_TEXTS.UNCORRECT_DATA };
     }
 
     // ЗМІНА: ПОВЕРТАЄМО ПОВНИЙ ОБ'ЄКТ
     return { success: reportData };
   } catch (e) {
-    console.error("Помилка в analyzeMonthlyData:", e);
     const errorMessage =
-      e instanceof Error ? e.message : "Невідома помилка на сервері.";
+      e instanceof Error ? e.message : ACTIONS_TEXTS.SERVER_ERROR;
     return { error: errorMessage };
   }
 }

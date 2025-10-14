@@ -4,6 +4,7 @@ import { Card } from "../shared";
 import { Dumbbell, Flame } from "lucide-react";
 import { Accordion } from "../ui";
 import { WorkoutListProps } from "@/types";
+import { COACH_TEXTS } from "./coach-text";
 
 // Додаємо новий тип для нашого компонента
 
@@ -12,7 +13,7 @@ export function WorkoutList({ savedWorkouts, plans }: WorkoutListProps) {
     return (
       <Card>
         <p className="text-center text-gray-500">
-          Поки що немає збережених тренувань або планів.
+          {COACH_TEXTS.WORKOUT_LIST.NO_WORKOUTS}
         </p>
       </Card>
     );
@@ -20,7 +21,9 @@ export function WorkoutList({ savedWorkouts, plans }: WorkoutListProps) {
 
   return (
     <Card>
-      <h2 className="text-xl font-semibold mb-4">Збережені тренування</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {COACH_TEXTS.WORKOUT_LIST.SAVED_WORKOUTS_TITLE}
+      </h2>
       <Accordion.Accordion type="single" collapsible className="w-full">
         {savedWorkouts.length > 0 && (
           <Accordion.Item
@@ -29,7 +32,7 @@ export function WorkoutList({ savedWorkouts, plans }: WorkoutListProps) {
           >
             <Accordion.Trigger className="flex justify-between items-center p-4 hover:bg-orange-50 transition-colors rounded-lg">
               <span className="font-semibold text-lg text-stone-800">
-                Мої тренування
+                {COACH_TEXTS.WORKOUT_LIST.MY_WORKOUTS}
               </span>
             </Accordion.Trigger>
             <Accordion.Content className="p-4 pt-0 space-y-4">
@@ -47,7 +50,8 @@ export function WorkoutList({ savedWorkouts, plans }: WorkoutListProps) {
                     </div>
                     <div className="flex items-center text-red-500 text-sm font-medium">
                       <Flame className="size-4 mr-1" />
-                      {workout.estimated_calories_burned} ккал
+                      {workout.estimated_calories_burned}{" "}
+                      {COACH_TEXTS.WORKOUT_LIST.UNIT_KILOCALORIE}
                     </div>
                   </div>
                   <ul className="text-sm mt-2 space-y-1 text-gray-600">

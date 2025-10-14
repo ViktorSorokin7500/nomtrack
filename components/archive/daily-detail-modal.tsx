@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect } from "react"; // <-- ДОДАНО useState
+import { useEffect } from "react";
 import { Card } from "../shared";
 import { BodyMeasurements } from "./body-measurements";
 import { DayData, Profile } from "@/types";
 import { ProgressRingArchive } from "./progress-ring-archive";
+import { ARCHIVE_TEXTS } from "./archive-texts";
 
 interface DailyDetailModalProps {
   day: DayData;
@@ -17,7 +18,6 @@ export function DailyDetailModal({
   userProfile,
   onClose,
 }: DailyDetailModalProps) {
-  // Блокуємо скрол на фоні, поки модальне вікно відкрите
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => {
@@ -32,61 +32,60 @@ export function DailyDetailModal({
     day: "numeric",
   });
 
-  // Визначення макроелементів для рендерингу
   const macros = [
     {
-      label: "Калорії",
+      label: ARCHIVE_TEXTS.DAILY_DETAILS.CALORIES,
       current: day.consumed_calories,
       target: day.target_calories,
       color: "stroke-orange-400",
       scolor: "stroke-red-400",
       type: "calories",
-      unit: "ккал",
+      unit: "ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_KILOCALORIE",
     },
     {
-      label: "Білки",
+      label: ARCHIVE_TEXTS.DAILY_DETAILS.PROTEIN,
       current: day.consumed_protein_g,
       target: day.target_protein_g,
       color: "stroke-yellow-400",
       scolor: "stroke-yellow-600",
       type: "protein",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_GRAM,
     },
     {
-      label: "Жири",
+      label: ARCHIVE_TEXTS.DAILY_DETAILS.FAT,
       current: day.consumed_fat_g,
       target: day.target_fat_g,
       color: "stroke-sky-300",
       scolor: "stroke-blue-900",
       type: "fat",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_GRAM,
     },
     {
-      label: "Вуглеводи",
+      label: ARCHIVE_TEXTS.DAILY_DETAILS.CARBOHYDRATE,
       current: day.consumed_carbs_g,
       target: day.target_carbs_g,
       color: "stroke-lime-400",
       scolor: "stroke-green-600",
       type: "carbs",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_GRAM,
     },
     {
-      label: "Цукор",
+      label: ARCHIVE_TEXTS.DAILY_DETAILS.SUGAR,
       current: day.consumed_sugar_g,
       target: day.target_sugar_g,
       color: "stroke-stone-400",
       scolor: "stroke-stone-600",
       type: "sugar",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_GRAM,
     },
     {
-      label: "Вода",
+      label: ARCHIVE_TEXTS.DAILY_DETAILS.WATER,
       current: day.consumed_water_ml,
       target: day.target_water_ml,
       color: "stroke-blue-400",
       scolor: "stroke-sky-600",
       type: "water",
-      unit: "мл",
+      unit: ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_ML,
     },
   ];
 
@@ -102,7 +101,8 @@ export function DailyDetailModal({
       >
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">
-            Підсумок за {longFormattedDate}
+            {ARCHIVE_TEXTS.DAILY_DETAILS.TITLE}
+            {longFormattedDate}
           </h2>
           <button
             onClick={onClose}
@@ -117,7 +117,7 @@ export function DailyDetailModal({
           {/* Ліва колонка з основними показниками */}
           <div className="p-5 rounded-lg bg-gray-50 lg:col-span-1">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
-              Цільові показники
+              {ARCHIVE_TEXTS.DAILY_DETAILS.GOALS}
             </h3>
             <div className="flex items-center justify-center flex-wrap gap-2">
               {macros.map((macro) => (

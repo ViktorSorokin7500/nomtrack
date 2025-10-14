@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NutritionArchive } from "@/components/archive/nutrition-archive";
 import { DailySummary, YearData } from "@/types";
+import { ARCHIVE_TEXTS } from "@/components/archive/archive-texts";
 
 // Цю функцію можна залишити без змін
 function groupDataByYearAndMonth(summaries: DailySummary[]) {
@@ -87,7 +88,7 @@ export default async function ArchivePage({
       "Failed to load archive data:",
       profileError || summariesError
     );
-    return <div>Не вдалося завантажити дані. Спробуйте пізніше.</div>;
+    return <div>{ARCHIVE_TEXTS.MAIN_PAGE.NO_FOUND}</div>;
   }
 
   const nutritionData = groupDataByYearAndMonth(summaries || []);

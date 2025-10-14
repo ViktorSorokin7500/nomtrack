@@ -1,4 +1,4 @@
-// @/lib/validators.ts
+import { LIB_TEXTS } from "@/components/shared/(texts)/lib-texts";
 import { z } from "zod";
 
 const numberOrNull = z.preprocess(
@@ -12,7 +12,7 @@ export const foodEntrySchema = z
     calc_mode: z.enum(["per100g", "serving"]).optional(),
 
     entry_text: z.string().optional(),
-    meal_type: z.string().min(1, "Будь ласка, оберіть прийом їжі."),
+    meal_type: z.string().min(1, LIB_TEXTS.VALIDATORS_TEXT.Z_MEAL_TYPE),
 
     calories: z.coerce.number().min(0).optional().nullable(),
     protein_g: z.coerce.number().min(0).optional().nullable(),
@@ -27,15 +27,13 @@ export const foodEntrySchema = z
     selected_global_food_name: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-    // --- УМОВНА ВАЛІДАЦІЯ ---
-
     if (
       data.entry_mode === "ai" &&
       (!data.entry_text || data.entry_text.trim().length === 0)
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Будь ласка, опишіть вашу страву для аналізу.",
+        message: LIB_TEXTS.VALIDATORS_TEXT.AI_MODE,
         path: ["entry_text"],
       });
     }
@@ -48,12 +46,11 @@ export const foodEntrySchema = z
     ) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Будь ласка, введіть назву продукту.",
+        message: LIB_TEXTS.VALIDATORS_TEXT.MANUAL_MODE,
         path: ["entry_text"],
       });
     }
 
-    // Нова логіка для перевірки наявності значень
     if (data.entry_mode === "manual") {
       if (
         data.calc_mode === "per100g" &&
@@ -61,7 +58,7 @@ export const foodEntrySchema = z
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Будь ласка, вкажіть вагу.",
+          message: LIB_TEXTS.VALIDATORS_TEXT.PER_100G_MODE,
           path: ["weight_eaten"],
         });
       }
@@ -71,7 +68,7 @@ export const foodEntrySchema = z
       ) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: "Будь ласка, вкажіть кількість порцій.",
+          message: LIB_TEXTS.VALIDATORS_TEXT.SERVING_MODE,
           path: ["servings"],
         });
       }

@@ -2,6 +2,7 @@ import NavMenu from "./nav-menu";
 import { NavLink } from "./nav-link";
 import { createClient } from "@/lib/supabase/server";
 import { PremiumCountdown } from "./premium-countdown";
+import { SHARED_TEXTS } from "./(texts)/shared-text";
 
 export async function Header() {
   const supabase = createClient();
@@ -48,10 +49,10 @@ export async function Header() {
               <circle cx="20" cy="12" r="4" fill="#FFE066"></circle>
             </svg>
             <span className="hidden sm:block font-extrabold lg:text-xl text-gray-900">
-              NomTrack
+              {SHARED_TEXTS.HEADER.NOMTRACK}
             </span>
             <span className="sm:hidden font-extrabold lg:text-xl text-gray-900">
-              NT
+              {SHARED_TEXTS.HEADER.NOMTRACK_SHORT}
             </span>
           </NavLink>
         </div>
@@ -61,7 +62,7 @@ export async function Header() {
         ) : (
           <>
             <div className="flex lg:justify-center gap-4 lg:gap-12 lg:items-center">
-              <NavLink href="#pricing">Тарифи</NavLink>
+              <NavLink href="#pricing">{SHARED_TEXTS.HEADER.PRICING}</NavLink>
             </div>
 
             <div className="flex lg:justify-end lg:flex-1">
@@ -70,7 +71,7 @@ export async function Header() {
                   href="/sign-in"
                   className="border border-orange-300 bg-orange-300 hover:bg-orange-400 text-white hover:text-gray-100 px-3 py-1 rounded-full"
                 >
-                  Увійти
+                  {SHARED_TEXTS.HEADER.SIGN_OUT}
                 </NavLink>
               </div>
             </div>

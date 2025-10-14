@@ -20,11 +20,7 @@ export function MonthSection({ month, userProfile }: MonthSectionProps) {
       )}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {month.days.map((day) => (
-          <DailyCard
-            key={day.fullDate}
-            day={day}
-            userProfile={userProfile} // Передаємо профіль далі
-          />
+          <DailyCard key={day.fullDate} day={day} userProfile={userProfile} />
         ))}
       </div>
     </div>

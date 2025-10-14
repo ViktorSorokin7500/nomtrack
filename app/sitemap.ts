@@ -2,7 +2,6 @@ import { MetadataRoute } from "next";
 
 const pages = ["", "pricing", "updates", "privacy-security", "help", "support"];
 
-// Генерує sitemap тільки для однієї мови (без i18n)
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://www.nomtrack.site"; // заміни на свій домен
 

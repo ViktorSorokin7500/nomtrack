@@ -1,5 +1,7 @@
 "use client";
 
+import { ARCHIVE_TEXTS } from "./archive-texts";
+
 export interface AiReportData {
   summary: {
     title: string;
@@ -30,15 +32,12 @@ export function ReportDisplay({ reportData }: ReportDisplayProps) {
 
   return (
     <div className="space-y-8 text-gray-700">
-      {/* Загальна оцінка прогресу */}
       <div className="text-center">
         <h3 className="text-2xl font-bold text-gray-800 mb-2">
           {reportData.summary.title}
         </h3>
         <p className="text-gray-600 italic">{reportData.summary.content}</p>
       </div>
-
-      {/* Аналіз метрик (таблиця або список) */}
 
       <div className="h-[2px] w-full bg-gray-200" />
 
@@ -51,14 +50,18 @@ export function ReportDisplay({ reportData }: ReportDisplayProps) {
             {reportData.weightAnalysis.startWeight}{" "}
             {reportData.weightAnalysis.unit}
           </p>
-          <p className="text-sm text-gray-500">Вага на початку місяця</p>
+          <p className="text-sm text-gray-500">
+            {ARCHIVE_TEXTS.REPORT_DISPLAY.START_WEIGHT}
+          </p>
         </div>
         <div>
           <p className="text-lg font-bold text-sky-600">
             {reportData.weightAnalysis.endWeight}{" "}
             {reportData.weightAnalysis.unit}
           </p>
-          <p className="text-sm text-gray-500">Вага в кінці місяця</p>
+          <p className="text-sm text-gray-500">
+            {ARCHIVE_TEXTS.REPORT_DISPLAY.END_WEIGHT}
+          </p>
         </div>
       </div>
       <p className="mt-4 text-center">{reportData.weightAnalysis.analysis}</p>

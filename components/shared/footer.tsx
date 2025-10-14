@@ -1,9 +1,10 @@
 import React from "react";
+import { SHARED_TEXTS } from "./(texts)/shared-text";
 
 const socialIcons = [
   {
     href: "#",
-    title: "Telegram",
+    title: SHARED_TEXTS.FOOTER.TELEGRAM,
     color: "hover:text-blue-500",
     path: (
       <path d="M21.05 2.63 2.19 9.69c-1.58.61-1.56 1.45-.29 1.85l4.63 1.45 1.75 5.54c.2.63.1.87.7.87.45 0 .64-.21.89-.47l2.13-2.08 4.44 3.27c.82.45 1.4.21 1.6-.76l3.08-14.57c.29-1.21-.46-1.76-1.47-1.16z" />
@@ -11,7 +12,7 @@ const socialIcons = [
   },
   {
     href: "#",
-    title: "Instagram",
+    title: SHARED_TEXTS.FOOTER.INSTAGRAM,
     color: "hover:text-blue-300",
     path: (
       <path d="M8.29 20.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0022 5.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.072 4.072 0 012.8 9.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 012 18.407a11.616 11.616 0 006.29 1.84" />
@@ -19,7 +20,7 @@ const socialIcons = [
   },
   {
     href: "#",
-    title: "Youtube",
+    title: SHARED_TEXTS.FOOTER.YOUTUBE,
     color: "hover:text-red-500",
     path: (
       <>
@@ -89,24 +90,24 @@ function SocialIcon({ href, path, title, color }: SocialIconProps) {
 export function Footer() {
   const footerLinks = [
     {
-      title: "Продукт",
+      title: SHARED_TEXTS.FOOTER.PRODUCT,
       links: [
-        { label: "Оновлення", href: "/updates" },
-        { label: "Тарифи", href: "/pricing" },
+        { label: SHARED_TEXTS.FOOTER.UPDATES, href: "/updates" },
+        { label: SHARED_TEXTS.FOOTER.PRICING, href: "/pricing" },
       ],
     },
     {
-      title: "Ресурси",
+      title: SHARED_TEXTS.FOOTER.RESOURCES,
       links: [
-        { label: "Підтримка", href: "/support" },
-        { label: "Карта сайту", href: "/sitemap-page" },
+        { label: SHARED_TEXTS.FOOTER.SUPPORT, href: "/support" },
+        { label: SHARED_TEXTS.FOOTER.SITEMAP, href: "/sitemap-page" },
       ],
     },
     {
-      title: "Юридична інформація",
+      title: SHARED_TEXTS.FOOTER.LEGAL,
       links: [
-        { label: "Політика конфіденційності", href: "/privacy-security" },
-        { label: "Умови надання послуг", href: "/help" },
+        { label: SHARED_TEXTS.FOOTER.PRIVACY, href: "/privacy-security" },
+        { label: SHARED_TEXTS.FOOTER.TERMS, href: "/help" },
       ],
     },
   ];
@@ -129,7 +130,9 @@ export function Footer() {
               />
               <circle cx="20" cy="12" r="4" fill="#FFE066" />
             </svg>
-            <h2 className="text-xl font-bold">NomTrack</h2>
+            <h2 className="text-xl font-bold">
+              {SHARED_TEXTS.FOOTER.NOMTRACK}
+            </h2>
           </div>
           <div className="flex space-x-6">
             {socialIcons.map((icon, index) => (
@@ -155,7 +158,10 @@ export function Footer() {
           </div>
         </div>
         <div className="border-t border-gray-200 mt-8 pt-8 text-center text-gray-500 text-sm">
-          <p>© {new Date().getFullYear()} NomTrack. Усі права захищено.</p>
+          <p>
+            © {new Date().getFullYear()} {SHARED_TEXTS.FOOTER.NOMTRACK}.{" "}
+            {SHARED_TEXTS.FOOTER.ALL_RIGHTS_RESERVED}.
+          </p>
         </div>
       </div>
     </footer>

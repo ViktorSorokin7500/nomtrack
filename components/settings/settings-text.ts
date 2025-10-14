@@ -1,0 +1,58 @@
+import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
+import "@/utils/stringExtensions";
+
+export const SETTINGS_TEXTS = {
+  TITLE: "Налаштування профілю",
+  NUTRITION_TARGETS_FORM: {
+    TOAST_ERROR:
+      'Будь ласка, спочатку вкажіть свою вагу, зріст та вік в розділі "Особисті дані".',
+    TOAST_SUCCESS: `Цілі розраховано! Натисніть ${COMMON_TEXTS.SAVE_BUTTON}, щоб застосувати.`,
+    TITLE: "Цільові показники харчування",
+    COUNT_BUTTON: "Автоматично розрахувати",
+    PER_DAY: "на день",
+    UNIT_KILOCALORIE: COMMON_TEXTS.UNIT_KILOCALORIE,
+    UNIT_GRAM: COMMON_TEXTS.UNIT_GRAM,
+    UNIT_ML: COMMON_TEXTS.UNIT_ML,
+    CALORIES: COMMON_TEXTS.CALORIES,
+    PROTEIN: COMMON_TEXTS.PROTEIN,
+    CARBOHYDRATE: COMMON_TEXTS.CARBOHYDRATE,
+    FAT: COMMON_TEXTS.FAT,
+    WATER: COMMON_TEXTS.WATER,
+    SAVE_BUTTON: COMMON_TEXTS.SAVE_BUTTON,
+  },
+  PERSONAL_INFO_FORM: {
+    Z_WEIGHT_POSITIVE: "Вага має бути > 0",
+    Z_HEIGHT_POSITIVE: "Зріст має бути > 0",
+    Z_AGE_POSITIVE: "Вік має бути > 0",
+    PERSONAL_INFO: "Особисті дані",
+    FULL_NAME: "Повне ім'я",
+    CURRENT_WEIGHT: `Поточна вага (${COMMON_TEXTS.UNIT_KG})`,
+    HEIGHT: `Зріст (${COMMON_TEXTS.UNIT_CM})`,
+    AGE: "Вік",
+    GENDER: "Стать",
+    MALE: "Чоловік",
+    FEMALE: "Жінка",
+    OTHER: "Інше",
+    ACTIVITY_LEVEL: "Рівень активності",
+    SEDENTARY: "Мінімальна (сидяча робота, без тренувань)",
+    LIGHT: "Низька (легкі вправи 1-3 дні на тиждень)",
+    MODERATE: "Середня (легкі вправи 3-5 днів на тиждень)",
+    ACTIVE: "Висока (легкі вправи 6-7 днів на тиждень)",
+    ULTRA: "Висока (легкі вправи 7-7 днів на тиждень)",
+    GOAL: "Ціль",
+    LOSE: "Схуднути",
+    MAINTAIN: "Підтримувати вагу",
+    GAIN: "Набрати вагу",
+    SAVE_BUTTON: COMMON_TEXTS.SAVE_BUTTON,
+  },
+  PROFILE_SIDEBAR: {
+    PERSONAL_INFO: "Особисті дані",
+    ARCHIVE: "Історія",
+    PRIVACY_SECURITY: "Приватність і безпека",
+    HELP_SUPPORT: "Допомога та підтримка",
+    ANONYMOUS: "Користувач",
+  },
+  PAGE: {
+    TITLE: "Налаштування профілю",
+  },
+};

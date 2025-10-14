@@ -1,27 +1,29 @@
 // nmt/lib/ai.ts
 "use server";
+import { LIB_TEXTS } from "@/components/shared/(texts)/lib-texts";
 import Together from "together-ai";
+import { TOGETHER_MODEL } from "./const";
 
 export async function getAiJsonResponse<T>(
   prompt: string
 ): Promise<{ data: T | null; error: string | null }> {
   try {
     if (!process.env.TOGETHER_AI_API_KEY) {
-      return { data: null, error: "API KEY для Together AI не налаштовано." };
+      return { data: null, error: LIB_TEXTS.AI_TEXT.NO_API };
     }
 
     const together = new Together({ apiKey: process.env.TOGETHER_AI_API_KEY });
 
     const response = await together.chat.completions.create({
       messages: [{ role: "user", content: prompt }],
-      model: "Qwen/Qwen3-235B-A22B-Instruct-2507-tput",
+      model: TOGETHER_MODEL,
       response_format: { type: "json_object" },
     });
 
     const content = response.choices?.[0]?.message?.content;
 
     if (!content) {
-      return { data: null, error: "ШІ не повернув жодного контенту." };
+      return { data: null, error: LIB_TEXTS.AI_TEXT.NO_RETURN };
     }
 
     // --- ВИПРАВЛЕННЯ КРИТИЧНОЇ ПОМИЛКИ ПАРСИНГУ ---
@@ -40,7 +42,7 @@ export async function getAiJsonResponse<T>(
 
       jsonString = jsonString.substring(startIndex);
     } else {
-      return { data: null, error: "У відповіді від ШІ не знайдено JSON." };
+      return { data: null, error: LIB_TEXTS.AI_TEXT.NO_JSON };
     }
 
     // 2. Знаходимо кінець, обрізаючи все, що після нього
@@ -51,7 +53,7 @@ export async function getAiJsonResponse<T>(
     if (endIndex === -1) {
       return {
         data: null,
-        error: "Не вдалося знайти кінець JSON (непарні дужки).",
+        error: LIB_TEXTS.AI_TEXT.UNBALANCED,
       };
     }
 
@@ -62,9 +64,7 @@ export async function getAiJsonResponse<T>(
     return { data: parsedJson, error: null };
   } catch (error) {
     const errorMessage =
-      error instanceof Error
-        ? error.message
-        : "Невідома помилка при взаємодії з ШІ.";
+      error instanceof Error ? error.message : LIB_TEXTS.AI_TEXT.ERROR;
     return { data: null, error: errorMessage };
   }
 }

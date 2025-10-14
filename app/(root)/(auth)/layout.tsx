@@ -1,6 +1,6 @@
-// app/[lang]/(root)/(auth)/layout.tsx
 import Link from "next/link";
 import { Card } from "@/components/shared";
+import { AUTH_TEXTS } from "@/components/shared/(texts)/auth-texts";
 
 export default function AuthLayout({
   children,
@@ -28,7 +28,7 @@ export default function AuthLayout({
         <Card className="p-8 shadow-xl">{children}</Card>
         <Link href="/" className="flex justify-center mt-8">
           <span className="text-sm text-gray-600 hover:text-orange-500">
-            Повернутися на головну сторінку
+            {AUTH_TEXTS.RETURN_HOME}
           </span>
         </Link>
       </div>

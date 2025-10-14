@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CreateWorkoutForm } from "@/components/coach/create-workout-form";
 import { WorkoutPlanForm } from "@/components/coach/workout-plan-form";
+import { COACH_TEXTS } from "./coach-text";
 
 export function CoachFormSwitcher() {
   const [activeForm, setActiveForm] = useState<"workout" | "plan">("workout");
@@ -18,7 +19,7 @@ export function CoachFormSwitcher() {
               : "bg-white text-gray-800 hover:bg-orange-100 cursor-pointer"
           }`}
         >
-          Створити разове тренування
+          {COACH_TEXTS.FORM_SWITCHER.BUTTON_ONE}
         </button>
         <button
           onClick={() => setActiveForm("plan")}
@@ -28,7 +29,7 @@ export function CoachFormSwitcher() {
               : "bg-white text-gray-800 hover:bg-orange-100 cursor-pointer"
           }`}
         >
-          Створити план на тиждень
+          {COACH_TEXTS.FORM_SWITCHER.BUTTON_WEEK}
         </button>
       </div>
 

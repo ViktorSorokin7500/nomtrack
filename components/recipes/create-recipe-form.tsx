@@ -9,12 +9,12 @@ import { useTransition } from "react";
 import { Card } from "../shared";
 import toast from "react-hot-toast";
 import { Coins } from "lucide-react";
+import { AI_REQUEST } from "@/lib/const";
+import { RECIPES_TEXTS } from "./recipes-text";
 
 const schema = z.object({
-  recipeName: z.string().min(3, "Name must be longer"),
-  ingredientsText: z
-    .string()
-    .min(10, "Please provide more detail for the ingredients"),
+  recipeName: z.string().min(3, RECIPES_TEXTS.Z_NAME_MIN_LENGTH),
+  ingredientsText: z.string().min(10, RECIPES_TEXTS.Z_INGREDIENTS_MIN_LENGTH),
 });
 
 type Schema = z.infer<typeof schema>;
@@ -36,7 +36,7 @@ export function CreateRecipeForm() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Рецепт успішно створено!");
+        toast.success(RECIPES_TEXTS.TOAST_SUCCESS);
         reset();
       }
     });
@@ -47,20 +47,19 @@ export function CreateRecipeForm() {
       {isPending ? (
         <div className="flex flex-col items-center justify-center min-h-[487px] text-center">
           <h2 className="text-xl font-semibold mb-4">
-            Аналіз інгредієнтів...
-            <SimpleRiseSpinner />
+            {RECIPES_TEXTS.ANALYZING_INGREDIENTS} <SimpleRiseSpinner />
           </h2>
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="z-50">
-          <h2 className="text-xl font-semibold">Створити новий рецепт</h2>
+          <h2 className="text-xl font-semibold">{RECIPES_TEXTS.TITLE}</h2>
 
           <div>
             <label
               htmlFor="recipeName"
               className="block text-sm font-medium text-gray-700"
             >
-              Назва рецепту
+              {RECIPES_TEXTS.RECIPE_NAME_LABEL}
             </label>
             <input
               {...register("recipeName")}
@@ -79,15 +78,15 @@ export function CreateRecipeForm() {
               htmlFor="ingredientsText"
               className="block text-sm font-medium text-gray-700"
             >
-              Інгредієнти <br />
-              <small>(введіть кожен інгредієнт із його вагою.)</small>
+              {RECIPES_TEXTS.INGREDIENTS} <br />
+              <small>({RECIPES_TEXTS.INGREDIENTS_DESCRIPTION})</small>
             </label>
             <textarea
               {...register("ingredientsText")}
               id="ingredientsText"
               rows={12}
               className="w-full p-2 border rounded-md mt-1"
-              placeholder={`150г курячого філе\n200г рису\n50г моркви`}
+              placeholder={RECIPES_TEXTS.RECIPE_NAME_PLACEHOLDER}
             />
             {errors.ingredientsText && (
               <p className="text-red-500 text-sm mt-1">
@@ -101,9 +100,10 @@ export function CreateRecipeForm() {
               <SimpleRiseSpinner />
             ) : (
               <>
-                <p>Зберегти рецепт</p>
+                <p>{RECIPES_TEXTS.SAVE_BUTTON}</p>
                 <span className="flex gap-0.5 ml-1 text-white-500">
-                  <Coins className="size-5" />1
+                  <Coins className="size-5" />
+                  {AI_REQUEST}
                 </span>
               </>
             )}

@@ -1,4 +1,5 @@
 import { CreateRecipeForm, RecipeList } from "@/components/recipes";
+import { RECIPES_TEXTS } from "@/components/recipes/recipes-text";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function RecipesPage() {
@@ -22,10 +23,8 @@ export default async function RecipesPage() {
     <section className="bg-orange-50 p-4">
       <div className="container max-w-5xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">Мої рецепти</h1>
-          <p className="text-gray-500">
-            Створюйте та керуйте власними рецептами.
-          </p>
+          <h1 className="text-3xl font-bold">{RECIPES_TEXTS.MY_RECIPES}</h1>
+          <p className="text-gray-500">{RECIPES_TEXTS.CREATE_NEW_RECIPE}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">

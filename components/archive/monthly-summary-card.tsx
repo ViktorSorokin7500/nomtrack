@@ -4,6 +4,7 @@ import { Card } from "../shared";
 import { type DayData, type Profile } from "@/types";
 import { ProgressRingArchive } from "./progress-ring-archive";
 import { MonthlyReportButton } from "./monthly-report-button";
+import { ARCHIVE_TEXTS } from "./archive-texts";
 
 interface MonthlySummaryCardProps {
   days: DayData[];
@@ -59,50 +60,50 @@ export function MonthlySummaryCard({
 
   const macros = [
     {
-      label: "Калорії",
+      label: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.CALORIES,
       current: averages.calories,
       target: averages.targetCalories,
       color: "stroke-orange-400",
       scolor: "stroke-red-400",
       type: "calories",
-      unit: "ккал",
+      unit: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.UNIT_KILOCALORIE,
     },
     {
-      label: "Білки",
+      label: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.PROTEIN,
       current: averages.protein,
       target: averages.targetProtein,
       color: "stroke-yellow-400",
       scolor: "stroke-yellow-600",
       type: "protein",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.UNIT_GRAM,
     },
     {
-      label: "Жири",
+      label: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.FAT,
       current: averages.fat,
       target: averages.targetFat,
       color: "stroke-sky-300",
       scolor: "stroke-blue-900",
       type: "fat",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.UNIT_GRAM,
     },
     {
-      label: "Вуглеводи",
+      label: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.CARBOHYDRATE,
       current: averages.carbs,
       target: averages.targetCarbs,
       color: "stroke-lime-400",
       scolor: "stroke-green-600",
       type: "carbs",
-      unit: "г",
+      unit: ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.UNIT_GRAM,
     },
   ];
 
   return (
     <Card className="p-6 bg-white shadow-sm rounded-lg mb-8">
       <h2 className="text-xl font-semibold text-gray-800 mb-4">
-        Середні показники за місяць
+        {ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.TITLE}
       </h2>
       <p className="text-gray-600 mb-6">
-        Проаналізуйте середній прогрес щодо ваших цілей.
+        {ARCHIVE_TEXTS.MONTHLY_SUMMARY_CARD.DESCRIPTION}
       </p>
 
       <div className="space-y-4 flex flex-wrap justify-between">

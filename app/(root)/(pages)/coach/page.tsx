@@ -10,6 +10,7 @@ import {
   WorkoutPlanCard,
 } from "@/components/coach";
 import { Dumbbell, Flame } from "lucide-react";
+import { COACH_TEXTS } from "@/components/coach/coach-text";
 
 // Типи для даних, що будуть завантажуватися з БД
 
@@ -31,7 +32,7 @@ export default async function CoachPage() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Помилка завантаження планів:", error);
+    console.error(error);
   }
 
   // Завантажуємо збережені тренування
@@ -46,10 +47,7 @@ export default async function CoachPage() {
     .order("created_at", { ascending: false });
 
   if (savedWorkoutsError) {
-    console.error(
-      "Помилка завантаження збережених тренувань:",
-      savedWorkoutsError
-    );
+    console.error(savedWorkoutsError);
   }
 
   const plans = (allPlans || []) as DbWorkoutPlan[];
@@ -59,13 +57,14 @@ export default async function CoachPage() {
     <div className="bg-orange-50 p-2 sm:p-8 min-h-screen">
       <div className="container mx-auto space-y-8">
         <h1 className="text-3xl font-bold text-stone-900 text-center">
-          Ваш персональний <br className="sm:hidden" /> ШІ трекер
+          {COACH_TEXTS.COACH_PAGE.TITLE_START} <br className="sm:hidden" />{" "}
+          {COACH_TEXTS.COACH_PAGE.TITLE_END}
         </h1>
         <CoachFormSwitcher />
         {plans.length > 0 || savedWorkoutsData.length > 0 ? (
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-stone-900 mb-4">
-              Історія активності
+              {COACH_TEXTS.COACH_PAGE.HISTORY}
             </h2>
             <Accordion.Accordion type="single" collapsible className="w-full">
               {savedWorkoutsData.length > 0 && (
@@ -75,7 +74,7 @@ export default async function CoachPage() {
                 >
                   <Accordion.Trigger className="flex justify-between items-center p-4 hover:bg-orange-50 transition-colors rounded-lg">
                     <span className="font-semibold text-lg text-stone-800">
-                      Мої збережені тренування
+                      {COACH_TEXTS.COACH_PAGE.MY_SAVED_TRAININGS}
                     </span>
                   </Accordion.Trigger>
                   <Accordion.Content className="p-4 pt-0 space-y-4">
@@ -93,7 +92,8 @@ export default async function CoachPage() {
                           </div>
                           <div className="flex items-center text-red-500 text-sm font-medium">
                             <Flame className="size-4 mr-1" />
-                            {workout.estimated_calories_burned} ккал
+                            {workout.estimated_calories_burned}{" "}
+                            {COACH_TEXTS.COACH_PAGE.UNIT_KILOCALORIE}
                           </div>
                         </div>
                         <ul className="text-sm mt-2 space-y-1 text-gray-600">
@@ -104,7 +104,7 @@ export default async function CoachPage() {
                                 exercise.reps &&
                                 ` (${exercise.sets} x ${exercise.reps})`}
                               {exercise.duration_min &&
-                                ` (${exercise.duration_min} хв)`}
+                                ` (${exercise.duration_min} ${COACH_TEXTS.COACH_PAGE.UNIT_MINUTES})`}
                             </li>
                           ))}
                         </ul>
@@ -124,14 +124,14 @@ export default async function CoachPage() {
                 >
                   <Accordion.Trigger className="flex justify-between items-center p-4 hover:bg-orange-50 transition-colors rounded-lg">
                     <span className="font-semibold text-lg text-stone-800">
-                      Історія згенерованих планів
+                      {COACH_TEXTS.COACH_PAGE.GENERATED_PLANS}
                     </span>
                   </Accordion.Trigger>
                   <Accordion.Content className="p-4 pt-0">
                     {plans.map((plan) => (
                       <div key={plan.id} className="mb-4">
                         <h3 className="font-semibold mb-2">
-                          План від{" "}
+                          {COACH_TEXTS.COACH_PAGE.PLAN_FROM}{" "}
                           {format(new Date(plan.created_at), "d MMMM yyyy", {
                             locale: uk,
                           })}
@@ -146,8 +146,7 @@ export default async function CoachPage() {
           </div>
         ) : (
           <p className="text-center text-gray-500 mt-8">
-            Поки що немає збережених тренувань або планів. Будь ласка,
-            згенеруйте або створіть їх.
+            {COACH_TEXTS.COACH_PAGE.UMPTY}
           </p>
         )}
       </div>

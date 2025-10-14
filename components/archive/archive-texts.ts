@@ -1,0 +1,75 @@
+import "@/utils/stringExtensions";
+import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
+
+export const ARCHIVE_TEXTS = {
+  MAIN_PAGE: {
+    NO_FOUND: "Не вдалося завантажити дані. Спробуйте пізніше.",
+  },
+  BODY_MEASUREMENTS: {
+    TITLE: "Вимірювання тіла",
+    IMAGE_ALT: "Модель тіла",
+    WEIGHT: COMMON_TEXTS.WEIGHT.capitalize(),
+    WAIST: "Талія",
+    BELLY: "Живіт",
+    UNIT_KG: COMMON_TEXTS.UNIT_KG,
+    UNIT_CM: COMMON_TEXTS.UNIT_CM,
+    NOT_AVAILABLE: COMMON_TEXTS.NOT_AVAILABLE,
+  },
+  DAILY_CARD: {
+    CALORIES_CONSUMED: "Калорій (спожито):",
+    WEIGHT: COMMON_TEXTS.WEIGHT.capitalize(),
+    UNIT_KG: COMMON_TEXTS.UNIT_KG,
+  },
+  DAILY_DETAILS: {
+    CALORIES: COMMON_TEXTS.CALORIES.capitalize(),
+    PROTEIN: COMMON_TEXTS.PROTEIN.capitalize(),
+    FAT: COMMON_TEXTS.FAT.capitalize(),
+    CARBOHYDRATE: COMMON_TEXTS.CARBOHYDRATE.capitalize(),
+    SUGAR: COMMON_TEXTS.SUGAR.capitalize(),
+    WATER: COMMON_TEXTS.WATER.capitalize(),
+    UNIT_GRAM: COMMON_TEXTS.UNIT_GRAM,
+    UNIT_ML: COMMON_TEXTS.UNIT_ML,
+    UNIT_KILOCALORIE: COMMON_TEXTS.UNIT_KILOCALORIE,
+    TITLE: "Підсумок за ",
+    GOALS: "Цільові показники",
+  },
+  REPORT: {
+    TITLE: "ШІ-аналіз за місяць",
+    GENERATE_BUTTON: "Згенерувати звіт за допомогою ШІ",
+    ANALYZE_BUTTON: "Проаналізувати ще раз",
+  },
+  MONTHLY_SUMMARY_CARD: {
+    TITLE: "Середні показники за поточний місяць",
+    DESCRIPTION: "Проаналізуйте середній прогрес щодо ваших цілей",
+    CALORIES: COMMON_TEXTS.CALORIES.capitalize(),
+    PROTEIN: COMMON_TEXTS.PROTEIN.capitalize(),
+    FAT: COMMON_TEXTS.FAT.capitalize(),
+    CARBOHYDRATE: COMMON_TEXTS.CARBOHYDRATE.capitalize(),
+    UNIT_GRAM: COMMON_TEXTS.UNIT_GRAM,
+    UNIT_KILOCALORIE: COMMON_TEXTS.UNIT_KILOCALORIE,
+  },
+  NUTRION_ARCHIVE: {
+    JANUARY: "Січень",
+    FEBRUARY: "Лютий",
+    MARCH: "Березень",
+    APRIL: "Квітень",
+    MAY: "Травень",
+    JUNE: "Червень",
+    JULY: "Липень",
+    AUGUST: "Серпень",
+    SEPTEMBER: "Вересень",
+    OCTOBER: "Жовтень",
+    NOVEMBER: "Листопад",
+    DECEMBER: "Грудень",
+    PREV_MONTH: "Попередній місяць",
+    NEXT_MONTH: "Наступний місяць",
+    TITLE: "Ваша історія харчування та прогресу",
+    NODATA: "Даних за цей місяць ще немає.",
+    NODATA_LONG:
+      "За цей місяць ще немає даних. Почніть відстежувати своє харчування та вимірювання тіла, щоб побачити свій прогрес тут.",
+  },
+  REPORT_DISPLAY: {
+    START_WEIGHT: "Вага на початку місяця",
+    END_WEIGHT: "Вага в кінці місяця",
+  },
+};

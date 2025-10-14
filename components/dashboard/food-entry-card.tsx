@@ -5,6 +5,7 @@ import { deleteFoodEntry } from "@/app/actions";
 import toast from "react-hot-toast";
 import { Button } from "../ui";
 import { FoodEntry } from "@/types";
+import { DASHBOARD_TEXTS } from "./dashboard-text";
 
 const TrashIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -30,10 +31,10 @@ interface FoodEntryCardProps {
 
 // Об'єкт для перекладу та кольорів
 const mealLabels: { [key: string]: string } = {
-  breakfast: "Сніданок",
-  lunch: "Обід",
-  dinner: "Вечеря",
-  snack: "Перекус",
+  breakfast: DASHBOARD_TEXTS.FOOD_ENTRY_CARD.BRACKFAST,
+  lunch: DASHBOARD_TEXTS.FOOD_ENTRY_CARD.LUNCH,
+  dinner: DASHBOARD_TEXTS.FOOD_ENTRY_CARD.DINNER,
+  snack: DASHBOARD_TEXTS.FOOD_ENTRY_CARD.SNACK,
 };
 
 const mealColors: { [key: string]: string } = {
@@ -56,9 +57,10 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
           return result;
         }),
         {
-          loading: "Видалення запису...",
-          success: "Запис успішно видалено!",
-          error: (err) => `Помилка: ${err.message}`,
+          loading: DASHBOARD_TEXTS.FOOD_ENTRY_CARD.DELETE_LOADING,
+          success: DASHBOARD_TEXTS.FOOD_ENTRY_CARD.DELETE_SUCCESS,
+          error: (err) =>
+            `${DASHBOARD_TEXTS.FOOD_ENTRY_CARD.DELETE_ERROR} ${err.message}`,
         }
       );
     });
@@ -69,7 +71,7 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
       (t) => (
         <div className="flex flex-col items-center gap-4">
           <p className="font-semibold text-center">
-            Ви впевнені, що хочете видалити цей запис?
+            {DASHBOARD_TEXTS.FOOD_ENTRY_CARD.DELETE_QUESTION}
           </p>
           <div className="flex gap-2">
             <Button
@@ -80,14 +82,14 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
                 performDelete();
               }}
             >
-              Так, видалити
+              {DASHBOARD_TEXTS.FOOD_ENTRY_CARD.CONFIRM_DELETE}
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => toast.dismiss(t.id)}
             >
-              Відміна
+              {DASHBOARD_TEXTS.FOOD_ENTRY_CARD.CANCEL}
             </Button>
           </div>
         </div>
@@ -100,10 +102,8 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
 
   return (
     <div className="bg-gray-50 rounded-lg p-4 text-sm flex flex-col md:flex-row md:items-center gap-4">
-      {/* --- Верхня частина: Назва, тип прийому їжі та кнопка --- */}
       <div className="flex-grow flex items-center justify-between">
         <div className="flex flex-col">
-          {/* НОВИЙ БЛОК: Тип прийому їжі */}
           <span
             className={`text-xs font-semibold ${mealColors[entry.meal_type]}`}
           >
@@ -128,24 +128,33 @@ export function FoodEntryCard({ entry }: FoodEntryCardProps) {
       <div className="w-full md:w-auto grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-2 text-xs text-gray-600 text-center flex-shrink-0">
         <div>
           <span className="font-bold block">{entry.calories}</span>
-          <span>ккал</span>
+          <span>{DASHBOARD_TEXTS.FOOD_ENTRY_CARD.UNIT_KILOCALORIE}</span>
         </div>
         <div>
-          <span className="font-bold block">{entry.protein_g}г</span>
-          <span>білки</span>
+          <span className="font-bold block">
+            {entry.protein_g}
+            {DASHBOARD_TEXTS.FOOD_ENTRY_CARD.UNIT_GRAM}
+          </span>
+          <span>{DASHBOARD_TEXTS.FOOD_ENTRY_CARD.PROTEIN}</span>
         </div>
         <div>
-          <span className="font-bold block">{entry.fat_g}г</span>
-          <span>жири</span>
+          <span className="font-bold block">
+            {entry.fat_g}
+            {DASHBOARD_TEXTS.FOOD_ENTRY_CARD.UNIT_GRAM}
+          </span>
+          <span>{DASHBOARD_TEXTS.FOOD_ENTRY_CARD.FAT}</span>
         </div>
         <div>
-          <span className="font-bold block">{entry.carbs_g}г</span>
-          <span>вугл.</span>
+          <span className="font-bold block">
+            {entry.carbs_g}
+            {DASHBOARD_TEXTS.FOOD_ENTRY_CARD.UNIT_GRAM}
+          </span>
+          <span>{DASHBOARD_TEXTS.FOOD_ENTRY_CARD.CARBOHYDRATE}</span>
         </div>
         {/* {entry.sugar_g != null && (
           <div>
-            <span className="font-bold block">{entry.sugar_g}г</span>
-            <span>цукор</span>
+            <span className="font-bold block">{entry.sugar_g}{DASHBOARD_TEXTS.FOOD_ENTRY_CARD.UNIT_GRAM}</span>
+            <span>{DASHBOARD_TEXTS.FOOD_ENTRY_CARD.SUGAR}</span>
           </div>
         )} */}
       </div>

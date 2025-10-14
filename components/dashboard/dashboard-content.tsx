@@ -8,6 +8,7 @@ import {
   LazySummaryCard,
   LazyWaterTracker,
 } from ".";
+import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
 
 export async function DashboardContent() {
   const supabase = createClient();
@@ -128,13 +129,13 @@ export async function DashboardContent() {
 
   const todayDayIndex = new Date().getDay();
   const daysOfWeek = [
-    "Неділя",
-    "Понеділок",
-    "Вівторок",
-    "Середа",
-    "Четвер",
-    "П'ятниця",
-    "Субота",
+    COMMON_TEXTS.SUNDAY,
+    COMMON_TEXTS.MONDAY,
+    COMMON_TEXTS.TUESDAY,
+    COMMON_TEXTS.WEDNESDAY,
+    COMMON_TEXTS.THURSDAY,
+    COMMON_TEXTS.FRIDAY,
+    COMMON_TEXTS.SATURDAY,
   ];
   const todayDayName = daysOfWeek[todayDayIndex];
 

@@ -7,6 +7,7 @@ import {
   SettingsSkeleton,
 } from "@/components/settings";
 import { Suspense } from "react";
+import { SETTINGS_TEXTS } from "@/components/settings/settings-text";
 
 export default async function Settings() {
   const supabase = createClient();
@@ -19,12 +20,10 @@ export default async function Settings() {
     redirect("/sign-in");
   }
 
-  const { data: profile, error } = await (
-    await supabase
-  )
+  const { data: profile, error } = await (await supabase)
     .from("profiles")
     .select("*")
-    .eq("id", user.id) // Ось тут ми використовуємо id юзера
+    .eq("id", user.id)
     .maybeSingle();
 
   if (error) {
@@ -35,7 +34,7 @@ export default async function Settings() {
     <section className="bg-orange-50 min-h-screen">
       <Suspense fallback={<SettingsSkeleton />}>
         <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold mb-8">Налаштування профілю</h1>
+          <h1 className="text-3xl font-bold mb-8">{SETTINGS_TEXTS.TITLE}</h1>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
               <ProfileSidebar

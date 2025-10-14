@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card } from "../shared";
 import { DailyDetailModal } from "./daily-detail-modal";
 import { DayData, Profile } from "@/types";
+import { ARCHIVE_TEXTS } from "./archive-texts";
 
 interface DailyCardProps {
   day: DayData;
@@ -28,23 +29,26 @@ export function DailyCard({ day, userProfile }: DailyCardProps) {
         </div>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
-            <span className="text-gray-600">Калорій (спожито):</span>
+            <span className="text-gray-600">
+              {ARCHIVE_TEXTS.DAILY_CARD.CALORIES_CONSUMED}
+            </span>
             <span className="font-semibold text-gray-800">
               {day.consumed_calories}
             </span>
           </div>
           {day.end_of_day_weight && (
             <div className="flex justify-between">
-              <span className="text-gray-600">Вага:</span>
+              <span className="text-gray-600">
+                {ARCHIVE_TEXTS.DAILY_CARD.WEIGHT}:
+              </span>
               <span className="font-semibold text-gray-800">
-                {day.end_of_day_weight} кг
+                {day.end_of_day_weight} {ARCHIVE_TEXTS.DAILY_CARD.UNIT_KG}
               </span>
             </div>
           )}
         </div>
       </Card>
 
-      {/* Модальне вікно, яке з'являється при натисканні на картку */}
       {isModalOpen && (
         <DailyDetailModal
           day={day}

@@ -4,11 +4,13 @@ import { useState, useTransition, useEffect } from "react";
 import { Button, SimpleRiseSpinner } from "../ui";
 import { analyzeMonthlyData } from "@/app/actions";
 import toast from "react-hot-toast";
-import { DailySummary, Profile } from "@/types"; // <-- ОНОВЛЕНИЙ ІМПОРТ
+import { DailySummary, Profile } from "@/types";
 import { Card } from "../shared";
 import { AiReportData, ReportDisplay } from "./report-display";
 import { useRouter } from "next/navigation";
 import { Coins, FileText } from "lucide-react";
+import { AI_ANALYZE } from "@/lib/const";
+import { ARCHIVE_TEXTS } from "./archive-texts";
 
 interface MonthlyReportButtonProps {
   daysData: DailySummary[];
@@ -36,11 +38,8 @@ export function MonthlyReportButton({
     };
   }, [isModalOpen]);
 
-  // ДОДАНИЙ ЛОГ
-
   const getReport = () => {
     startTransition(async () => {
-      // ЗМІНА: ПРЯМО ПРИЙМАЄМО ОБ'ЄКТ
       const result = await analyzeMonthlyData(daysData, userProfile);
       if (result?.error) {
         toast.error(result.error);
@@ -65,9 +64,10 @@ export function MonthlyReportButton({
         ) : (
           <>
             <FileText size={20} />
-            <p>Згенерувати звіт від ШІ</p>
+            <p>{ARCHIVE_TEXTS.REPORT.GENERATE_BUTTON}</p>
             <span className="flex gap-0.5 ml-1 text-white-500">
-              <Coins className="size-5" />5
+              <Coins className="size-5" />
+              {AI_ANALYZE}
             </span>
           </>
         )}
@@ -83,7 +83,7 @@ export function MonthlyReportButton({
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-2xl font-bold text-gray-800">
-                ШІ-аналіз за місяць
+                {ARCHIVE_TEXTS.REPORT.TITLE}
               </h2>
               <button
                 onClick={() => setIsModalOpen(false)}

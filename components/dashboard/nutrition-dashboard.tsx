@@ -8,11 +8,10 @@ import { FoodEntryCard } from "./food-entry-card";
 import { UserRecipe } from "@/types";
 import { useState } from "react";
 
-// Тип для одного запису їжі, що приходить з сервера
 import type { FoodEntry } from "@/types";
 import { Accordion } from "../ui";
+import { DASHBOARD_TEXTS } from "./dashboard-text";
 
-// Типи для пропсів, які компонент отримує від сторінки
 interface NutritionDashboardProps {
   summaryData: {
     calories: {
@@ -44,31 +43,29 @@ export function NutritionDashboard({
       const percentage = target > 0 ? Math.round((current / target) * 100) : 0;
       return `${percentage}%`;
     }
-    return `${current}г / ${target}г`;
+    return `${current}${DASHBOARD_TEXTS.NUTRION_DASHBOARD.UNIT_GRAM} / ${target}${DASHBOARD_TEXTS.NUTRION_DASHBOARD.UNIT_GRAM}`;
   };
-  // Формуємо динамічний список доступних опцій для випадаючого меню
   const availableMealTypes = [
-    { value: "breakfast", label: "Сніданок" },
-    { value: "lunch", label: "Обід" },
-    { value: "dinner", label: "Вечеря" },
-    { value: "snack", label: "Перекус" },
+    { value: "breakfast", label: DASHBOARD_TEXTS.NUTRION_DASHBOARD.BRACKFAST },
+    { value: "lunch", label: DASHBOARD_TEXTS.NUTRION_DASHBOARD.LUNCH },
+    { value: "dinner", label: DASHBOARD_TEXTS.NUTRION_DASHBOARD.DINNER },
+    { value: "snack", label: DASHBOARD_TEXTS.NUTRION_DASHBOARD.SNACK },
   ];
 
   return (
     <Card className="container mx-auto px-4 py-8 max-w-4xl">
       <header className="mb-8 text-center">
         <h1 className="text-3xl font-light text-gray-800 mb-2">
-          Журнал харчування
+          {DASHBOARD_TEXTS.NUTRION_DASHBOARD.FOOD_JOURNAL}
         </h1>
         <p className="text-gray-500 font-light">
-          Відстежуйте прийоми їжі, щоб стежити за своїм прогресом
+          {DASHBOARD_TEXTS.NUTRION_DASHBOARD.TRACK_PROGRESS}
         </p>
       </header>
 
-      {/* Блок з прогресом, що використовує реальні дані */}
       <Card className="bg-white rounded-xl shadow-sm p-6 mb-8">
         <h2 className="text-xl font-light text-gray-700 mb-4">
-          Підсумок за сьогодні
+          {DASHBOARD_TEXTS.NUTRION_DASHBOARD.TODAY_SUMMARY}
         </h2>
         <div className="flex items-center justify-between gap-4 sm:gap-6">
           <ProgressRing
@@ -76,14 +73,15 @@ export function NutritionDashboard({
             target={summaryData.calories.target}
           />
           <div className="flex-1 space-y-4">
-            {/* Protein */}
             <div
               onMouseEnter={() => setHoveredMacro("protein")}
               onMouseLeave={() => setHoveredMacro(null)}
               className="cursor-pointer"
             >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Білки</span>
+                <span className="text-sm font-medium text-gray-600">
+                  {DASHBOARD_TEXTS.NUTRION_DASHBOARD.PROTEIN}
+                </span>
                 <span className="text-sm text-gray-600">
                   {getMacroValue("protein")}
                 </span>
@@ -94,7 +92,6 @@ export function NutritionDashboard({
                 color="bg-yellow-400"
               />
             </div>
-            {/* Carbs */}
             <div
               onMouseEnter={() => setHoveredMacro("carbs")}
               onMouseLeave={() => setHoveredMacro(null)}
@@ -102,7 +99,7 @@ export function NutritionDashboard({
             >
               <div className="flex justify-between mb-1">
                 <span className="text-sm font-medium text-gray-600">
-                  Вуглеводи
+                  {DASHBOARD_TEXTS.NUTRION_DASHBOARD.CARBOHYDRATE}
                 </span>
                 <span className="text-sm text-gray-600">
                   {getMacroValue("carbs")}
@@ -114,14 +111,15 @@ export function NutritionDashboard({
                 color="bg-green-400"
               />
             </div>
-            {/* Fat */}
             <div
               onMouseEnter={() => setHoveredMacro("fat")}
               onMouseLeave={() => setHoveredMacro(null)}
               className="cursor-pointer"
             >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Жири</span>
+                <span className="text-sm font-medium text-gray-600">
+                  {DASHBOARD_TEXTS.NUTRION_DASHBOARD.FAT}
+                </span>
                 <span className="text-sm text-gray-600">
                   {getMacroValue("fat")}
                 </span>
@@ -132,14 +130,13 @@ export function NutritionDashboard({
                 color="bg-orange-400"
               />
             </div>
-            {/* Sugar */}
             {/* <div
               onMouseEnter={() => setHoveredMacro("sugar")}
               onMouseLeave={() => setHoveredMacro(null)}
               className="cursor-pointer"
             >
               <div className="flex justify-between mb-1">
-                <span className="text-sm font-medium text-gray-600">Цукор</span>
+                <span className="text-sm font-medium text-gray-600">{DASHBOARD_TEXTS.NUTRION_DASHBOARD.SUGAR}</span>
                 <span className="text-sm text-gray-600">
                   {getMacroValue("sugar")}
                 </span>
@@ -155,7 +152,6 @@ export function NutritionDashboard({
       </Card>
 
       <div className="space-y-6">
-        {/* Рендеримо вже існуючі записи, якщо вони є */}
         {foodLogData.length > 0 && (
           <Accordion.Accordion
             type="single"
@@ -167,7 +163,7 @@ export function NutritionDashboard({
               className="border-b-2 border-orange-100"
             >
               <Accordion.Trigger className="font-semibold text-gray-800 text-lg hover:no-underline">
-                Журнал за сьогодні
+                {DASHBOARD_TEXTS.NUTRION_DASHBOARD.TODAY_JOURNAL}
               </Accordion.Trigger>
               <Accordion.Content className="pt-2">
                 <div className="space-y-3">
@@ -180,7 +176,6 @@ export function NutritionDashboard({
           </Accordion.Accordion>
         )}
 
-        {/* Завжди показуємо одну універсальну картку для додавання нового запису */}
         <MealCard
           availableMealTypes={availableMealTypes}
           userRecipes={userRecipes}

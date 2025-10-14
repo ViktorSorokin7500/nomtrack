@@ -4,8 +4,8 @@ import { useState, useTransition } from "react";
 import { Modal } from "../ui";
 import { deleteRecipe } from "@/app/actions";
 import toast from "react-hot-toast";
+import { RECIPES_TEXTS } from "./recipes-text";
 
-// Описуємо тип нашого рецепта, щоб TypeScript нам допомагав
 type Recipe = {
   id: string;
   recipe_name: string;
@@ -13,7 +13,7 @@ type Recipe = {
   protein_per_100g: number;
   fat_per_100g: number;
   carbs_per_100g: number;
-  sugar_per_100g: number; // Додаємо цукор, якщо він є
+  sugar_per_100g: number;
   ingredients_text: string;
   total_weight_g: number;
 };
@@ -23,7 +23,6 @@ interface RecipeListProps {
 }
 
 export function RecipeList({ recipes }: RecipeListProps) {
-  // Стан для зберігання даних ВИБРАНОГО рецепта. Якщо null - модальне вікно закрите.
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   const [isPending, startTransition] = useTransition();
@@ -32,39 +31,38 @@ export function RecipeList({ recipes }: RecipeListProps) {
     toast(
       (t) => (
         <div className="flex flex-col items-center gap-4">
-          <p className="font-semibold">
-            Ви впевнені, що хочете видалити цей рецепт?
-          </p>
+          <p className="font-semibold">{RECIPES_TEXTS.DELETE_WARNING}</p>
           <div className="flex gap-3">
             <button
               onClick={() => {
                 startTransition(() => {
-                  // Викликаємо серверну дію при підтвердженні
                   deleteRecipe(recipeId).then((res) => {
                     if (res.error) {
-                      toast.error(res.error); // Показуємо помилку, якщо вона є
+                      toast.error(res.error);
                     } else {
-                      toast.success(res.success || "Рецепт видалено!"); // Повідомлення про успіх
+                      toast.success(
+                        res.success || RECIPES_TEXTS.RECIPE_WAS_DELETED
+                      );
                     }
                   });
                 });
-                toast.dismiss(t.id); // Закриваємо поточне сповіщення
+                toast.dismiss(t.id);
               }}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-md hover:bg-red-700"
             >
-              Так, видалити
+              {RECIPES_TEXTS.CONFIRM_DELETE}
             </button>
             <button
-              onClick={() => toast.dismiss(t.id)} // Просто закриваємо сповіщення
+              onClick={() => toast.dismiss(t.id)}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
             >
-              Скасувати
+              {RECIPES_TEXTS.CANCEL}
             </button>
           </div>
         </div>
       ),
       {
-        duration: 6000, // Сповіщення буде висіти 6 секунд, якщо нічого не робити
+        duration: 6000,
       }
     );
   };
@@ -74,24 +72,28 @@ export function RecipeList({ recipes }: RecipeListProps) {
       <div className="space-y-4 md:max-h-[500] overflow-y-auto pr-2">
         {recipes && recipes.length > 0 ? (
           recipes.map((recipe) => (
-            // Тепер цей div - просто контейнер, без onClick
             <div
               key={recipe.id}
               className="p-4 border rounded-lg bg-white shadow-sm flex justify-between items-center"
             >
-              {/* Інформація про рецепт */}
               <div className="flex-grow">
                 <h3 className="font-bold">{recipe.recipe_name}</h3>
                 <p className="text-sm text-gray-500">
-                  На 100 г: {recipe.calories_per_100g} ккал, б:{" "}
-                  {recipe.protein_per_100g}г, ж: {recipe.fat_per_100g}г, в:{" "}
-                  {recipe.carbs_per_100g}г, ц: {recipe.sugar_per_100g}г
+                  {RECIPES_TEXTS.PER_100G.capitalize()}: {recipe.total_weight_g}
+                  {RECIPES_TEXTS.UNIT_GRAM}: {recipe.calories_per_100g}{" "}
+                  {RECIPES_TEXTS.UNIT_KILOCALORIE},{" "}
+                  {RECIPES_TEXTS.PROTEIN_SHORT}: {recipe.protein_per_100g}
+                  {RECIPES_TEXTS.UNIT_GRAM}, {RECIPES_TEXTS.FAT_SHORT}:{" "}
+                  {recipe.fat_per_100g}
+                  {RECIPES_TEXTS.UNIT_GRAM}, {RECIPES_TEXTS.CARBOHYDRATE_SHORT}:{" "}
+                  {recipe.carbs_per_100g}
+                  {RECIPES_TEXTS.UNIT_GRAM}, {RECIPES_TEXTS.SUGAR_SHORT}:{" "}
+                  {recipe.sugar_per_100g}
+                  {RECIPES_TEXTS.UNIT_GRAM}
                 </p>
               </div>
 
-              {/* Контейнер для кнопок дій */}
               <div className="flex items-center ml-4">
-                {/* Кнопка "Переглянути" для відкриття модального вікна */}
                 <button
                   onClick={() => setSelectedRecipe(recipe)}
                   className="p-2 text-gray-400 hover:text-blue-600 rounded-full hover:bg-blue-50 transition-colors"
@@ -100,7 +102,6 @@ export function RecipeList({ recipes }: RecipeListProps) {
                   📖
                 </button>
 
-                {/* Кнопка видалення */}
                 <button
                   onClick={() => handleDeleteConfirmation(recipe.id)}
                   disabled={isPending}
@@ -114,35 +115,44 @@ export function RecipeList({ recipes }: RecipeListProps) {
           ))
         ) : (
           <p className="text-center text-gray-500 py-10">
-            У вас ще немає збережених рецептів.
+            {RECIPES_TEXTS.NO_RECIPES}
           </p>
         )}
       </div>
 
-      {/* Модальне вікно, яке рендериться, тільки якщо рецепт вибрано */}
       <Modal isOpen={!!selectedRecipe} onClose={() => setSelectedRecipe(null)}>
         {selectedRecipe && (
           <div className="space-y-4">
             <h2 className="text-2xl font-bold">{selectedRecipe.recipe_name}</h2>
 
             <div>
-              <h4 className="font-semibold">Харчова цінність (на 100 г):</h4>
+              <h4 className="font-semibold">
+                {RECIPES_TEXTS.NUTRITIONAL_VALUES} ({RECIPES_TEXTS.PER_100G}):
+              </h4>
               <p className="text-gray-700">
-                {selectedRecipe.calories_per_100g} ккал | білок:{" "}
-                {selectedRecipe.protein_per_100g}г | жири:{" "}
-                {selectedRecipe.fat_per_100g}г | вуглеводи:{" "}
-                {selectedRecipe.carbs_per_100g}г | цукр:{" "}
-                {selectedRecipe.sugar_per_100g}г
+                {selectedRecipe.calories_per_100g}{" "}
+                {RECIPES_TEXTS.UNIT_KILOCALORIE} | {RECIPES_TEXTS.PROTEIN}:{" "}
+                {selectedRecipe.protein_per_100g}
+                {RECIPES_TEXTS.UNIT_GRAM} | {RECIPES_TEXTS.FAT}:{" "}
+                {selectedRecipe.fat_per_100g}
+                {RECIPES_TEXTS.UNIT_GRAM} | {RECIPES_TEXTS.CARBOHYDRATE}:{" "}
+                {selectedRecipe.carbs_per_100g}
+                {RECIPES_TEXTS.UNIT_GRAM} | {RECIPES_TEXTS.SUGAR}:{" "}
+                {selectedRecipe.sugar_per_100g}
+                {RECIPES_TEXTS.UNIT_GRAM}
               </p>
             </div>
 
             <p className="text-sm text-gray-600">
-              Загальна вага страви:{" "}
-              <strong>{selectedRecipe.total_weight_g}г</strong>
+              {RECIPES_TEXTS.TOTAL_WEIGHT_OF_MEAL}
+              <strong>
+                {selectedRecipe.total_weight_g}
+                {RECIPES_TEXTS.UNIT_GRAM}
+              </strong>
             </p>
 
             <div>
-              <h4 className="font-semibold">Інгредієнти:</h4>
+              <h4 className="font-semibold">{RECIPES_TEXTS.INGREDIENTS}:</h4>
               <pre className="p-3 bg-gray-100 rounded-md whitespace-pre-wrap text-sm font-sans">
                 {selectedRecipe.ingredients_text}
               </pre>

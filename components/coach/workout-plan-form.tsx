@@ -11,14 +11,16 @@ import { Card } from "../shared/card";
 import { Button } from "../ui/button";
 import { Coins } from "lucide-react";
 import { SimpleRiseSpinner } from "../ui";
+import { AI_ANALYZE } from "@/lib/const";
+import { COACH_TEXTS } from "./coach-text";
 
 const formSchema = z.object({
   equipmentText: z
     .string()
-    .min(3, { message: "Опишіть, будь ласка, наявний інвентар." }),
+    .min(3, { message: COACH_TEXTS.WORKOUT_PLAN_FORM.Z_TEXT }),
   durationMinutes: z.coerce
     .number()
-    .min(15, { message: "Тривалість має бути не менше 15 хвилин." }),
+    .min(15, { message: COACH_TEXTS.WORKOUT_PLAN_FORM.Z_DURATION }),
 });
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -41,7 +43,7 @@ export function WorkoutPlanForm() {
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("План тренувань успішно згенеровано!");
+        toast.success(COACH_TEXTS.WORKOUT_PLAN_FORM.TOAST_SUCCESS);
         reset();
       }
     });
@@ -51,14 +53,14 @@ export function WorkoutPlanForm() {
     <Card>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
         <h2 className="text-xl font-semibold text-stone-800">
-          Створити новий план тренувань
+          {COACH_TEXTS.WORKOUT_PLAN_FORM.TITLE}
         </h2>
         <div className="space-y-2">
           <textarea
             {...register("equipmentText")}
             rows={2}
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder="Опишіть ваш інвентар (напр., 'лише власна вага', 'гантелі 5кг, фітнес-гумка')."
+            placeholder={COACH_TEXTS.WORKOUT_PLAN_FORM.Z_TEXT}
           />
           {errors.equipmentText && (
             <p className="text-red-500 text-sm">
@@ -71,7 +73,7 @@ export function WorkoutPlanForm() {
             type="number"
             {...register("durationMinutes")}
             className="w-full p-3 border border-gray-200 rounded-lg"
-            placeholder="Бажана тривалість тренування (хв)"
+            placeholder={COACH_TEXTS.WORKOUT_PLAN_FORM.Z_DURATION}
           />
           {errors.durationMinutes && (
             <p className="text-red-500 text-sm">
@@ -86,7 +88,9 @@ export function WorkoutPlanForm() {
               <SimpleRiseSpinner className="w-[174px]" />
             ) : (
               <span className="flex items-center gap-2">
-                Згенерувати план <Coins className="size-5" />5
+                {COACH_TEXTS.WORKOUT_PLAN_FORM.GENERATE_PLAN}{" "}
+                <Coins className="size-5" />
+                {AI_ANALYZE}
               </span>
             )}
           </Button>

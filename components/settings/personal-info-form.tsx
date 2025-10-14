@@ -7,13 +7,21 @@ import { Card } from "../shared";
 import { Button, SimpleRiseSpinner } from "../ui";
 import { updatePersonalInfo } from "@/app/actions";
 import toast from "react-hot-toast";
+import { SETTINGS_TEXTS } from "./settings-text";
 
 // Схема валідації залишається без змін
 const personalInfoSchema = z.object({
   full_name: z.string().optional(),
-  current_weight_kg: z.coerce.number().positive("Вага має бути > 0"),
-  height_cm: z.coerce.number().positive("Зріст має бути > 0"),
-  age: z.coerce.number().positive("Вік має бути > 0").int(),
+  current_weight_kg: z.coerce
+    .number()
+    .positive(SETTINGS_TEXTS.PERSONAL_INFO_FORM.Z_WEIGHT_POSITIVE),
+  height_cm: z.coerce
+    .number()
+    .positive(SETTINGS_TEXTS.PERSONAL_INFO_FORM.Z_HEIGHT_POSITIVE),
+  age: z.coerce
+    .number()
+    .positive(SETTINGS_TEXTS.PERSONAL_INFO_FORM.Z_AGE_POSITIVE)
+    .int(),
   gender: z.enum(["male", "female", "other"]),
   activity_level: z.enum(["sedentary", "light", "moderate", "active", "ultra"]),
   goal: z.enum(["lose", "maintain", "gain"]),
@@ -55,16 +63,17 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
 
   return (
     <Card>
-      <h2 className="text-xl font-semibold mb-6">Особисті дані</h2>
+      <h2 className="text-xl font-semibold mb-6">
+        {SETTINGS_TEXTS.PERSONAL_INFO_FORM.PERSONAL_INFO}
+      </h2>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Поле для імені */}
           <div>
             <label
               htmlFor="full_name"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Повне ім&apos;я
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.FULL_NAME}
             </label>
             <input
               id="full_name"
@@ -79,13 +88,12 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
             )}
           </div>
 
-          {/* Вага */}
           <div>
             <label
               htmlFor="current_weight_kg"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Вага (кг)
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.CURRENT_WEIGHT}
             </label>
             <input
               id="current_weight_kg"
@@ -101,13 +109,12 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
             )}
           </div>
 
-          {/* Зріст */}
           <div>
             <label
               htmlFor="height_cm"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Зріст (см)
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.HEIGHT}
             </label>
             <input
               id="height_cm"
@@ -122,13 +129,12 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
             )}
           </div>
 
-          {/* Вік */}
           <div>
             <label
               htmlFor="age"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Вік
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.AGE}
             </label>
             <input
               id="age"
@@ -141,43 +147,57 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
             )}
           </div>
 
-          {/* Стать */}
           <div>
             <label
               htmlFor="gender"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Стать
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.GENDER}
             </label>
             <select
               id="gender"
               {...register("gender")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="male">Чоловік</option>
-              <option value="female">Жінка</option>
-              <option value="other">Інше</option>
+              <option value="male">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.MALE}
+              </option>
+              <option value="female">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.FEMALE}
+              </option>
+              <option value="other">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.OTHER}
+              </option>
             </select>
           </div>
 
-          {/* Рівень активності */}
           <div>
             <label
               htmlFor="activity_level"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Рівень активності
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.ACTIVITY_LEVEL}
             </label>
             <select
               id="activity_level"
               {...register("activity_level")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="sedentary">Сидячий спосіб життя</option>
-              <option value="light">Низька активність</option>
-              <option value="moderate">Помірна активність</option>
-              <option value="active">Активний</option>
-              <option value="ultra">Дуже активний</option>
+              <option value="sedentary">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.SEDENTARY}
+              </option>
+              <option value="light">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.LIGHT}
+              </option>
+              <option value="moderate">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.MODERATE}
+              </option>
+              <option value="active">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.ACTIVE}
+              </option>
+              <option value="ultra">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.ULTRA}
+              </option>
             </select>
           </div>
 
@@ -187,16 +207,22 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
               htmlFor="goal"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Ціль
+              {SETTINGS_TEXTS.PERSONAL_INFO_FORM.GOAL}
             </label>
             <select
               id="goal"
               {...register("goal")}
               className="w-full px-4 py-3 rounded-xl border"
             >
-              <option value="lose">Скинути вагу</option>
-              <option value="maintain">Підтримувати вагу</option>
-              <option value="gain">Набрати м&apos;язову масу</option>
+              <option value="lose">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.LOSE}
+              </option>
+              <option value="maintain">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.MAINTAIN}
+              </option>
+              <option value="gain">
+                {SETTINGS_TEXTS.PERSONAL_INFO_FORM.GAIN}
+              </option>
             </select>
           </div>
         </div>
@@ -206,7 +232,7 @@ export function PersonalInfoForm({ initialData }: PersonalInfoFormProps) {
             {isSubmitting ? (
               <SimpleRiseSpinner className="w-[67px]" />
             ) : (
-              "Зберегти"
+              SETTINGS_TEXTS.PERSONAL_INFO_FORM.SAVE_BUTTON
             )}
           </Button>
         </div>

@@ -9,20 +9,17 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Link from "next/link";
 import { Button } from "@/components/ui";
+import { AUTH_TEXTS } from "@/components/shared/(texts)/auth-texts";
 
 // Schema for Magic Link (email only)
 const magicLinkSchema = z.object({
-  email: z
-    .string()
-    .email({ message: "Будь ласка, введіть дійсну адресу електронної пошти" }),
+  email: z.string().email({ message: AUTH_TEXTS.Z_EMAIL }),
 });
 
 // Schema for password sign-in
 const passwordSchema = z.object({
-  email: z
-    .string()
-    .email({ message: "Будь ласка, введіть дійсну адресу електронної пошти" }),
-  password: z.string().min(1, { message: "Пароль не може бути порожнім" }),
+  email: z.string().email({ message: AUTH_TEXTS.Z_EMAIL }),
+  password: z.string().min(1, { message: AUTH_TEXTS.SIGN_IN.Z_PASSWORD }),
 });
 
 type MagicLinkSchema = z.infer<typeof magicLinkSchema>;
@@ -48,24 +45,23 @@ const MagicLinkForm = () => {
     });
 
     if (error) {
-      toast.error(`Error: ${error.message}`);
-    } else {
-      toast.success(
-        "Перевірте свою електронну пошту, щоб отримати посилання для входу!",
-        {
-          duration: 6000,
-        }
+      toast.error(
+        `${AUTH_TEXTS.SIGN_IN.MAGIC_LINK_TOAST_ERROR} ${error.message}`
       );
+    } else {
+      toast.success(AUTH_TEXTS.SIGN_IN.MAGIC_LINK_TOAST_SUCCESS, {
+        duration: 6000,
+      });
     }
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <p className="text-center text-sm text-gray-500">
-        Введіть свою електронну пошту, щоб отримати миттєве посилання для входу.
+        {AUTH_TEXTS.SIGN_IN.ENTER_YOUR_MAIL}
       </p>
       <div>
-        <label htmlFor="email">Email</label>
+        <label htmlFor="email">{AUTH_TEXTS.EMAIL}</label>
         <input
           id="email"
           type="email"
@@ -78,7 +74,9 @@ const MagicLinkForm = () => {
         )}
       </div>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Відправляю..." : "Отримати магічне посилання"}
+        {isSubmitting
+          ? AUTH_TEXTS.SIGN_IN.MAGIC_BUTTON_LOADING
+          : AUTH_TEXTS.SIGN_IN.MAGIC_BUTTON_SUBMIT}
       </Button>
     </form>
   );
@@ -103,9 +101,11 @@ const PasswordForm = () => {
     });
 
     if (error) {
-      toast.error(`Помилка входу: ${error.message}`);
+      toast.error(
+        `${AUTH_TEXTS.SIGN_IN.PASSWORD_FORM_TOAST_ERROR} ${error.message}`
+      );
     } else {
-      toast.success("Вхід успішний! Виконується перенаправлення");
+      toast.success(AUTH_TEXTS.SIGN_IN.PASSWORD_FORM_TOAST_SUCCESS);
       router.push("/dashboard");
       router.refresh();
     }
@@ -114,7 +114,7 @@ const PasswordForm = () => {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
       <div>
-        <label htmlFor="email_pass">Email</label>
+        <label htmlFor="email_pass">{AUTH_TEXTS.EMAIL}</label>
         <input
           id="email_pass"
           type="email"
@@ -126,7 +126,7 @@ const PasswordForm = () => {
         )}
       </div>
       <div>
-        <label htmlFor="password">Пароль</label>
+        <label htmlFor="password">{AUTH_TEXTS.PASSWORD}</label>
         <input
           id="password"
           type="password"
@@ -138,7 +138,9 @@ const PasswordForm = () => {
         )}
       </div>
       <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? "Виконується вхід..." : "Увійти"}
+        {isSubmitting
+          ? AUTH_TEXTS.SIGN_IN.PASSWORD_BUTTON_LOADING
+          : AUTH_TEXTS.SIGN_IN.PASSWORD_BUTTON_SUBMIT}
       </Button>
     </form>
   );
@@ -158,19 +160,18 @@ export default function SignInPage() {
     });
 
     if (error) {
-      toast.error(`Помилка входу через Google: ${error.message}`);
+      toast.error(`${AUTH_TEXTS.SIGN_IN.GOOGLE_TOAST_ERROR} ${error.message}`);
     }
   };
 
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">
-        Увійти до свого облікового запису
+        {AUTH_TEXTS.SIGN_IN.TITLE}
       </h1>
 
       {view === "magic_link" ? <MagicLinkForm /> : <PasswordForm />}
 
-      {/* View switcher */}
       <div className="text-center mt-4">
         <a
           href="#"
@@ -181,19 +182,19 @@ export default function SignInPage() {
           className="text-sm font-medium text-orange-500 hover:underline"
         >
           {view === "magic_link"
-            ? "Увійти за допомогою пароля"
-            : 'Увійти за допомогою "магічного" посилання'}
+            ? AUTH_TEXTS.SIGN_IN.ENTER_WITH_PASSWORD
+            : AUTH_TEXTS.SIGN_IN.ENTER_WITH_MAGIC_LINK}
         </a>
       </div>
 
-      {/* Divider */}
       <div className="relative flex py-5 items-center">
         <div className="flex-grow border-t border-gray-300" />
-        <span className="flex-shrink mx-4 text-gray-400 text-sm">АБО</span>
+        <span className="flex-shrink mx-4 text-gray-400 text-sm">
+          {AUTH_TEXTS.SIGN_IN.OR}
+        </span>
         <div className="flex-grow border-t border-gray-300" />
       </div>
 
-      {/* Google Sign-In */}
       <Button
         variant="outline"
         onClick={handleSignInWithGoogle}
@@ -217,17 +218,17 @@ export default function SignInPage() {
             d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.574l6.19,5.238C42.022,35.244,44,30.036,44,24C44,22.659,43.862,21.35,43.611,20.083z"
           ></path>
         </svg>
-        Продовжити через Google
+        {AUTH_TEXTS.SIGN_IN.CONTINUE_WITH_GOOGLE}
       </Button>
 
       {/* Sign-up link */}
       <p className="text-center text-sm text-gray-600 mt-8">
-        Немає облікового запису?
+        {AUTH_TEXTS.SIGN_IN.NO_ACCOUNT_TEXT}{" "}
         <Link
           href="/sign-up"
           className="font-medium text-orange-500 hover:underline"
         >
-          Зареєструватися зараз
+          {AUTH_TEXTS.SIGN_IN.NO_ACCOUNT_LINK}
         </Link>
       </p>
     </div>

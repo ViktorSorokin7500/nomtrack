@@ -32,7 +32,6 @@ export default async function PricingPage() {
             Спробуйте всі функції NomTrack. Скасуйте підписку в будь-який час.
           </p>
         </div>
-        {/* 2. Centering the single pricing card. */}
         <div className="flex justify-center">
           <PricingCard {...planData} />
         </div>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Card } from "../shared";
+import { SETTINGS_TEXTS } from "./settings-text";
 
 export function ProfileSidebar({
   userName,
@@ -12,22 +13,22 @@ export function ProfileSidebar({
 }) {
   const navItems = [
     {
-      label: "Особисті дані",
+      label: SETTINGS_TEXTS.PROFILE_SIDEBAR.PERSONAL_INFO,
       href: "#personal-info",
       icon: "M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z",
     },
     {
-      label: "Історія",
+      label: SETTINGS_TEXTS.PROFILE_SIDEBAR.ARCHIVE,
       href: "/archive",
       icon: "M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z",
     },
     {
-      label: "Приватність і безпека",
+      label: SETTINGS_TEXTS.PROFILE_SIDEBAR.PRIVACY_SECURITY,
       href: "/privacy-security",
       icon: "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
     },
     {
-      label: "Допомога та підтримка",
+      label: SETTINGS_TEXTS.PROFILE_SIDEBAR.HELP_SUPPORT,
       href: "/help",
       icon: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
     },
@@ -40,7 +41,9 @@ export function ProfileSidebar({
           <div />
         </div>
         <div>
-          <h2 className="font-semibold text-lg">{userName || "Користувач"}</h2>
+          <h2 className="font-semibold text-lg">
+            {userName || SETTINGS_TEXTS.PROFILE_SIDEBAR.ANONYMOUS}
+          </h2>
           <p className="text-gray-500 text-sm">{userEmail}</p>
         </div>
       </div>
@@ -51,7 +54,7 @@ export function ProfileSidebar({
               <Link
                 href={item.href}
                 className={`flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${
-                  item.label === "Особисті дані"
+                  item.label === SETTINGS_TEXTS.PROFILE_SIDEBAR.PERSONAL_INFO
                     ? "bg-orange-50 bg-opacity-10 text-orange-400"
                     : "text-gray-600 hover:bg-gray-100"
                 }`}

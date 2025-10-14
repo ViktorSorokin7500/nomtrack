@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link"; // <-- ІМПОРТ КОМПОНЕНТА Link
 import { Gem } from "lucide-react";
+import { SHARED_TEXTS } from "./(texts)/shared-text";
 
 interface PremiumCountdownProps {
   expiresAt: string | null;
@@ -25,7 +26,7 @@ export function PremiumCountdown({ expiresAt }: PremiumCountdownProps) {
 
       // Якщо час вийшов
       if (difference <= 0) {
-        setTimeLeft("Преміум вичерпано");
+        setTimeLeft(SHARED_TEXTS.PREMIUM.TIME_OUT);
         return;
       }
 
@@ -35,21 +36,20 @@ export function PremiumCountdown({ expiresAt }: PremiumCountdownProps) {
 
       let formattedTime = "";
       if (days > 0) {
-        formattedTime = `${days} дн. ${hours} год.`;
+        formattedTime = `${days} ${SHARED_TEXTS.PREMIUM.DAYS} ${hours} ${SHARED_TEXTS.PREMIUM.HOURS}`;
       } else if (hours > 0) {
-        formattedTime = `${hours} год. ${minutes} хв.`;
+        formattedTime = `${hours} ${SHARED_TEXTS.PREMIUM.HOURS} ${minutes} ${SHARED_TEXTS.PREMIUM.MINUTES}`;
       } else if (minutes > 0) {
-        formattedTime = `${minutes} хв.`;
+        formattedTime = `${minutes} ${SHARED_TEXTS.PREMIUM.MINUTES}`;
       } else {
-        formattedTime = "Менше хвилини";
+        formattedTime = SHARED_TEXTS.PREMIUM.LESS_THAN_MINUTE;
       }
 
       setTimeLeft(formattedTime);
     };
 
     updateCountdown();
-    const intervalId = setInterval(updateCountdown, 60000); // Оновлюємо щохвилини
-
+    const intervalId = setInterval(updateCountdown, 60000);
     return () => clearInterval(intervalId);
   }, [expiresAt]);
 
@@ -59,30 +59,30 @@ export function PremiumCountdown({ expiresAt }: PremiumCountdownProps) {
     ? Math.ceil((expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))
     : null;
 
-  // Компонент не відображається, якщо до закінчення більше 5 днів
   if (daysRemaining === null || daysRemaining > 5) {
     return null;
   }
 
-  const isExpired = timeLeft === "Преміум вичерпано";
+  const isExpired = timeLeft === SHARED_TEXTS.PREMIUM.TIME_OUT;
 
   return (
     <div className="flex justify-center items-center gap-1 text-sm text-yellow-600 font-semibold bg-yellow-100 px-3 py-1 rounded-full">
       <Gem size={4} />
-      {/* Умовний рендеринг залежно від статусу */}
       {isExpired ? (
         <span>
-          Ваша підписка вичерпана.{" "}
+          {SHARED_TEXTS.PREMIUM.PREMIUM_EXPIRED}{" "}
           <Link
             href="/pricing"
             className="underline text-blue-400 hover:text-sky-600"
           >
-            Продовжіть
+            {SHARED_TEXTS.PREMIUM.RENEW}
           </Link>
-          , щоб отримати доступ до функцій ШІ.
+          , {SHARED_TEXTS.PREMIUM.RENEWAL_PROMPT}
         </span>
       ) : (
-        <span>Залишилось: {timeLeft}</span>
+        <span>
+          {SHARED_TEXTS.PREMIUM.PREMIUM_EXPIRES_IN} {timeLeft}
+        </span>
       )}
     </div>
   );

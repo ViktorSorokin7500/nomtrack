@@ -1,4 +1,3 @@
-// components/dashboard/ai-coach-card.tsx
 "use client";
 
 import { useForm, useWatch } from "react-hook-form";
@@ -16,34 +15,35 @@ import { ActivityEntryCard } from "./activity-entry-card";
 import toast from "react-hot-toast";
 import { Coins, Dumbbell, Flame } from "lucide-react";
 import { DbSavedWorkout } from "@/types";
+import { DASHBOARD_TEXTS } from "./dashboard-text";
+import { AI_REQUEST } from "@/lib/const";
 
-// ---- schema ----
 const activitySchema = z
   .object({
-    mode: z.enum(["ai", "manual", "planned", "saved"]), // <-- Додаємо 'saved'
+    mode: z.enum(["ai", "manual", "planned", "saved"]),
     text: z.string().optional(),
     calories: z.coerce.number().optional(),
-    selected_workout_id: z.string().optional(), // <-- Нове поле для ID
+    selected_workout_id: z.string().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.mode === "ai" && (!data.text || data.text.trim().length < 3)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Будь ласка, опишіть вашу активність для аналізу.",
+        message: DASHBOARD_TEXTS.AI_COACH_CARD.Z_ACTIVITY,
         path: ["text"],
       });
     }
     if (data.mode === "manual" && (!data.calories || data.calories <= 0)) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Будь ласка, вкажіть спалені калорії.",
+        message: DASHBOARD_TEXTS.AI_COACH_CARD.Z_CALORIES,
         path: ["calories"],
       });
     }
     if (data.mode === "saved" && !data.selected_workout_id) {
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
-        message: "Будь ласка, оберіть збережене тренування.",
+        message: DASHBOARD_TEXTS.AI_COACH_CARD.Z_SELECT_WORKOUT,
         path: ["selected_workout_id"],
       });
     }
@@ -64,14 +64,13 @@ interface AICoachCardProps {
     estimated_calories_burned: number;
     exercises: { name: string }[];
   } | null;
-  savedWorkouts: DbSavedWorkout[]; // <-- Додаємо новий prop
+  savedWorkouts: DbSavedWorkout[];
 }
 
-// ---- component ----
 export function AICoachCard({
   activityLogData,
   todaysWorkout,
-  savedWorkouts, // <-- Отримуємо новий prop
+  savedWorkouts,
 }: AICoachCardProps) {
   const [isPending, startTransition] = useTransition();
 
@@ -109,16 +108,15 @@ export function AICoachCard({
       let result;
       if (data.mode === "planned" && todaysWorkout) {
         result = await logPlannedWorkout({
-          entryText: `${todaysWorkout.type} тренування`,
+          entryText: `${todaysWorkout.type} ${DASHBOARD_TEXTS.AI_COACH_CARD.TRANING} (${todaysWorkout.estimated_calories_burned} ${DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES})`,
           caloriesBurned: todaysWorkout.estimated_calories_burned,
         });
       } else if (data.mode === "manual") {
         result = await logPlannedWorkout({
-          entryText: `Ручний запис (${data.calories} ккал)`,
+          entryText: `${DASHBOARD_TEXTS.AI_COACH_CARD.MANUAL_ENTER} (${data.calories} ${DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES})`,
           caloriesBurned: data.calories!,
         });
       } else if (data.mode === "saved") {
-        // <-- НОВА ЛОГІКА ДЛЯ 'SAVED'
         const selectedWorkout = savedWorkouts.find(
           (w) => String(w.id) === data.selected_workout_id
         );
@@ -128,7 +126,7 @@ export function AICoachCard({
             caloriesBurned: selectedWorkout.estimated_calories_burned,
           });
         } else {
-          toast.error("Вибране тренування не знайдено.");
+          toast.error(DASHBOARD_TEXTS.AI_COACH_CARD.TOAST_ERROR);
           return;
         }
       } else {
@@ -138,7 +136,7 @@ export function AICoachCard({
       if (result?.error) {
         toast.error(result.error);
       } else {
-        toast.success("Активність успішно додано!");
+        toast.success(DASHBOARD_TEXTS.AI_COACH_CARD.TOAST_SUCCESS);
         reset({
           mode: "ai",
           text: "",
@@ -154,7 +152,7 @@ export function AICoachCard({
       (t) => (
         <div className="flex flex-col items-center gap-4">
           <p className="font-semibold">
-            Ви впевнені, що хочете видалити цю активність?
+            {DASHBOARD_TEXTS.AI_COACH_CARD.DELETE_ACTIVITY}
           </p>
           <div className="flex gap-3">
             <button
@@ -164,7 +162,9 @@ export function AICoachCard({
                     if (res.error) {
                       toast.error(res.error);
                     } else {
-                      toast.success(res.success || "Активність видалено!");
+                      toast.success(
+                        res.success || DASHBOARD_TEXTS.AI_COACH_CARD.DELETED
+                      );
                     }
                   });
                 });
@@ -172,13 +172,13 @@ export function AICoachCard({
               }}
               className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
             >
-              Так, видалити
+              {DASHBOARD_TEXTS.AI_COACH_CARD.CONFIRM_DELETE}
             </button>
             <button
               onClick={() => toast.dismiss(t.id)}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border rounded-md hover:bg-gray-50"
             >
-              Скасувати
+              {DASHBOARD_TEXTS.AI_COACH_CARD.CANCEL}
             </button>
           </div>
         </div>
@@ -196,7 +196,9 @@ export function AICoachCard({
     <Card>
       {activityLogData.length > 0 && (
         <div className="py-2 border-b border-gray-200">
-          <h3 className="text-lg font-medium mb-3">Активність за сьогодні</h3>
+          <h3 className="text-lg font-medium mb-3">
+            {DASHBOARD_TEXTS.AI_COACH_CARD.TODAY_ACTIVITY}
+          </h3>
           <div className="space-y-2">
             {activityLogData.map((entry) => (
               <ActivityEntryCard
@@ -211,10 +213,11 @@ export function AICoachCard({
       )}
 
       <div className="py-2">
-        <h2 className="text-xl font-medium mb-4">Відстеження активності</h2>
+        <h2 className="text-xl font-medium mb-4">
+          {DASHBOARD_TEXTS.AI_COACH_CARD.ALL_ACTIVITY}
+        </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {/* radio */}
           <div className="flex gap-2 rounded-lg bg-gray-100 p-1">
             <label className="flex-1 cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm flex justify-center items-center">
               <input
@@ -224,9 +227,9 @@ export function AICoachCard({
                 checked={currentMode === "ai"}
                 className="sr-only"
               />
-              ШІ Аналіз
+              {DASHBOARD_TEXTS.AI_COACH_CARD.AI_ANALISIS}
               <span className="ml-1 text-green-500 flex items-center gap-1">
-                <Coins className="size-4" />
+                <Coins className="size-4" /> {AI_REQUEST}
               </span>
             </label>
 
@@ -238,10 +241,9 @@ export function AICoachCard({
                 checked={currentMode === "manual"}
                 className="sr-only"
               />
-              Ввести вручну
+              {DASHBOARD_TEXTS.AI_COACH_CARD.MANUAL_ENTER}
             </label>
 
-            {/* НОВА РАДІОКНОПКА */}
             {savedWorkouts.length > 0 && (
               <label className="flex-1 cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm flex justify-center items-center">
                 <input
@@ -251,7 +253,7 @@ export function AICoachCard({
                   checked={currentMode === "saved"}
                   className="sr-only"
                 />
-                Мій запис
+                {DASHBOARD_TEXTS.AI_COACH_CARD.MY_ENTER}
               </label>
             )}
           </div>
@@ -276,54 +278,55 @@ export function AICoachCard({
                   <div className="flex items-center space-x-2">
                     <Dumbbell size={20} className="text-orange-600" />
                     <span className="font-semibold">
-                      {todaysWorkout.type} тренування
+                      {todaysWorkout.type}{" "}
+                      {DASHBOARD_TEXTS.AI_COACH_CARD.TRANING}
                     </span>
                   </div>
                   <div className="flex items-center text-red-500 text-sm font-medium">
                     <Flame className="size-4 mr-1" />
-                    {todaysWorkout.estimated_calories_burned} ккал
+                    {todaysWorkout.estimated_calories_burned}{" "}
+                    {DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES}
                   </div>
                 </div>
               </div>
             </label>
           )}
 
-          {/* inputs */}
           {currentMode === "ai" && (
             <textarea
               {...register("text")}
               rows={2}
               className="w-full p-3 border rounded-lg"
-              placeholder="Легкі садові роботи протягом 60 хвилин."
+              placeholder={DASHBOARD_TEXTS.AI_COACH_CARD.AI_PLACEHOLDER}
             />
           )}
           {currentMode === "manual" && (
             <input
               type="number"
               step="1"
-              placeholder="Спалені калорії"
+              placeholder={DASHBOARD_TEXTS.AI_COACH_CARD.MANUAL_PLACEHOLDER}
               {...register("calories", { valueAsNumber: true })}
               className="w-full p-3 border rounded-lg"
             />
           )}
 
-          {/* НОВИЙ ВИПАДАЮЧИЙ СПИСОК */}
           {currentMode === "saved" && savedWorkouts.length > 0 && (
             <select
               {...register("selected_workout_id")}
               className="w-full p-3 border rounded-lg"
             >
-              <option value="">-- Оберіть збережене тренування --</option>
+              <option value="">
+                {DASHBOARD_TEXTS.AI_COACH_CARD.SELECT_WORKOUT}
+              </option>
               {savedWorkouts.map((workout) => (
                 <option key={workout.id} value={workout.id}>
                   {workout.workout_name} ({workout.estimated_calories_burned}{" "}
-                  ккал)
+                  {DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES})
                 </option>
               ))}
             </select>
           )}
 
-          {/* errors */}
           {errors.text && currentMode === "ai" && (
             <p className="text-red-500 text-sm">{errors.text.message}</p>
           )}
@@ -341,7 +344,7 @@ export function AICoachCard({
               {isPending ? (
                 <SimpleRiseSpinner className="w-[53px]" />
               ) : (
-                "Додати"
+                DASHBOARD_TEXTS.AI_COACH_CARD.SUBMIT_BUTTON
               )}
             </Button>
           </div>

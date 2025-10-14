@@ -5,6 +5,7 @@ import { Card } from "../shared";
 import { Button, SimpleRiseSpinner } from "../ui";
 import { addWaterEntry } from "@/app/actions";
 import toast from "react-hot-toast";
+import { DASHBOARD_TEXTS } from "./dashboard-text";
 
 interface WaterTrackerProps {
   currentWater: number;
@@ -28,11 +29,9 @@ export function WaterTrackerCard({
     }
   );
 
-  // 1. Централізована функція, яка тепер містить перевірку
   const handleUpdateWater = async (amount: number) => {
-    // Ця перевірка тепер працює для ВСІХ кнопок та поля вводу
     if (optimisticWater + amount < 0) {
-      toast.error("Water amount cannot be negative.");
+      toast.error(DASHBOARD_TEXTS.WATER_TRACKER_CARD.TOAST_ERROR);
       return;
     }
 
@@ -49,7 +48,6 @@ export function WaterTrackerCard({
   const handleAddCustomAmount = () => {
     const amount = parseInt(customAmount, 10);
     if (!isNaN(amount) && amount !== 0) {
-      // 2. Тепер ця функція просто викликає основний обробник
       handleUpdateWater(amount);
       setCustomAmount("");
     }
@@ -60,16 +58,19 @@ export function WaterTrackerCard({
   return (
     <Card className="bg-white rounded-2xl shadow-lg p-6">
       <h2 className="text-xl font-medium text-stone-900 mb-4">
-        Відстеження води
+        {DASHBOARD_TEXTS.WATER_TRACKER_CARD.TITLE}
       </h2>
 
       <div className="mb-4">
         <div className="flex justify-between items-baseline mb-1">
           <span className="text-lg font-bold text-blue-500">
-            {optimisticWater.toLocaleString("uk-UA")} мл
+            {optimisticWater.toLocaleString("uk-UA")}{" "}
+            {DASHBOARD_TEXTS.WATER_TRACKER_CARD.UNIT_ML}
           </span>
           <span className="text-sm text-gray-500">
-            Ціль: {targetWater.toLocaleString("uk-UA")} мл
+            {DASHBOARD_TEXTS.WATER_TRACKER_CARD.GOAL}{" "}
+            {targetWater.toLocaleString("uk-UA")}{" "}
+            {DASHBOARD_TEXTS.WATER_TRACKER_CARD.UNIT_ML}
           </span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2.5">
@@ -82,7 +83,9 @@ export function WaterTrackerCard({
 
       <div className="space-y-4">
         <div className="text-center">
-          <p className="text-sm text-gray-600 mb-2">Швидко додати:</p>
+          <p className="text-sm text-gray-600 mb-2">
+            {DASHBOARD_TEXTS.WATER_TRACKER_CARD.QUICK_ADD}
+          </p>
           <div className="flex justify-center gap-2">
             {quickAddAmounts.map((amount) => (
               <Button
@@ -93,8 +96,8 @@ export function WaterTrackerCard({
                 disabled={isPending}
                 className="bg-blue-50 hover:bg-blue-100 text-blue-600 border-blue-200"
               >
-                {/* 3. Невеличке покращення: додаємо '+' для позитивних значень */}
-                {amount > 0 ? `+${amount}` : amount} мл
+                {amount > 0 ? `+${amount}` : amount}{" "}
+                {DASHBOARD_TEXTS.WATER_TRACKER_CARD.UNIT_ML}
               </Button>
             ))}
           </div>
@@ -117,7 +120,7 @@ export function WaterTrackerCard({
             {isPending ? (
               <SimpleRiseSpinner className="bg-blue-500 w-[53px]" />
             ) : (
-              "Додати"
+              DASHBOARD_TEXTS.WATER_TRACKER_CARD.SUBMIT_BUTTON
             )}
           </Button>
         </div>

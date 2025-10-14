@@ -17,24 +17,19 @@ export function ProgressRingArchive({
   color,
   scolor,
 }: ProgressRingProps) {
-  const [isHovered, setIsHovered] = useState(false); // <-- НОВЕ: Стан для відстеження наведення
+  const [isHovered, setIsHovered] = useState(false);
 
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
 
-  // 1. Розраховуємо фактичний прогрес (може бути > 1)
   const progress = target > 0 ? current / target : 0;
 
-  // 2. Обмежуємо ВІЗУАЛЬНИЙ прогрес максимумом в 1 (100%)
   const clampedProgress = Math.min(progress, 1);
 
-  // 3. Розраховуємо зсув на основі обмеженого значення
   const dashOffset = circumference * (1 - clampedProgress);
 
-  // 4. (Покращення UX) Визначаємо колір залежно від прогресу
   const ringColor = progress > 1 ? scolor : color;
 
-  // 5. Розраховуємо відсоток і округлюємо його
   const percentage = Math.round(progress * 100);
 
   return (
@@ -52,7 +47,6 @@ export function ProgressRingArchive({
             cy="60"
           />
           <circle
-            // 6. Застосовуємо динамічний колір та анімацію
             className={`${ringColor} transition-colors duration-500`}
             strokeWidth="8"
             stroke="currentColor"
@@ -66,9 +60,9 @@ export function ProgressRingArchive({
           />
         </svg>
         <div
-          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer" // <-- НОВЕ: Додаємо курсор
-          onMouseEnter={() => setIsHovered(true)} // <-- НОВЕ: Встановлюємо стан при наведенні
-          onMouseLeave={() => setIsHovered(false)} // <-- НОВЕ: Скидаємо стан
+          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
         >
           {isHovered ? (
             <span className="text-2xl font-semibold text-stone-900">

@@ -1,4 +1,5 @@
 "use server";
+import { LIB_TEXTS } from "@/components/shared/(texts)/lib-texts";
 import { createClient } from "@/lib/supabase/server";
 import { Supabase } from "@/types";
 export async function getAuthUserOrError() {
@@ -6,7 +7,7 @@ export async function getAuthUserOrError() {
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
-  if (!user) throw new Error("Ви не авторизовані");
+  if (!user) throw new Error(LIB_TEXTS.BILLING_TEXT.NOT_AUTHPRIZED);
   return { supabase: await supabase, user };
 }
 
@@ -18,7 +19,7 @@ export async function checkPremiumStatus(user_id: string, supabase: Supabase) {
     .single();
 
   if (error) {
-    throw new Error("Не вдалося перевірити статус підписки.");
+    throw new Error(LIB_TEXTS.BILLING_TEXT.NOT_FOUND_SUBSCRIBE);
   }
 
   // Перевіряємо, чи підписка існує і чи вона ще не вичерпана
@@ -26,7 +27,7 @@ export async function checkPremiumStatus(user_id: string, supabase: Supabase) {
     !profile?.premium_expires_at ||
     new Date(profile.premium_expires_at) < new Date()
   ) {
-    throw new Error("Ваша підписка вичерпана. Будь ласка, оновіть її.");
+    throw new Error(LIB_TEXTS.BILLING_TEXT.SUBSCRIBE_OFF);
   }
 }
 
@@ -42,14 +43,14 @@ export async function checkCreditsAndDeduct(
     .single();
 
   if (error) {
-    throw new Error("Не вдалося перевірити кількість токенів.");
+    throw new Error(LIB_TEXTS.BILLING_TEXT.NOT_FOUND_TOKENS);
   }
 
   if ((profile?.ai_credits_left || 0) < cost) {
     throw new Error(
-      `Недостатньо токенів. Потрібно: ${cost}, доступно: ${
-        profile?.ai_credits_left || 0
-      }.`
+      `${LIB_TEXTS.BILLING_TEXT.NEED_TOKENS_START} ${cost}, ${
+        LIB_TEXTS.BILLING_TEXT.NEED_TOKENS_END
+      }: ${profile?.ai_credits_left || 0}.`
     );
   }
 
@@ -60,6 +61,6 @@ export async function checkCreditsAndDeduct(
     .eq("id", user_id);
 
   if (updateError) {
-    throw new Error("Не вдалося оновити кількість токенів.");
+    throw new Error(LIB_TEXTS.BILLING_TEXT.CANNOT_REFRESH);
   }
 }

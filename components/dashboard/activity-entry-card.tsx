@@ -1,5 +1,7 @@
 "use client";
 
+import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
+
 interface ActivityEntryCardProps {
   entry: {
     id: number;
@@ -24,7 +26,9 @@ export function ActivityEntryCard({
           <span className="font-bold block text-red-500">
             -{entry.calories_burned}
           </span>
-          <span className="text text-gray-600">ккал</span>
+          <span className="text text-gray-600">
+            {COMMON_TEXTS.UNIT_KILOCALORIE}
+          </span>
         </div>
         <button
           onClick={() => handleDeleteActivity(entry.id)}

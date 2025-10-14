@@ -14,6 +14,7 @@ import {
   NutritionInfo,
 } from "@/types";
 import { revalidatePath } from "next/cache";
+import { ACTIONS_TEXTS } from "@/components/shared/(texts)/actions-texts";
 
 export async function createAndAnalyzeRecipe(formData: {
   recipeName: string;
@@ -22,7 +23,7 @@ export async function createAndAnalyzeRecipe(formData: {
   const { recipeName, ingredientsText } = formData;
 
   if (!recipeName.trim() || !ingredientsText.trim()) {
-    return { error: "Назва та інгредієнти не можуть бути порожніми." };
+    return { error: ACTIONS_TEXTS.DESCRIPTION_EMPTY };
   }
 
   const { supabase, user } = await getAuthUserOrError();
@@ -36,7 +37,7 @@ export async function createAndAnalyzeRecipe(formData: {
       .filter((line) => line.length > 0);
 
     if (initialIngredientLines.length === 0) {
-      return { error: "Список інгредієнтів порожній або некоректний." };
+      return { error: ACTIONS_TEXTS.RECIPES.UMPTY_INGREDIENTS };
     }
 
     // Крок 1: Робимо запит до ШІ з нашим безпечним типом AiRecipeResponse
@@ -45,14 +46,14 @@ export async function createAndAnalyzeRecipe(formData: {
       await getAiJsonResponse<AiRecipeResponse>(batchPrompt);
 
     if (aiError) {
-      return { error: `Помилка аналізу ШІ: ${aiError}` };
+      return { error: `${ACTIONS_TEXTS.AI_ERROR} ${aiError}` };
     }
 
     // Крок 2: ОНОВЛЕНА ЛОГІКА: універсальна обробка відповіді AI
     let normalizedIngredients: NormalizedIngredient[] = [];
 
     if (!aiData) {
-      throw new Error("ШІ повернув порожню відповідь (null).");
+      throw new Error(ACTIONS_TEXTS.RECIPES.UMPTY_AI);
     }
 
     if (Array.isArray(aiData)) {
@@ -70,7 +71,7 @@ export async function createAndAnalyzeRecipe(formData: {
 
     if (!normalizedIngredients || normalizedIngredients.length === 0) {
       return {
-        error: "Не вдалося розпізнати інгредієнти у вашому запиті.",
+        error: ACTIONS_TEXTS.RECIPES.NORMALIZED_ERROR,
       };
     }
 
@@ -98,7 +99,7 @@ export async function createAndAnalyzeRecipe(formData: {
 
         if (!nutritionResponse.ok) {
           console.warn(
-            `Помилка CalorieNinjas для '${item.ingredientName}', ігноруємо.`
+            `${ACTIONS_TEXTS.RECIPES.CN_ERROR_START} '${item.ingredientName}'${ACTIONS_TEXTS.RECIPES.CN_ERROR_END}`
           );
           return {
             calories: 0,
@@ -114,7 +115,7 @@ export async function createAndAnalyzeRecipe(formData: {
           await nutritionResponse.json();
         if (nutritionData.items.length === 0) {
           console.warn(
-            `CalorieNinjas не розпізнав '${item.ingredientName}', ігноруємо.`
+            `${ACTIONS_TEXTS.RECIPES.CN_ERROR_START} '${item.ingredientName}'${ACTIONS_TEXTS.RECIPES.CN_ERROR_END}`
           );
           return {
             calories: 0,
@@ -164,7 +165,7 @@ export async function createAndAnalyzeRecipe(formData: {
     );
 
     if (finalTotals.total_weight_g < 1) {
-      return { error: "Не вдалося визначити вагу інгредієнтів." };
+      return { error: ACTIONS_TEXTS.RECIPES.WEIGHT_ERROR };
     }
 
     // Крок 5: Розраховуємо значення на 100г і готуємо дані для збереження
@@ -189,24 +190,23 @@ export async function createAndAnalyzeRecipe(formData: {
       .insert([recipeData]);
 
     if (insertError) {
-      throw new Error(
-        "Помилка збереження рецепта в БД: " + insertError.message
-      );
+      throw new Error(ACTIONS_TEXTS.ERROR_DB_SAVE + insertError.message);
     }
 
     revalidatePath("/recipes");
-    return { success: `Рецепт "${recipeName}" успішно збережено!` };
+    return {
+      success: `${ACTIONS_TEXTS.RECIPES.RECIPE_START} "${recipeName}" ${ACTIONS_TEXTS.RECIPES.RECIPE_END}`,
+    };
   } catch (error) {
-    let errorMessage = "Сталася невідома помилка.";
+    let errorMessage = ACTIONS_TEXTS.SERVER_ERROR;
     if (error instanceof Error) errorMessage = error.message;
-    console.error("Повна помилка в createAndAnalyzeRecipe:", error);
     return { error: errorMessage };
   }
 }
 
 export async function deleteRecipe(recipeId: string) {
   if (!recipeId) {
-    return { error: "ID рецепта не вказано." };
+    return { error: ACTIONS_TEXTS.RECIPES.NOT_FOUND_ID };
   }
 
   const { supabase, user } = await getAuthUserOrError();
@@ -218,12 +218,11 @@ export async function deleteRecipe(recipeId: string) {
     .eq("user_id", user.id);
 
   if (error) {
-    console.error("Помилка видалення рецепта:", error);
-    return { error: "Не вдалося видалити рецепт." };
+    return { error: ACTIONS_TEXTS.RECIPES.DELETED_ERROR };
   }
 
   // Оновлюємо кеш сторінки, щоб список оновився
   revalidatePath("/recipes");
 
-  return { success: "Рецепт успішно видалено." };
+  return { success: ACTIONS_TEXTS.RECIPES.RECEPE_ADD_SUCCESS };
 }

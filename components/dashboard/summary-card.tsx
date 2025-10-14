@@ -5,6 +5,7 @@ import { Card } from "../shared";
 import { Button, SimpleRiseSpinner } from "../ui";
 import { addWeightEntry } from "@/app/actions"; // Імпортуємо нову дію
 import toast from "react-hot-toast";
+import { DASHBOARD_TEXTS } from "./dashboard-text";
 
 interface SummaryCardProps {
   currentWeight: number | null;
@@ -17,8 +18,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
   const handleAddWeight = () => {
     const weightValue = parseFloat(weightInput);
     if (!weightValue || weightValue <= 0) {
-      toast.error("Please enter a valid weight");
-      // alert("Введіть коректну вагу.");
+      toast.error(DASHBOARD_TEXTS.SUMMARY_CARD.TOAST_ERROR);
       return;
     }
 
@@ -27,8 +27,10 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
       if (result?.error) {
         toast.success("Error: " + result.error);
       } else {
-        setWeightInput(""); // Очищуємо поле після успішного збереження
-        toast.success(result.success || "Weight saved successfully!");
+        setWeightInput("");
+        toast.success(
+          result.success || DASHBOARD_TEXTS.SUMMARY_CARD.TOAST_SUCCESS
+        );
       }
     });
   };
@@ -36,7 +38,9 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
   return (
     <Card className="max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-medium text-stone-900">Прогрес ваги</h2>
+        <h2 className="text-xl font-medium text-stone-900">
+          {DASHBOARD_TEXTS.SUMMARY_CARD.TITLE}
+        </h2>
         <div className="text-sm text-gray-500">
           {new Date().toLocaleDateString("uk-UA")}
         </div>
@@ -45,17 +49,19 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
       <div className="mb-8">
         <div className="bg-green-100 rounded-xl p-4">
           <div className="flex items-center">
-            <div className="bg-green-200 rounded-full p-2 mr-3">
-              {/* SVG icon */}
-            </div>
+            <div className="bg-green-200 rounded-full p-2 mr-3" />
             <div className="flex-1">
-              <h4 className="font-medium text-stone-900">Відстеження ваги</h4>
+              <h4 className="font-medium text-stone-900">
+                {DASHBOARD_TEXTS.SUMMARY_CARD.WEIGHT_PROGRESS}
+              </h4>
               <div className="text-xs text-gray-600 mt-1">
-                Поточна вага:
+                {DASHBOARD_TEXTS.SUMMARY_CARD.CURRENT_WEIGHT}:
                 <span className="font-bold ml-1">
                   {currentWeight
-                    ? `${currentWeight.toLocaleString("uk-UA")} кг`
-                    : "N/A"}
+                    ? `${currentWeight.toLocaleString("uk-UA")} ${
+                        DASHBOARD_TEXTS.SUMMARY_CARD.UNIT_KG
+                      }`
+                    : DASHBOARD_TEXTS.SUMMARY_CARD.NOT_AVAILABLE}
                 </span>
               </div>
             </div>
@@ -65,7 +71,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
 
       <div className="bg-blue-50 rounded-xl p-4">
         <h3 className="font-medium text-stone-900 mb-3">
-          Записати сьогоднішню вагу
+          {DASHBOARD_TEXTS.SUMMARY_CARD.ENTER_TODAY_WEIGHT}
         </h3>
         <div className="flex items-end gap-3">
           <div className="flex-grow">
@@ -73,7 +79,8 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
               htmlFor="weightInput"
               className="block text-sm font-medium text-gray-700 mb-1"
             >
-              Вага (кг)
+              {DASHBOARD_TEXTS.SUMMARY_CARD.WEIGHT} (
+              {DASHBOARD_TEXTS.SUMMARY_CARD.UNIT_KG})
             </label>
             <input
               id="weightInput"
@@ -93,7 +100,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
             {isPending ? (
               <SimpleRiseSpinner className="w-[67px]" />
             ) : (
-              "Зберегти"
+              DASHBOARD_TEXTS.SUMMARY_CARD.SAVE_BUTTON
             )}
           </Button>
         </div>

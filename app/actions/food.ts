@@ -10,13 +10,14 @@ import { getAiJsonResponse } from "@/lib/ai";
 import { FoodEntryFormSchema, foodEntrySchema } from "@/lib/validators";
 import { Ingredient, NutritionInfo } from "@/types";
 import { revalidatePath } from "next/cache";
+import { ACTIONS_TEXTS } from "@/components/shared/(texts)/actions-texts";
 
 export async function analyzeAndSaveFoodEntry(formData: {
   text: string;
   mealType: string;
 }) {
   const { text, mealType } = formData;
-  if (!text.trim()) return { error: "Текст не може бути порожнім" };
+  if (!text.trim()) return { error: ACTIONS_TEXTS.DESCRIPTION_EMPTY };
 
   const { supabase, user } = await getAuthUserOrError();
 
@@ -30,12 +31,12 @@ export async function analyzeAndSaveFoodEntry(formData: {
     }>(ingredientPrompt);
 
     if (error) {
-      return { error: `Помилка аналізу ШІ: ${error}` };
+      return { error: ACTIONS_TEXTS.AI_ERROR + error };
     }
 
     const ingredients = data?.ingredients;
     if (!ingredients || ingredients.length === 0) {
-      return { error: "Не вдалося знайти інгредієнти у вашому запиті." };
+      return { error: ACTIONS_TEXTS.FOOD.NO_INGREDIENTS };
     }
 
     const query = ingredients
@@ -53,7 +54,9 @@ export async function analyzeAndSaveFoodEntry(formData: {
 
     if (!nutritionResponse.ok) {
       throw new Error(
-        `Помилка API CalorieNinjas: ${await nutritionResponse.text()}`
+        `${
+          ACTIONS_TEXTS.FOOD.NUTRITION_ERROR
+        } ${await nutritionResponse.text()}`
       );
     }
 
@@ -92,14 +95,13 @@ export async function analyzeAndSaveFoodEntry(formData: {
     ]);
 
     if (insertError)
-      throw new Error("Помилка збереження в БД: " + insertError.message);
+      throw new Error(ACTIONS_TEXTS.ERROR_DB_SAVE + insertError.message);
 
     revalidatePath("/dashboard");
-    return { success: "Запис успішно додано!" };
+    return { success: ACTIONS_TEXTS.ADDED_SUCCESS };
   } catch (error) {
-    let errorMessage = "Сталася невідома помилка.";
+    let errorMessage = ACTIONS_TEXTS.SERVER_ERROR;
     if (error instanceof Error) errorMessage = error.message;
-    console.error("Повна помилка в analyzeAndSaveFoodEntry:", error);
     return { error: errorMessage };
   }
 }
@@ -107,13 +109,12 @@ export async function analyzeAndSaveFoodEntry(formData: {
 export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
   const validationResult = foodEntrySchema.safeParse(entryData);
   if (!validationResult.success) {
-    console.error("Помилка серверної валідації:", validationResult.error);
-    return { error: "Некоректні дані, надіслані на сервер." };
+    return { error: ACTIONS_TEXTS.FOOD.NO_CORRECT_DATA };
   }
 
   // Перевіряємо, що ми в правильному режимі
   if (entryData.entry_mode !== "manual") {
-    return { error: "Неправильний режим для цього екшену" };
+    return { error: ACTIONS_TEXTS.FOOD.NOT_IN_MANUAL_MODE };
   }
 
   const { supabase, user } = await getAuthUserOrError();
@@ -121,9 +122,8 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
   try {
     await checkPremiumStatus(user.id, supabase);
   } catch (e) {
-    let errorMessage = "Не вдалося перевірити підписку.";
+    let errorMessage = ACTIONS_TEXTS.CHECK_PREMIUM_ERROR;
     if (e instanceof Error) errorMessage = e.message;
-    console.error("Помилка перевірки підписки в addManualFoodEntry:", e);
     return { error: errorMessage };
   }
 
@@ -149,7 +149,6 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       sugar_g: 0,
     };
 
-    // --- ЛОГІКА РОЗРАХУНКУ ---
     if (calc_mode === "per100g") {
       const multiplier = (weight_eaten || 0) / 100;
       finalData.calories = (calories || 0) * multiplier;
@@ -158,7 +157,6 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       finalData.carbs_g = (carbs_g || 0) * multiplier;
       finalData.sugar_g = (sugar_g || 0) * multiplier;
     } else {
-      // Режим "на порцію"
       const servingsCount = servings || 1;
       finalData.calories = (calories || 0) * servingsCount;
       finalData.protein_g = (protein_g || 0) * servingsCount;
@@ -184,18 +182,16 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       .insert([dataToInsert]);
 
     if (error) {
-      console.error("ПОМИЛКА ЗАПИСУ В SUPABASE:", error);
-      return { error: "Помилка бази даних: " + error.message };
+      return { error: ACTIONS_TEXTS.ERROR_DB_SAVE + error.message };
     }
 
     revalidatePath("/dashboard");
-    return { success: "Запис успішно додано!" };
+    return { success: ACTIONS_TEXTS.ADDED_SUCCESS };
   } catch (e) {
-    console.error("КРИТИЧНА ПОМИЛКА В ЕКШЕНІ addManualFoodEntry:", e);
     if (e instanceof Error) {
-      return { error: `Невідома помилка на сервері: ${e.message}` };
+      return { error: ACTIONS_TEXTS.SERVER_ERROR + e.message };
     }
-    return { error: "Невідома помилка на сервері." };
+    return { error: ACTIONS_TEXTS.SERVER_ERROR };
   }
 }
 
@@ -217,11 +213,13 @@ export async function addWaterEntry(amount: number) {
   ]);
 
   if (error) {
-    return { error: "Не вдалося додати запис: " + error.message };
+    return { error: ACTIONS_TEXTS.FOOD.NOT_ADDED + error.message };
   }
 
   revalidatePath("/dashboard");
-  return { success: `Додано ${amount} мл води!` };
+  return {
+    success: `${ACTIONS_TEXTS.FOOD.ADDED_START} ${amount} ${ACTIONS_TEXTS.FOOD.ADDED_END}`,
+  };
 }
 
 export async function deleteFoodEntry(entryId: number) {
@@ -235,16 +233,16 @@ export async function deleteFoodEntry(entryId: number) {
       .eq("id", entryId);
 
     if (error) {
-      return { error: "Помилка бази даних: " + error.message };
+      return { error: ACTIONS_TEXTS.ERROR_DB_SAVE + error.message };
     }
     revalidatePath("/dashboard");
 
-    return { success: "Запис видалено!" };
+    return { success: ACTIONS_TEXTS.DELETE_SUCCESS };
   } catch (e) {
     if (e instanceof Error) {
-      return { error: `Невідома помилка на сервері: ${e.message}` };
+      return { error: ACTIONS_TEXTS.SERVER_ERROR + e.message };
     }
-    return { error: "Невідома помилка на сервері." };
+    return { error: ACTIONS_TEXTS.SERVER_ERROR };
   }
 }
 
@@ -262,11 +260,9 @@ export async function searchGlobalFood(searchTerm: string) {
     });
 
     if (error) {
-      console.error("Помилка пошуку в БД:", error);
-      return { error: "Не вдалося знайти продукти. Спробуйте пізніше." };
+      return { error: ACTIONS_TEXTS.FOOD.NO_PRODUCTS_FOUND };
     }
 
-    // Прибираємо зайві дані, залишаємо тільки потрібні поля
     const formattedData = data.map(
       (item: {
         id: number;
@@ -287,10 +283,8 @@ export async function searchGlobalFood(searchTerm: string) {
 
     return { success: formattedData };
   } catch (e) {
-    let errorMessage = "Не вдалося перевірити підписку.";
+    let errorMessage = ACTIONS_TEXTS.CONNOT_CHECK_PREMIUM;
     if (e instanceof Error) errorMessage = e.message;
-    console.error("Повна помилка в searchGlobalFood:", e);
-    // ЗМІНА: Повертаємо об'єкт з помилкою
     return { error: errorMessage };
   }
 }
