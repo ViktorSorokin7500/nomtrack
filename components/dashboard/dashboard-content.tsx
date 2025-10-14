@@ -2,13 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 import { DbSavedWorkout, WorkoutPlan } from "@/types";
+import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
 import {
   LazyAICoachCard,
   LazyNutritionDashboard,
   LazySummaryCard,
   LazyWaterTracker,
-} from ".";
-import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
+} from "./lazy";
 
 export async function DashboardContent() {
   const supabase = createClient();

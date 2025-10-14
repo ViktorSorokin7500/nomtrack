@@ -59,7 +59,7 @@ export function MealCard({
     defaultValues: {
       entry_mode: "ai",
       calc_mode: "per100g",
-      meal_type: "",
+      meal_type: "snack",
       selected_recipe_id: "",
       entry_text: "",
     },
@@ -455,19 +455,23 @@ export function MealCard({
             </div>
           )}
 
-          <select
-            {...register("meal_type")}
-            className="w-full px-4 py-3 rounded-xl border border-gray-300"
-          >
-            <option value="" disabled>
-              {DASHBOARD_TEXTS.MEAL_CARD.OPTIONS}
-            </option>
+          <div className="flex gap-1 rounded-lg bg-gray-100 p-1">
             {availableMealTypes.map((meal) => (
-              <option key={meal.value} value={meal.value}>
+              <label
+                key={meal.value}
+                className="flex-1 cursor-pointer p-2 rounded-lg has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm flex justify-center items-center font-medium"
+              >
+                <input
+                  type="radio"
+                  value={meal.value}
+                  {...register("meal_type")}
+                  className="sr-only"
+                />
                 {meal.label}
-              </option>
+              </label>
             ))}
-          </select>
+          </div>
+
           {errors.meal_type && (
             <p className="text-red-500 text-sm">{errors.meal_type.message}</p>
           )}

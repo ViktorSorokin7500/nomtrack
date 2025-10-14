@@ -4,7 +4,3 @@ export { NutritionDashboard } from "./nutrition-dashboard";
 export { WaterTrackerCard } from "./water-tracker";
 export { DashboardSkeleton } from "./dashboard-skeleton";
 export { DashboardContent } from "./dashboard-content";
-export { LazyAICoachCard } from "./lazy-ai-coach-card";
-export { LazySummaryCard } from "./lazy-summary-card";
-export { LazyNutritionDashboard } from "./lazy-nutrition-dashboard";
-export { LazyWaterTracker } from "./lazy-water-tracker";
