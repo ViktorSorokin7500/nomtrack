@@ -5,6 +5,7 @@ import { Modal } from "../ui";
 import { deleteRecipe } from "@/app/actions";
 import toast from "react-hot-toast";
 import { RECIPES_TEXTS } from "./recipes-text";
+import { capitalize } from "@/utils/stringExtensions";
 
 type Recipe = {
   id: string;
@@ -79,7 +80,7 @@ export function RecipeList({ recipes }: RecipeListProps) {
               <div className="flex-grow">
                 <h3 className="font-bold">{recipe.recipe_name}</h3>
                 <p className="text-sm text-gray-500">
-                  {RECIPES_TEXTS.PER_100G.capitalize()}: {recipe.total_weight_g}
+                  {capitalize(RECIPES_TEXTS.PER_100G)}: {recipe.total_weight_g}
                   {RECIPES_TEXTS.UNIT_GRAM}: {recipe.calories_per_100g}{" "}
                   {RECIPES_TEXTS.UNIT_KILOCALORIE},{" "}
                   {RECIPES_TEXTS.PROTEIN_SHORT}: {recipe.protein_per_100g}

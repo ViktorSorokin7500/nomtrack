@@ -33,7 +33,7 @@ export const LoadingNutritionDashboard = () => (
           <div>
             <div className="flex justify-between mb-1">
               <span className="text-sm font-medium text-gray-600">
-                {DASHBOARD_TEXTS.DASHBOARD_SKELETON.CARBS}
+                {DASHBOARD_TEXTS.DASHBOARD_SKELETON.CARBOHYDRATE}
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2" />

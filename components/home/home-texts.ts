@@ -1,5 +1,6 @@
 import "@/utils/stringExtensions";
 import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
+import { capitalize } from "@/utils/stringExtensions";
 
 export const HOME_TEXTS = {
   HERO_SECTION: {
@@ -68,22 +69,22 @@ export const HOME_TEXTS = {
 
     CARD_DATA: [
       {
-        title: COMMON_TEXTS.CALORIES.capitalize(),
+        title: capitalize(COMMON_TEXTS.CALORIES),
         description:
           "Енергія, що живить ваш день. Nomtrack допоможе знайти правильний баланс для досягнення ваших цілей.",
       },
       {
-        title: COMMON_TEXTS.PROTEIN.capitalize(),
+        title: capitalize(COMMON_TEXTS.PROTEIN),
         description:
           "Основні будівельні блоки для м'язів і тканин. Важливі для відновлення, сили та відчуття ситості.",
       },
       {
-        title: COMMON_TEXTS.CARBOHYDRATE.capitalize(),
+        title: capitalize(COMMON_TEXTS.CARBOHYDRATE),
         description:
           "Головне джерело енергії для вашого тіла. Обирайте складні вуглеводи для стабільної, чистої енергії протягом дня.",
       },
       {
-        title: COMMON_TEXTS.FAT.capitalize(),
+        title: capitalize(COMMON_TEXTS.FAT),
         description:
           "Життєво важливі для вироблення гормонів, здоров'я мозку та засвоєння вітамінів. Здорові жири — ваші друзі.",
       },

@@ -3,10 +3,10 @@
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTransition, useEffect } from "react";
+import { useTransition, useEffect, useState } from "react";
 import {
   analyzeAndSaveActivityEntry,
-  deleteActivity,
+  deleteEntry,
   logPlannedWorkout,
 } from "@/app/actions";
 import { Card } from "../shared";
@@ -73,6 +73,8 @@ export function AICoachCard({
   savedWorkouts,
 }: AICoachCardProps) {
   const [isPending, startTransition] = useTransition();
+  const [currentTodaysWorkout, setCurrentTodaysWorkout] =
+    useState(todaysWorkout);
 
   const {
     register,
@@ -96,20 +98,23 @@ export function AICoachCard({
   const selectedWorkoutId = useWatch({ control, name: "selected_workout_id" });
 
   useEffect(() => {
-    if (todaysWorkout && todaysWorkout.estimated_calories_burned > 0) {
+    if (
+      currentTodaysWorkout &&
+      currentTodaysWorkout.estimated_calories_burned > 0
+    ) {
       setValue("mode", "planned");
     } else {
       setValue("mode", "ai");
     }
-  }, [todaysWorkout, setValue]);
+  }, [currentTodaysWorkout, setValue]);
 
   const onSubmit = async (data: ActivitySchema) => {
     startTransition(async () => {
       let result;
-      if (data.mode === "planned" && todaysWorkout) {
+      if (data.mode === "planned" && currentTodaysWorkout) {
         result = await logPlannedWorkout({
-          entryText: `${todaysWorkout.type} ${DASHBOARD_TEXTS.AI_COACH_CARD.TRANING} (${todaysWorkout.estimated_calories_burned} ${DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES})`,
-          caloriesBurned: todaysWorkout.estimated_calories_burned,
+          entryText: `${currentTodaysWorkout.type} ${DASHBOARD_TEXTS.AI_COACH_CARD.TRANING} (${currentTodaysWorkout.estimated_calories_burned} ${DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES})`,
+          caloriesBurned: currentTodaysWorkout.estimated_calories_burned,
         });
       } else if (data.mode === "manual") {
         result = await logPlannedWorkout({
@@ -143,6 +148,9 @@ export function AICoachCard({
           calories: undefined,
           selected_workout_id: "",
         });
+        if (data.mode === "planned") {
+          setCurrentTodaysWorkout(null);
+        }
       }
     });
   };
@@ -158,7 +166,7 @@ export function AICoachCard({
             <button
               onClick={() => {
                 startTransition(() => {
-                  deleteActivity(activityId).then((res) => {
+                  deleteEntry("activity_entries", activityId).then((res) => {
                     if (res.error) {
                       toast.error(res.error);
                     } else {
@@ -258,39 +266,40 @@ export function AICoachCard({
             )}
           </div>
 
-          {todaysWorkout && todaysWorkout.estimated_calories_burned > 0 && (
-            <label className="block cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
-              <input
-                type="radio"
-                value="planned"
-                {...register("mode")}
-                checked={currentMode === "planned"}
-                className="sr-only"
-              />
-              <div
-                className={`p-3 rounded-lg border transition-colors ${
-                  currentMode === "planned"
-                    ? "border-orange-500 bg-orange-50"
-                    : "border-gray-200 bg-white"
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2">
-                    <Dumbbell size={20} className="text-orange-600" />
-                    <span className="font-semibold">
-                      {todaysWorkout.type}{" "}
-                      {DASHBOARD_TEXTS.AI_COACH_CARD.TRANING}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-red-500 text-sm font-medium">
-                    <Flame className="size-4 mr-1" />
-                    {todaysWorkout.estimated_calories_burned}{" "}
-                    {DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES}
+          {currentTodaysWorkout &&
+            currentTodaysWorkout.estimated_calories_burned > 0 && (
+              <label className="block cursor-pointer p-2 rounded-md has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm">
+                <input
+                  type="radio"
+                  value="planned"
+                  {...register("mode")}
+                  checked={currentMode === "planned"}
+                  className="sr-only"
+                />
+                <div
+                  className={`p-3 rounded-lg border transition-colors ${
+                    currentMode === "planned"
+                      ? "border-orange-500 bg-orange-50"
+                      : "border-gray-200 bg-white"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Dumbbell size={20} className="text-orange-600" />
+                      <span className="font-semibold">
+                        {currentTodaysWorkout.type}{" "}
+                        {DASHBOARD_TEXTS.AI_COACH_CARD.TRANING}
+                      </span>
+                    </div>
+                    <div className="flex items-center text-red-500 text-sm font-medium">
+                      <Flame className="size-4 mr-1" />
+                      {currentTodaysWorkout.estimated_calories_burned}{" "}
+                      {DASHBOARD_TEXTS.AI_COACH_CARD.UNIT_CALORIES}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </label>
-          )}
+              </label>
+            )}
 
           {currentMode === "ai" && (
             <textarea

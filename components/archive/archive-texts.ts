@@ -1,4 +1,4 @@
-import "@/utils/stringExtensions";
+import { capitalize } from "@/utils/stringExtensions";
 import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
 
 export const ARCHIVE_TEXTS = {
@@ -8,7 +8,7 @@ export const ARCHIVE_TEXTS = {
   BODY_MEASUREMENTS: {
     TITLE: "Вимірювання тіла",
     IMAGE_ALT: "Модель тіла",
-    WEIGHT: COMMON_TEXTS.WEIGHT.capitalize(),
+    WEIGHT: capitalize(COMMON_TEXTS.WEIGHT),
     WAIST: "Талія",
     BELLY: "Живіт",
     UNIT_KG: COMMON_TEXTS.UNIT_KG,
@@ -17,16 +17,16 @@ export const ARCHIVE_TEXTS = {
   },
   DAILY_CARD: {
     CALORIES_CONSUMED: "Калорій (спожито):",
-    WEIGHT: COMMON_TEXTS.WEIGHT.capitalize(),
+    WEIGHT: capitalize(COMMON_TEXTS.WEIGHT),
     UNIT_KG: COMMON_TEXTS.UNIT_KG,
   },
   DAILY_DETAILS: {
-    CALORIES: COMMON_TEXTS.CALORIES.capitalize(),
-    PROTEIN: COMMON_TEXTS.PROTEIN.capitalize(),
-    FAT: COMMON_TEXTS.FAT.capitalize(),
-    CARBOHYDRATE: COMMON_TEXTS.CARBOHYDRATE.capitalize(),
-    SUGAR: COMMON_TEXTS.SUGAR.capitalize(),
-    WATER: COMMON_TEXTS.WATER.capitalize(),
+    CALORIES: capitalize(COMMON_TEXTS.CALORIES),
+    PROTEIN: capitalize(COMMON_TEXTS.PROTEIN),
+    FAT: capitalize(COMMON_TEXTS.FAT),
+    CARBOHYDRATE: capitalize(COMMON_TEXTS.CARBOHYDRATE),
+    SUGAR: capitalize(COMMON_TEXTS.SUGAR),
+    WATER: capitalize(COMMON_TEXTS.WATER),
     UNIT_GRAM: COMMON_TEXTS.UNIT_GRAM,
     UNIT_ML: COMMON_TEXTS.UNIT_ML,
     UNIT_KILOCALORIE: COMMON_TEXTS.UNIT_KILOCALORIE,
@@ -41,10 +41,10 @@ export const ARCHIVE_TEXTS = {
   MONTHLY_SUMMARY_CARD: {
     TITLE: "Середні показники за поточний місяць",
     DESCRIPTION: "Проаналізуйте середній прогрес щодо ваших цілей",
-    CALORIES: COMMON_TEXTS.CALORIES.capitalize(),
-    PROTEIN: COMMON_TEXTS.PROTEIN.capitalize(),
-    FAT: COMMON_TEXTS.FAT.capitalize(),
-    CARBOHYDRATE: COMMON_TEXTS.CARBOHYDRATE.capitalize(),
+    CALORIES: capitalize(COMMON_TEXTS.CALORIES),
+    PROTEIN: capitalize(COMMON_TEXTS.PROTEIN),
+    FAT: capitalize(COMMON_TEXTS.FAT),
+    CARBOHYDRATE: capitalize(COMMON_TEXTS.CARBOHYDRATE),
     UNIT_GRAM: COMMON_TEXTS.UNIT_GRAM,
     UNIT_KILOCALORIE: COMMON_TEXTS.UNIT_KILOCALORIE,
   },

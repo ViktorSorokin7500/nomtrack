@@ -3,9 +3,7 @@ export {
   createAndAnalyzeWorkoutPlan,
   logPlannedWorkout,
   createAndAnalyzeWorkout,
-  deleteActivity,
-  deleteWorkoutPlan,
-  deleteUserWorkout,
+  deleteEntry,
 } from "./activity";
 
 export {

@@ -1,5 +1,5 @@
 "use client";
-import { deleteUserWorkout } from "@/app/actions";
+import { deleteEntry } from "@/app/actions";
 import { useTransition } from "react";
 import toast from "react-hot-toast";
 import { COACH_TEXTS } from "./coach-text";
@@ -18,7 +18,7 @@ export function DeleteWorkoutUser({ id }: { id: number }) {
             <button
               onClick={() => {
                 startTransition(() => {
-                  deleteUserWorkout(activityId).then((res) => {
+                  deleteEntry("user_workouts", activityId).then((res) => {
                     if (res.error) {
                       toast.error(res.error);
                     } else {

@@ -8,7 +8,7 @@ import { uk } from "date-fns/locale";
 import { WorkoutPlan } from "@/types";
 import toast from "react-hot-toast";
 import { useTransition } from "react";
-import { deleteWorkoutPlan } from "@/app/actions";
+import { deleteEntry } from "@/app/actions";
 import { COACH_TEXTS } from "./coach-text";
 
 interface WorkoutPlanCardProps {
@@ -44,7 +44,7 @@ export function WorkoutPlanCard({
             <button
               onClick={() => {
                 startTransition(() => {
-                  deleteWorkoutPlan(activityId).then((res) => {
+                  deleteEntry("workout_plans", activityId).then((res) => {
                     if (res.error) {
                       toast.error(res.error);
                     } else {

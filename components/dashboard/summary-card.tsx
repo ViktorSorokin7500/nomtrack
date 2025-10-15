@@ -55,7 +55,7 @@ export function SummaryCard({ currentWeight }: SummaryCardProps) {
                 {DASHBOARD_TEXTS.SUMMARY_CARD.WEIGHT_PROGRESS}
               </h4>
               <div className="text-xs text-gray-600 mt-1">
-                {DASHBOARD_TEXTS.SUMMARY_CARD.CURRENT_WEIGHT}:
+                {DASHBOARD_TEXTS.SUMMARY_CARD.CURRENT_WEIGHT}
                 <span className="font-bold ml-1">
                   {currentWeight
                     ? `${currentWeight.toLocaleString("uk-UA")} ${

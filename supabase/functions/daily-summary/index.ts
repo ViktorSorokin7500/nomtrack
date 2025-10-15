@@ -117,26 +117,22 @@ Deno.serve(async (_req) => {
         ) || 0;
 
       const baseTargetCalories = profile?.target_calories || 0;
-      const proteinPercentage =
-        baseTargetCalories > 0
-          ? ((profile?.target_protein_g || 0) * 4) / baseTargetCalories
-          : 0;
-      const carbsPercentage =
-        baseTargetCalories > 0
-          ? ((profile?.target_carbs_g || 0) * 4) / baseTargetCalories
-          : 0;
-      const fatPercentage =
-        baseTargetCalories > 0
-          ? ((profile?.target_fat_g || 0) * 9) / baseTargetCalories
-          : 0;
+      const baseTargetProtein = profile?.target_protein_g || 0;
+      const baseTargetCarbs = profile?.target_carbs_g || 0;
+      const baseTargetFat = profile?.target_fat_g || 0;
 
       const targetCalories = baseTargetCalories + burnedCalories;
-      const targetProtein = Math.round(
-        (targetCalories * proteinPercentage) / 4
-      );
-      const targetCarbs = Math.round((targetCalories * carbsPercentage) / 4);
-      const targetFat = Math.round((targetCalories * fatPercentage) / 9);
+      const proteinMultiplier = 0.3;
+      const carbsMultiplier = 0.4;
+      const fatMultiplier = 0.3;
 
+      const addedProteinG = (burnedCalories * proteinMultiplier) / 4;
+      const addedCarbsG = (burnedCalories * carbsMultiplier) / 4;
+      const addedFatG = (burnedCalories * fatMultiplier) / 9;
+
+      const targetProtein = Math.round(baseTargetProtein + addedProteinG);
+      const targetCarbs = Math.round(baseTargetCarbs + addedCarbsG);
+      const targetFat = Math.round(baseTargetFat + addedFatG);
       // Готуємо об'єкт для вставки в архів
       const summaryPayload = {
         user_id: userId,

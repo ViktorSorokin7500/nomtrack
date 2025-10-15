@@ -226,68 +226,31 @@ export async function createAndAnalyzeWorkout(formData: {
   }
 }
 
-export async function deleteActivity(activityId: number) {
+export async function deleteEntry(
+  table: "activity_entries" | "workout_plans" | "user_workouts",
+  entryId: number
+) {
   const { supabase, user } = await getAuthUserOrError();
 
   try {
     const { error } = await (await supabase)
-      .from("activity_entries")
+      .from(table)
       .delete()
       .eq("user_id", user.id)
-      .eq("id", activityId);
+      .eq("id", entryId);
 
     if (error) {
       return { error: ACTIONS_TEXTS.ACTIVITY.DB_ERROR + error.message };
     }
-    revalidatePath("/dashboard");
 
-    return { success: ACTIONS_TEXTS.DELETE_SUCCESS };
-  } catch (e) {
-    if (e instanceof Error) {
-      return { error: `${ACTIONS_TEXTS.SERVER_ERROR}: ${e.message}` };
-    }
-    return { error: ACTIONS_TEXTS.SERVER_ERROR };
-  }
-}
+    // Оновлюємо кеш залежно від того, що було видалено
+    const revalidatePathMap = {
+      activity_entries: "/dashboard",
+      workout_plans: "/coach",
+      user_workouts: "/coach",
+    };
 
-export async function deleteWorkoutPlan(planId: number) {
-  const { supabase, user } = await getAuthUserOrError();
-
-  try {
-    const { error } = await (await supabase)
-      .from("workout_plans")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("id", planId);
-
-    if (error) {
-      return { error: ACTIONS_TEXTS.ACTIVITY.DB_ERROR + error.message };
-    }
-    revalidatePath("/dashboard");
-
-    return { success: ACTIONS_TEXTS.DELETE_SUCCESS };
-  } catch (e) {
-    if (e instanceof Error) {
-      return { error: `${ACTIONS_TEXTS.SERVER_ERROR}: ${e.message}` };
-    }
-    return { error: ACTIONS_TEXTS.SERVER_ERROR };
-  }
-}
-
-export async function deleteUserWorkout(workoutId: number) {
-  const { supabase, user } = await getAuthUserOrError();
-
-  try {
-    const { error } = await (await supabase)
-      .from("user_workouts")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("id", workoutId);
-
-    if (error) {
-      return { error: ACTIONS_TEXTS.ACTIVITY.DB_ERROR + error.message };
-    }
-    revalidatePath("/dashboard");
+    revalidatePath(revalidatePathMap[table]);
 
     return { success: ACTIONS_TEXTS.DELETE_SUCCESS };
   } catch (e) {

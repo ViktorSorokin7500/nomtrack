@@ -1,3 +1,4 @@
+import { capitalize } from "@/utils/stringExtensions";
 import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
 import "@/utils/stringExtensions";
 
@@ -34,8 +35,8 @@ export const COACH_TEXTS = {
     DELETE_TRAINING: "Ви впевнені, що хочете видалити план своїх тренувань?",
     DELETE_SUCCESS: COMMON_TEXTS.DELETE_SUCCESS,
     CONFIRM_DELETE: COMMON_TEXTS.CONFIRM_DELETE,
-    CANCEL: COMMON_TEXTS.CANCEL.capitalize(),
-    DELETE: COMMON_TEXTS.DELETE.capitalize(),
+    CANCEL: capitalize(COMMON_TEXTS.CANCEL),
+    DELETE: capitalize(COMMON_TEXTS.DELETE),
   },
   WORKOUT_LIST: {
     NO_WORKOUTS: "Поки що немає збережених тренувань або планів.",
@@ -48,8 +49,8 @@ export const COACH_TEXTS = {
     DELETE_SUCCESS: COMMON_TEXTS.DELETE_SUCCESS,
     DELETE_TRAINING: "Ви впевнені, що хочете видалити цей план тренувань?",
     CONFIRM_DELETE: COMMON_TEXTS.CONFIRM_DELETE,
-    CANCEL: COMMON_TEXTS.CANCEL.capitalize(),
-    DELETE: COMMON_TEXTS.DELETE.capitalize(),
+    CANCEL: capitalize(COMMON_TEXTS.CANCEL),
+    DELETE: capitalize(COMMON_TEXTS.DELETE),
     UNIT_KILOCALORIE: "ккал",
     TIMES: "підходи по",
     REPS: "повторень",

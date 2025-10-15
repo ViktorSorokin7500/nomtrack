@@ -459,7 +459,7 @@ export function MealCard({
             {availableMealTypes.map((meal) => (
               <label
                 key={meal.value}
-                className="flex-1 cursor-pointer p-2 rounded-lg has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm flex justify-center items-center font-medium"
+                className="flex-1 cursor-pointer p-1 rounded-lg has-[:checked]:bg-white has-[:checked]:shadow transition-all text-sm flex justify-center items-center font-medium"
               >
                 <input
                   type="radio"
