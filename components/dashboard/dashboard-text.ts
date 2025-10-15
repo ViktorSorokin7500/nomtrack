@@ -79,6 +79,7 @@ export const DASHBOARD_TEXTS = {
     PORCE_QUANTITY: "Кількість порцій",
     WEIGHT: capitalize(COMMON_TEXTS.WEIGHT),
     UNIT_GRAM: COMMON_TEXTS.UNIT_GRAM,
+    UNIT_KILOCALORIE: capitalize(COMMON_TEXTS.UNIT_KILOCALORIE),
     ADD_MEAL: "Додати прийом їжі",
     ANALIZE_AI: "ШІ Аналіз",
     MANUAL_ENTER: "Ручний запис",

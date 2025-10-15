@@ -106,7 +106,7 @@ export function MealCard({
       setValue("protein_g", undefined);
       setValue("fat_g", undefined);
       setValue("carbs_g", undefined);
-      setValue("sugar_g", undefined);
+      // setValue("sugar_g", undefined);
       return;
     }
 
@@ -118,7 +118,7 @@ export function MealCard({
       setValue("protein_g", recipe.protein_per_100g);
       setValue("fat_g", recipe.fat_per_100g);
       setValue("carbs_g", recipe.carbs_per_100g);
-      setValue("sugar_g", recipe.sugar_per_100g);
+      // setValue("sugar_g", recipe.sugar_per_100g);
     } else {
       console.error(
         `${DASHBOARD_TEXTS.MEAL_CARD.RECIPE_ERROR} ${selectedRecipeId}`
@@ -182,7 +182,7 @@ export function MealCard({
     setValue("protein_g", food.protein);
     setValue("fat_g", food.fat);
     setValue("carbs_g", food.carbs);
-    setValue("sugar_g", food.carbs);
+    // setValue("sugar_g", food.carbs);
     setValue("selected_recipe_id", "");
   };
 
@@ -348,7 +348,7 @@ export function MealCard({
                 <input
                   type="number"
                   step="0.01"
-                  placeholder="Калорії"
+                  placeholder={DASHBOARD_TEXTS.MEAL_CARD.UNIT_KILOCALORIE}
                   {...register("calories", { valueAsNumber: true })}
                   className={`p-2 border rounded ${
                     isRecipeSelected || selectedGlobalFood
@@ -393,7 +393,7 @@ export function MealCard({
                   }`}
                   readOnly={isRecipeSelected || !!selectedGlobalFood}
                 />
-                <input
+                {/* <input
                   type="number"
                   step={0.01}
                   placeholder={DASHBOARD_TEXTS.MEAL_CARD.SUGAR}
@@ -404,7 +404,7 @@ export function MealCard({
                       : ""
                   }`}
                   readOnly={isRecipeSelected || !!selectedGlobalFood}
-                />
+                /> */}
               </div>
               {errors.weight_eaten && (
                 <p className="text-red-500 text-sm">

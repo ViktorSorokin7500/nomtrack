@@ -136,7 +136,7 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       protein_g,
       fat_g,
       carbs_g,
-      sugar_g,
+      // sugar_g,
       weight_eaten,
       servings,
     } = entryData;
@@ -146,7 +146,7 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       protein_g: 0,
       fat_g: 0,
       carbs_g: 0,
-      sugar_g: 0,
+      // sugar_g: 0,
     };
 
     if (calc_mode === "per100g") {
@@ -155,14 +155,14 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       finalData.protein_g = (protein_g || 0) * multiplier;
       finalData.fat_g = (fat_g || 0) * multiplier;
       finalData.carbs_g = (carbs_g || 0) * multiplier;
-      finalData.sugar_g = (sugar_g || 0) * multiplier;
+      // finalData.sugar_g = (sugar_g || 0) * multiplier;
     } else {
       const servingsCount = servings || 1;
       finalData.calories = (calories || 0) * servingsCount;
       finalData.protein_g = (protein_g || 0) * servingsCount;
       finalData.fat_g = (fat_g || 0) * servingsCount;
       finalData.carbs_g = (carbs_g || 0) * servingsCount;
-      finalData.sugar_g = (sugar_g || 0) * servingsCount;
+      // finalData.sugar_g = (sugar_g || 0) * servingsCount;
     }
 
     const dataToInsert = {
@@ -173,7 +173,7 @@ export async function addManualFoodEntry(entryData: FoodEntryFormSchema) {
       protein_g: Math.round(finalData.protein_g),
       fat_g: Math.round(finalData.fat_g),
       carbs_g: Math.round(finalData.carbs_g),
-      sugar_g: Math.round(finalData.sugar_g),
+      sugar_g: 0,
       water_ml: 0,
     };
 

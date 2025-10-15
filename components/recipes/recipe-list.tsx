@@ -88,9 +88,10 @@ export function RecipeList({ recipes }: RecipeListProps) {
                   {recipe.fat_per_100g}
                   {RECIPES_TEXTS.UNIT_GRAM}, {RECIPES_TEXTS.CARBOHYDRATE_SHORT}:{" "}
                   {recipe.carbs_per_100g}
-                  {RECIPES_TEXTS.UNIT_GRAM}, {RECIPES_TEXTS.SUGAR_SHORT}:{" "}
+                  {RECIPES_TEXTS.UNIT_GRAM},
+                  {/* {RECIPES_TEXTS.SUGAR_SHORT}:{" "}
                   {recipe.sugar_per_100g}
-                  {RECIPES_TEXTS.UNIT_GRAM}
+                  {RECIPES_TEXTS.UNIT_GRAM} */}
                 </p>
               </div>
 
@@ -138,9 +139,10 @@ export function RecipeList({ recipes }: RecipeListProps) {
                 {selectedRecipe.fat_per_100g}
                 {RECIPES_TEXTS.UNIT_GRAM} | {RECIPES_TEXTS.CARBOHYDRATE}:{" "}
                 {selectedRecipe.carbs_per_100g}
-                {RECIPES_TEXTS.UNIT_GRAM} | {RECIPES_TEXTS.SUGAR}:{" "}
-                {selectedRecipe.sugar_per_100g}
                 {RECIPES_TEXTS.UNIT_GRAM}
+                {/* | {RECIPES_TEXTS.SUGAR}:{" "}
+                {selectedRecipe.sugar_per_100g}
+                {RECIPES_TEXTS.UNIT_GRAM} */}
               </p>
             </div>
 

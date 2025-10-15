@@ -84,10 +84,7 @@ export default async function ArchivePage({
   ]);
 
   if (profileError || summariesError) {
-    console.error(
-      "Failed to load archive data:",
-      profileError || summariesError
-    );
+    console.error(profileError || summariesError);
     return <div>{ARCHIVE_TEXTS.MAIN_PAGE.NO_FOUND}</div>;
   }
 
