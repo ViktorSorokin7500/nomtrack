@@ -6,6 +6,9 @@ import {
   analyzeAndSaveFoodEntry,
   addManualFoodEntry,
   searchGlobalFood,
+  saveGlobalFoodToFavorites,
+  getSavedGlobalFood,
+  deleteSavedGlobalFood,
 } from "@/app/actions";
 import { Button, SimpleRiseSpinner } from "../ui";
 import { useEffect, useTransition, useState } from "react";
@@ -13,7 +16,7 @@ import { foodEntrySchema, type FoodEntryFormSchema } from "@/lib/validators";
 import toast from "react-hot-toast";
 import { Card } from "../shared";
 import { UserRecipe } from "@/types";
-import { Coins, XCircle } from "lucide-react";
+import { Coins, XCircle, Star, ChevronDown, Trash2 } from "lucide-react";
 import { DASHBOARD_TEXTS } from "./dashboard-text";
 import { AI_REQUEST } from "@/lib/const";
 
@@ -24,6 +27,7 @@ type GlobalFoodSearchResult = {
   protein: number;
   fat: number;
   carbs: number;
+  is_favorite?: boolean;
 };
 
 interface MealCardProps {
@@ -43,9 +47,11 @@ export function MealCard({
   const [globalSearchResults, setGlobalSearchResults] = useState<
     GlobalFoodSearchResult[]
   >([]);
+  const [savedFoods, setSavedFoods] = useState<GlobalFoodSearchResult[]>([]);
   const [searchLoading, setSearchLoading] = useState(false);
   const [selectedGlobalFood, setSelectedGlobalFood] =
     useState<GlobalFoodSearchResult | null>(null);
+  const [isQuickSelectOpen, setIsQuickSelectOpen] = useState(false);
 
   const {
     register,
@@ -69,8 +75,24 @@ export function MealCard({
   const selectedRecipeId = useWatch({ control, name: "selected_recipe_id" });
   const isRecipeSelected = entryMode === "manual" && !!selectedRecipeId;
 
+  const truncateName = (name: string, limit: number = 12) => {
+    if (name.length > limit) {
+      return name.slice(0, limit) + "...";
+    }
+    return name;
+  };
+
   // НОВЕ: Відстежуємо calc_mode
   const calcMode = useWatch({ control, name: "calc_mode" });
+
+  useEffect(() => {
+    startTransition(async () => {
+      const result = await getSavedGlobalFood();
+      if (result.success) {
+        setSavedFoods(result.success as GlobalFoodSearchResult[]);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const handleSearch = async () => {
@@ -84,7 +106,12 @@ export function MealCard({
         toast.error(`${DASHBOARD_TEXTS.MEAL_CARD.ERROR} ${result.error}`);
         setGlobalSearchResults([]);
       } else if (result.success) {
-        setGlobalSearchResults(result.success as GlobalFoodSearchResult[]);
+        const savedIds = new Set(savedFoods.map((f) => f.id));
+        const filteredResults = (
+          result.success as GlobalFoodSearchResult[]
+        ).filter((food) => !savedIds.has(food.id));
+
+        setGlobalSearchResults(filteredResults);
       }
       setSearchLoading(false);
     };
@@ -94,7 +121,7 @@ export function MealCard({
     }, 500);
 
     return () => clearTimeout(debounceSearch);
-  }, [searchTerm, entryMode]);
+  }, [searchTerm, entryMode, savedFoods]);
 
   useEffect(() => {
     if (entryMode !== "manual") return;
@@ -197,6 +224,45 @@ export function MealCard({
     setValue("sugar_g", undefined);
   };
 
+  const handleSaveToFavorites = (food: GlobalFoodSearchResult) => {
+    startTransition(async () => {
+      const result = await saveGlobalFoodToFavorites(food.id, food.name);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          result.success || DASHBOARD_TEXTS.MEAL_CARD.SUBMIT_SUCCESS
+        );
+        setSearchTerm("");
+
+        const newSavedFood: GlobalFoodSearchResult = {
+          ...food,
+          is_favorite: true,
+        };
+        setSavedFoods([newSavedFood, ...savedFoods]);
+
+        setGlobalSearchResults((prev) =>
+          prev.filter((item) => item.id !== food.id)
+        );
+      }
+    });
+  };
+
+  const handleDeleteSavedFood = (foodId: number) => {
+    startTransition(async () => {
+      const result = await deleteSavedGlobalFood(foodId);
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success(
+          result.success || DASHBOARD_TEXTS.MEAL_CARD.SUBMIT_SUCCESS
+        );
+        // Видаляємо з локального стану
+        setSavedFoods((prev) => prev.filter((item) => item.id !== foodId));
+      }
+    });
+  };
+
   const placeholderText =
     calcMode === "serving"
       ? DASHBOARD_TEXTS.MEAL_CARD.PORCE_QUANTITY
@@ -239,6 +305,50 @@ export function MealCard({
 
           {entryMode === "manual" && (
             <div className="p-4 border rounded-lg space-y-4 bg-gray-50/70">
+              {savedFoods.length > 0 && !selectedGlobalFood && !searchTerm && (
+                <div className="border border-orange-200 rounded-lg p-2 bg-orange-50/50">
+                  <h4
+                    className="font-semibold text-gray-700 cursor-pointer flex items-center justify-between"
+                    onClick={() => setIsQuickSelectOpen((prev) => !prev)}
+                  >
+                    {DASHBOARD_TEXTS.MEAL_CARD.QUICK_SEARCH}
+                    <ChevronDown
+                      className={`size-4 transition-transform duration-300 ${
+                        isQuickSelectOpen ? "rotate-180" : "rotate-0"
+                      }`}
+                    />
+                  </h4>
+                  <div
+                    className={`flex flex-wrap gap-3 transition-all duration-500 ease-in-out overflow-y-auto ${
+                      isQuickSelectOpen ? "mt-2" : "max-h-0"
+                    }`}
+                  >
+                    {savedFoods.map((food) => (
+                      <div key={food.id} className="relative group">
+                        <button
+                          type="button"
+                          onClick={() => handleSelectGlobalFood(food)}
+                          className="px-3 py-1 text-sm bg-orange-100 hover:bg-orange-200 rounded-full transition-colors flex items-center gap-1 cursor-pointer pr-5"
+                          title={food.name}
+                        >
+                          <Star className="size-3 text-yellow-600 fill-yellow-600" />
+                          <span className="truncate">
+                            {truncateName(food.name)}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteSavedFood(food.id)}
+                          className="absolute top-1/2 right-0 -translate-y-1/2 translate-x-1/2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity disabled:opacity-50 z-10"
+                          disabled={isPending}
+                        >
+                          <Trash2 className="size-4 cursor-pointer" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
               <div className="relative">
                 <input
                   type="text"
@@ -259,28 +369,41 @@ export function MealCard({
               {globalSearchResults.length > 0 && (
                 <div className="border border-gray-200 rounded-md mt-1 max-h-60 overflow-y-auto shadow-lg">
                   {globalSearchResults.map((food) => (
-                    <button
+                    <div
                       key={food.id}
-                      type="button"
-                      onClick={() => handleSelectGlobalFood(food)}
-                      className="w-full text-left p-3 hover:bg-gray-100 transition-colors border-b last:border-b-0"
+                      className="w-full p-3 hover:bg-gray-100 transition-colors border-b last:border-b-0 flex justify-between items-center"
                     >
-                      <h4 className="font-semibold text-gray-800">
-                        {food.name}
-                      </h4>
-                      <p className="text-xs text-gray-500">
-                        {DASHBOARD_TEXTS.MEAL_CARD.CALORIES_SHORT}:{" "}
-                        {food.calories} |{" "}
-                        {DASHBOARD_TEXTS.MEAL_CARD.PROTEIN_SHORT}:{" "}
-                        {food.protein}
-                        {DASHBOARD_TEXTS.MEAL_CARD.UNIT_GRAM} |{" "}
-                        {DASHBOARD_TEXTS.MEAL_CARD.FAT_SHORT}: {food.fat}
-                        {DASHBOARD_TEXTS.MEAL_CARD.UNIT_GRAM}|{" "}
-                        {DASHBOARD_TEXTS.MEAL_CARD.CARBOHYDRATE_SHORT}:{" "}
-                        {food.carbs}
-                        {DASHBOARD_TEXTS.MEAL_CARD.UNIT_GRAM}
-                      </p>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectGlobalFood(food)}
+                        className="w-full text-left p-2 hover:bg-gray-100 transition-colors "
+                      >
+                        <h4 className="font-semibold text-gray-800">
+                          {food.name}
+                        </h4>
+                        <p className="text-xs text-gray-500">
+                          {DASHBOARD_TEXTS.MEAL_CARD.CALORIES_SHORT}:{" "}
+                          {food.calories} |{" "}
+                          {DASHBOARD_TEXTS.MEAL_CARD.PROTEIN_SHORT}:{" "}
+                          {food.protein}
+                          {DASHBOARD_TEXTS.MEAL_CARD.UNIT_GRAM} |{" "}
+                          {DASHBOARD_TEXTS.MEAL_CARD.FAT_SHORT}: {food.fat}
+                          {DASHBOARD_TEXTS.MEAL_CARD.UNIT_GRAM}|{" "}
+                          {DASHBOARD_TEXTS.MEAL_CARD.CARBOHYDRATE_SHORT}:{" "}
+                          {food.carbs}
+                          {DASHBOARD_TEXTS.MEAL_CARD.UNIT_GRAM}
+                        </p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSaveToFavorites(food)}
+                        disabled={isPending}
+                        className="p-2 text-gray-400 hover:text-yellow-600 transition-colors"
+                        aria-label="Додати до вибраного"
+                      >
+                        <Star className="size-5 hover:fill-yellow-600 cursor-pointer" />
+                      </button>
+                    </div>
                   ))}
                 </div>
               )}

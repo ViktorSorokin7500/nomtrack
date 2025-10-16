@@ -71,7 +71,7 @@ export async function Header() {
                   href="/sign-in"
                   className="border border-orange-300 bg-orange-300 hover:bg-orange-400 text-white hover:text-gray-100 px-3 py-1 rounded-full"
                 >
-                  {SHARED_TEXTS.HEADER.SIGN_OUT}
+                  {SHARED_TEXTS.HEADER.SIGN_IN}
                 </NavLink>
               </div>
             </div>

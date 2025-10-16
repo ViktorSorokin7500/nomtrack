@@ -104,6 +104,7 @@ export const DASHBOARD_TEXTS = {
     SELECT: "Обрано:",
     OPTIONS: "-- Оберіть прийом їжі --",
     SUBMIT_BUTTON: COMMON_TEXTS.SUBMIT_BUTTON,
+    QUICK_SEARCH: "Швидкий вибір:",
   },
   NUTRION_DASHBOARD: {
     FOOD_JOURNAL: "Журнал харчування",

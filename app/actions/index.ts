@@ -11,7 +11,10 @@ export {
   addManualFoodEntry,
   addWaterEntry,
   deleteFoodEntry,
+  deleteSavedGlobalFood,
   searchGlobalFood,
+  saveGlobalFoodToFavorites,
+  getSavedGlobalFood,
 } from "./food";
 
 export {

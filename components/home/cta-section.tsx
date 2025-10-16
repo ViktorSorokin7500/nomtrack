@@ -10,9 +10,11 @@ export function CtaSection() {
         <h2 className="text-3xl md:text-4xl font-bold mb-6">
           {HOME_TEXTS.CTA_SECTION.TITLE}
         </h2>
-        <p className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto">
-          {HOME_TEXTS.CTA_SECTION.DESCRIPTION}
-        </p>
+        <div className="text-lg text-gray-700 mb-8 max-w-2xl mx-auto space-y-2">
+          <p>{HOME_TEXTS.CTA_SECTION.DESCRIPTION1}</p>
+          <p>{HOME_TEXTS.CTA_SECTION.DESCRIPTION2}</p>
+          <p>{HOME_TEXTS.CTA_SECTION.DESCRIPTION3}</p>
+        </div>
         <div className="flex justify-center">
           <Button
             asChild

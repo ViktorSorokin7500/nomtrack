@@ -22,7 +22,7 @@ export const SHARED_TEXTS = {
     NOMTRACK: COMMON_TEXTS.NOMTRACK,
     NOMTRACK_SHORT: "NT",
     PRICING: "Тарифи",
-    SIGN_OUT: "Вийти",
+    SIGN_IN: "Увійти",
   },
   COPY: {
     TOAST_SUCCESS: "Скопійовано!",

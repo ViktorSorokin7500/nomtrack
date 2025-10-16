@@ -8,7 +8,12 @@ import { AI_REQUEST } from "@/lib/const";
 import { promptWithIngredients } from "@/lib/prompts";
 import { getAiJsonResponse } from "@/lib/ai";
 import { FoodEntryFormSchema, foodEntrySchema } from "@/lib/validators";
-import { Ingredient, NutritionInfo } from "@/types";
+import {
+  Ingredient,
+  NutritionInfo,
+  RawSavedFoodData,
+  SavedFoodItem,
+} from "@/types";
 import { revalidatePath } from "next/cache";
 import { ACTIONS_TEXTS } from "@/components/shared/(texts)/actions-texts";
 
@@ -222,30 +227,6 @@ export async function addWaterEntry(amount: number) {
   };
 }
 
-export async function deleteFoodEntry(entryId: number) {
-  const { supabase, user } = await getAuthUserOrError();
-
-  try {
-    const { error } = await (await supabase)
-      .from("food_entries")
-      .delete()
-      .eq("user_id", user.id)
-      .eq("id", entryId);
-
-    if (error) {
-      return { error: ACTIONS_TEXTS.ERROR_DB_SAVE + error.message };
-    }
-    revalidatePath("/dashboard");
-
-    return { success: ACTIONS_TEXTS.DELETE_SUCCESS };
-  } catch (e) {
-    if (e instanceof Error) {
-      return { error: ACTIONS_TEXTS.SERVER_ERROR + e.message };
-    }
-    return { error: ACTIONS_TEXTS.SERVER_ERROR };
-  }
-}
-
 export async function searchGlobalFood(searchTerm: string) {
   if (!searchTerm || searchTerm.length < 2) {
     return { success: [] };
@@ -287,4 +268,105 @@ export async function searchGlobalFood(searchTerm: string) {
     if (e instanceof Error) errorMessage = e.message;
     return { error: errorMessage };
   }
+}
+
+export async function saveGlobalFoodToFavorites(
+  foodId: number,
+  foodName: string
+) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+
+    const { error } = await supabase
+      .from("user_saved_products")
+      .insert([{ user_id: user.id, food_id: foodId }]);
+
+    if (error) {
+      if (error.code === "23505") {
+        return {
+          error: `Продукт "${foodName}" вже збережено у вашому списку.`,
+        };
+      }
+      return { error: ACTIONS_TEXTS.CANNOT_SAVE + error.message };
+    }
+
+    revalidatePath("/dashboard");
+    return { success: `Продукт "${foodName}" успішно додано до вибраного.` };
+  } catch (e) {
+    let errorMessage = ACTIONS_TEXTS.CONNOT_CHECK_PREMIUM;
+    if (e instanceof Error) errorMessage = e.message;
+    return { error: errorMessage };
+  }
+}
+
+export async function getSavedGlobalFood() {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    await checkPremiumStatus(user.id, supabase);
+
+    const { data, error } = await supabase.rpc(
+      "get_user_saved_products_with_details"
+    );
+
+    if (error) {
+      if (error.code === "42883") return { success: [] };
+      return { error: ACTIONS_TEXTS.FOOD.NO_PRODUCTS_FOUND };
+    }
+
+    const formattedData: SavedFoodItem[] = (
+      data || ([] as RawSavedFoodData[])
+    ).map((item: RawSavedFoodData) => ({
+      id: item.id,
+      name: item.name,
+      calories: item.calories,
+      protein: item.protein,
+      fat: item.fat,
+      carbs: item.carbs,
+      is_favorite: true,
+    }));
+
+    return { success: formattedData };
+  } catch (e) {
+    let errorMessage = ACTIONS_TEXTS.CONNOT_CHECK_PREMIUM;
+    if (e instanceof Error) errorMessage = e.message;
+    return { error: errorMessage };
+  }
+}
+
+async function _deleteUserEntry(table: string, idKey: string, idValue: number) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  try {
+    const { error } = await (await supabase)
+      .from(table)
+      .delete()
+      .eq("user_id", user.id)
+      .eq(idKey, idValue);
+
+    if (error) {
+      return { error: ACTIONS_TEXTS.ERROR_DB_SAVE + error.message };
+    }
+
+    revalidatePath("/dashboard");
+    return { success: ACTIONS_TEXTS.DELETE_SUCCESS };
+  } catch (e) {
+    let errorMessage = ACTIONS_TEXTS.SERVER_ERROR;
+    if (e instanceof Error) errorMessage = e.message;
+    return { error: errorMessage };
+  }
+}
+
+export async function deleteSavedGlobalFood(foodId: number) {
+  return _deleteUserEntry("user_saved_products", "food_id", foodId);
+}
+
+export async function deleteFoodEntry(entryId: number) {
+  return _deleteUserEntry(
+    "food_entries",
+    "id", // Стандартний ключ 'id'
+    entryId
+  );
 }

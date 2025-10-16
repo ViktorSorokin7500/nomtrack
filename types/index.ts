@@ -71,6 +71,25 @@ export type NutritionInfo = {
   serving_size_g?: number;
 };
 
+export type SavedFoodItem = {
+  id: number;
+  name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+  is_favorite: boolean;
+};
+
+export interface RawSavedFoodData {
+  id: number;
+  name: string;
+  calories: number;
+  protein: number;
+  fat: number;
+  carbs: number;
+}
+
 export interface TotalNutrition {
   calories: number;
   protein_g: number;
