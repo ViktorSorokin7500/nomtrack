@@ -1,200 +1,145 @@
-// ggg/app/[lang]/(root)/(pages)/(footer)/sitemap/page.tsx
+// nt/app/(root)/(pages)/(footer)/sitemap-page/page.tsx - ОНОВЛЕНИЙ ФАЙЛ
 import React from "react";
 import { Card } from "@/components/shared";
 import Link from "next/link";
+import { FOOTER_TEXTS } from "@/components/shared/(texts)/footer-texts";
+
+interface SitemapItemProps {
+  href: string;
+  label: string;
+  description: string;
+  notes?: string;
+}
+
+const SitemapItem: React.FC<SitemapItemProps> = ({
+  href,
+  label,
+  description,
+  notes,
+}) => (
+  <li>
+    <Link href={href} className="font-semibold text-orange-500 hover:underline">
+      {label}
+    </Link>
+    <p className="text-gray-600">
+      {description}
+      {notes && (
+        <>
+          <br />
+          <strong className="text-green-600">
+            {FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.INTEGRATION_TITLE}
+          </strong>{" "}
+          {notes}
+        </>
+      )}
+    </p>
+  </li>
+);
+
+const publicPagesData = [
+  {
+    href: "/",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.HOME.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.HOME.DESC,
+  },
+  {
+    href: "/pricing",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.PRICING.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.PRICING.DESC,
+  },
+  {
+    href: "/sign-in",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.SIGN_IN.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.SIGN_IN.DESC,
+  },
+  {
+    href: "/sign-up",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.SIGN_UP.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.SIGN_UP.DESC,
+  },
+  {
+    href: "/updates",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.UPDATES.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.UPDATES.DESC,
+  },
+  {
+    href: "/privacy-security",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.PRIVACY.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.PRIVACY.DESC,
+  },
+  {
+    href: "/support",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.SUPPORT.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.SUPPORT.DESC,
+  },
+  {
+    href: "/help",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.HELP.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.HELP.DESC,
+  },
+];
+
+const authPagesData = [
+  {
+    href: "/dashboard",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.DASHBOARD.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.DASHBOARD.DESC,
+    notes: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.DASHBOARD.NOTES,
+  },
+  {
+    href: "/settings",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.SETTINGS.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.SETTINGS.DESC,
+  },
+  {
+    href: "/archive",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.ARCHIVE.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.ARCHIVE.DESC,
+    notes: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.ARCHIVE.NOTES,
+  },
+  {
+    href: "/recipes",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.RECIPES.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.RECIPES.DESC,
+    notes: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.RECIPES.NOTES,
+  },
+  {
+    href: "/coach",
+    label: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.COACH.LABEL,
+    description: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.COACH.DESC,
+    notes: FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.COACH.NOTES,
+  },
+];
 
 export default function SitemapPage() {
   return (
     <section className="bg-orange-50 min-h-screen py-16">
       <div className="container mx-auto px-4 max-w-4xl">
-        <h1 className="text-4xl font-bold mb-4 text-center">Карта сайту</h1>
+        <h1 className="text-4xl font-bold mb-4 text-center">
+          {FOOTER_TEXTS.SITEMAP_TEXTS.TITLE}
+        </h1>
         <p className="text-center text-gray-600 mb-12">
-          Детальний путівник по всіх можливостях NomTrack.
+          {FOOTER_TEXTS.SITEMAP_TEXTS.DESCRIPTION}
         </p>
 
         <Card>
           <div className="prose prose-lg mx-auto">
-            <h2 className="text-2xl font-bold mb-4">Публічні сторінки</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              {FOOTER_TEXTS.SITEMAP_TEXTS.PUBLIC_PAGES.TITLE}
+            </h2>
             <ul className="list-disc list-inside space-y-4 mb-8">
-              <li>
-                <Link
-                  href="/"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Головна сторінка
-                </Link>
-                <p className="text-gray-600">
-                  Опис продукту, основні функції та переваги. Тут можна
-                  дізнатися про філософію NomTrack та переглянути загальні
-                  тарифи.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/pricing"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Тарифи
-                </Link>
-                <p className="text-gray-600">
-                  Детальна інформація про тарифи, що надає NomTrack, та переваги
-                  преміум-підписки.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/sign-in"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Увійти
-                </Link>
-                <p className="text-gray-600">
-                  Сторінка для входу в особистий кабінет. Підтримує вхід через
-                  електронну пошту/пароль та Google.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/sign-up"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Зареєструватися
-                </Link>
-                <p className="text-gray-600">
-                  Сторінка реєстрації нового користувача.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/updates"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Оновлення
-                </Link>
-                <p className="text-gray-600">
-                  Дорожня карта розвитку проекту з переліком запланованих та
-                  майбутніх функцій.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/privacy-security"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Політика конфіденційності
-                </Link>
-                <p className="text-gray-600">
-                  Інформація про збір, використання та захист ваших персональних
-                  даних.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/support"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Підтримка
-                </Link>
-                <p className="text-gray-600">
-                  Контактна інформація та ресурси для допомоги.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/help"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Допомога
-                </Link>
-                <p className="text-gray-600">
-                  Загальна інформація та умови надання послуг.
-                </p>
-              </li>
+              {publicPagesData.map((item) => (
+                <SitemapItem key={item.href} {...item} />
+              ))}
             </ul>
 
             <h2 className="text-2xl font-bold mt-8 mb-4">
-              Для зареєстрованих користувачів
+              {FOOTER_TEXTS.SITEMAP_TEXTS.AUTH_PAGES.TITLE}
             </h2>
             <ul className="list-disc list-inside space-y-4">
-              <li>
-                <Link
-                  href="/dashboard"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Особистий кабінет (Дашборд)
-                </Link>
-                <p className="text-gray-600">
-                  Центр управління харчуванням та активністю. Тут можна
-                  відстежувати калорії, білки, жири та вуглеводи, моніторити
-                  споживання води та додавати фізичні активності.
-                  <br />
-                  <strong className="text-green-600">Інтеграції:</strong> Аналіз
-                  страв та активності за допомогою ШІ (Together AI) та отримання
-                  нутриційної інформації (CalorieNinjas).
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/settings"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Налаштування
-                </Link>
-                <p className="text-gray-600">
-                  Керування персональними даними, такими як вага, зріст, вік, а
-                  також встановлення щоденних цілей по харчуванню (калорії,
-                  макроелементи) та воді.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/archive"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Історія
-                </Link>
-                <p className="text-gray-600">
-                  Перегляд минулих записів харчування та фізичних показників за
-                  місяцями. Можливість згенерувати детальний звіт від ШІ за
-                  обраний місяць.
-                  <br />
-                  <strong className="text-green-600">Інтеграції:</strong>{" "}
-                  Генерація щомісячного звіту за допомогою ШІ (Together AI).
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/recipes"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Мої рецепти
-                </Link>
-                <p className="text-gray-600">
-                  Створення та збереження власних рецептів. Система автоматично
-                  аналізує інгредієнти та розраховує харчову цінність на 100 г
-                  страви.
-                  <br />
-                  <strong className="text-green-600">Інтеграції:</strong> Аналіз
-                  інгредієнтів та розрахунок БЖВ за допомогою ШІ (Together AI)
-                  та CalorieNinjas.
-                </p>
-              </li>
-              <li>
-                <Link
-                  href="/coach"
-                  className="font-semibold text-orange-500 hover:underline"
-                >
-                  Мій трекер
-                </Link>
-                <p className="text-gray-600">
-                  Персональний ШІ-коуч для створення тренувань та планів. Ви
-                  можете створити разове тренування або згенерувати план на весь
-                  тиждень, вказавши доступний інвентар.
-                  <br />
-                  <strong className="text-green-600">Інтеграції:</strong>{" "}
-                  Генерація тренувань та планів за допомогою ШІ (Together AI).
-                </p>
-              </li>
+              {authPagesData.map((item) => (
+                <SitemapItem key={item.href} {...item} />
+              ))}
             </ul>
           </div>
         </Card>

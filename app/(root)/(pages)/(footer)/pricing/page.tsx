@@ -1,3 +1,5 @@
+// nt/app/(root)/(pages)/(footer)/pricing/page.tsx - ОНОВЛЕНИЙ ФАЙЛ
+import { FOOTER_TEXTS } from "@/components/shared/(texts)/footer-texts";
 import { Button } from "@/components/ui";
 import { ArrowRight, CheckIcon } from "lucide-react";
 import Link from "next/link";
@@ -5,31 +7,23 @@ import Link from "next/link";
 export default async function PricingPage() {
   const planData = {
     id: "month",
-    name: "NomTrack",
-    price: 50,
-    description:
-      "Повний набір інструментів для досягнення ваших цілей у харчуванні та оздоровленні.",
-    items: [
-      "500 токенів для запитів",
-      "Персональний ШІ-коуч для інсайтів і порад",
-      "Розширені звіти про прогрес та аналітика",
-      "Аналіз рецептів та персональна база даних",
-      "Відстеження споживання води та активності",
-      "Досвід без жодної реклами",
-    ],
+    name: FOOTER_TEXTS.PRICING_PAGE.CARD.NAME,
+    price: FOOTER_TEXTS.PRICING_PAGE.CARD.PRICE,
+    description: FOOTER_TEXTS.PRICING_PAGE.CARD.DESCRIPTION,
+    items: FOOTER_TEXTS.PRICING_PAGE.CARD.ITEMS,
     paymentLink: "/sign-up",
-    cta: "Перейти до оплати",
-    month: "місяць",
+    cta: FOOTER_TEXTS.PRICING_PAGE.CARD.CTA,
+    month: FOOTER_TEXTS.PRICING_PAGE.CARD.MONTH,
   };
   return (
     <section className="relative overflow-hidden" id="pricing">
       <div className="py-12 sm:py-16 lg:py-24 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800">
-            Один план. Усі можливості.
+            {FOOTER_TEXTS.PRICING_PAGE.TITLE}
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Спробуйте всі функції NomTrack. Скасуйте підписку в будь-який час.
+            {FOOTER_TEXTS.PRICING_PAGE.DESCRIPTION}
           </p>
         </div>
         <div className="flex justify-center">
@@ -64,28 +58,24 @@ const PricingCard = ({
           <h5 className="text-lg lg:text-xl font-bold text-gray-800">{name}</h5>
           <p className="text-gray-600 mt-2">{description}</p>
         </div>
-
-        {/* Price display */}
         <div className="my-4">
           <div className="flex items-end gap-2">
             <p className="text-5xl tracking-tight font-extrabold text-gray-900">
               ₴{price}
             </p>
+
             <p className="text-gray-500">/ {month}</p>
           </div>
         </div>
-
-        {/* Features list */}
         <ul className="space-y-3 leading-relaxed text-base flex-1">
           {items.map((item, i) => (
             <li key={i} className="flex items-center gap-3">
               <CheckIcon size={18} className="text-orange-500" />
+
               <span className="text-gray-700">{item}</span>
             </li>
           ))}
         </ul>
-
-        {/* Call to action */}
         <Button asChild className="mt-6">
           <Link
             href={paymentLink}
@@ -98,3 +88,5 @@ const PricingCard = ({
     </div>
   );
 };
+
+// Ок. Ми дішли до секції Ціна. Що зробити з оплатою? Як реалізувати? Треба замінити "paymentLink". Які є можливості для реалізації оплати? Дай декілька вариантів, без коду, просто спілкуємось!!!

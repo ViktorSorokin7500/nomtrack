@@ -1,4 +1,5 @@
 import { Card } from "@/components/shared";
+import { FOOTER_TEXTS } from "@/components/shared/(texts)/footer-texts";
 import {
   ClipboardList,
   Smartphone,
@@ -8,6 +9,7 @@ import {
   Bot,
   GlassWater,
   ShoppingCart,
+  Camera,
 } from "lucide-react";
 
 export default function UpdatesPage() {
@@ -15,48 +17,46 @@ export default function UpdatesPage() {
   const plannedFeatures = [
     {
       icon: <Smartphone />,
-      title: "Повноцінний мобільний додаток",
-      description:
-        "Розробка додатків для iOS та Android для максимальної зручності.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.PLANNED_TITLE_1,
+      description: FOOTER_TEXTS.UPDATES_PAGE.PLANNED_DESCRIPTION_1,
     },
     {
       icon: <LineChart />,
-      title: "Розширений аналіз та звіти",
-      description:
-        "Створення тижневих та місячних звітів з візуальними графіками.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.PLANNED_TITLE_2,
+      description: FOOTER_TEXTS.UPDATES_PAGE.PLANNED_DESCRIPTION_2,
+    },
+    {
+      icon: <Camera />,
+      title: FOOTER_TEXTS.UPDATES_PAGE.PLANNED_TITLE_3,
+      description: FOOTER_TEXTS.UPDATES_PAGE.PLANNED_DESCRIPTION_3,
     },
   ];
 
   const futureFeatures = [
     {
       icon: <Watch />,
-      title: "Інтеграція з фітнес-трекерами",
-      description:
-        "Синхронізація даних з Apple Health, Google Fit та іншими сервісами.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_TITLE_1,
+      description: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_DESCRIPTION_1,
     },
     {
       icon: <Users />,
-      title: "Соціальні функції та челенджі",
-      description:
-        "Можливість ділитися успіхами з друзями або брати участь у спільних челенджах.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_TITLE_2,
+      description: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_DESCRIPTION_2,
     },
     {
       icon: <Bot />,
-      title: "Персоналізовані плани харчування",
-      description:
-        "Використання ШІ для генерації індивідуальних планів харчування.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_TITLE_3,
+      description: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_DESCRIPTION_3,
     },
     {
       icon: <GlassWater />,
-      title: "Поглиблене відстеження гідратації",
-      description:
-        "Відстеження не тільки води, а й інших напоїв, налаштування нагадувань.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_TITLE_4,
+      description: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_DESCRIPTION_4,
     },
     {
       icon: <ShoppingCart />,
-      title: "Списки покупок",
-      description:
-        "Автоматичне створення списку покупок на основі твого плану харчування.",
+      title: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_TITLE_5,
+      description: FOOTER_TEXTS.UPDATES_PAGE.FUTURE_DESCRIPTION_5,
     },
   ];
 
@@ -83,19 +83,18 @@ export default function UpdatesPage() {
       <div className="container mx-auto max-w-4xl py-16 px-4">
         <header className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            Дорожня карта
+            {FOOTER_TEXTS.UPDATES_PAGE.TITLE}
           </h1>
           <p className="text-lg text-gray-600">
-            Наш план з розвитку та покращення NomTrack
+            {FOOTER_TEXTS.UPDATES_PAGE.DESCRIPTION}
           </p>
         </header>
 
         <Card>
-          {/* --- Секція "Заплановано" --- */}
           <section className="mb-12">
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
               <ClipboardList className="text-orange-500" />
-              Заплановано
+              {FOOTER_TEXTS.UPDATES_PAGE.PLANNED}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {plannedFeatures.map((feature) => (
@@ -104,11 +103,10 @@ export default function UpdatesPage() {
             </div>
           </section>
 
-          {/* --- Секція "Розглядається" --- */}
           <section>
             <h2 className="text-2xl font-semibold text-gray-800 mb-6 flex items-center gap-3">
               <Users className="text-orange-500" />
-              Розглядається
+              {FOOTER_TEXTS.UPDATES_PAGE.FUTURE}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {futureFeatures.map((feature) => (

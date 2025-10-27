@@ -1,118 +1,75 @@
-// ggg/app/[lang]/(root)/(pages)/(footer)/privacy-security/page.tsx
 import React from "react";
 import { Card } from "@/components/shared";
+import { FOOTER_TEXTS } from "@/components/shared/(texts)/footer-texts";
+
+interface PrivacyListItemProps {
+  strong: string;
+  desc: string;
+}
+
+const PrivacyListItem: React.FC<PrivacyListItemProps> = ({ strong, desc }) => (
+  <li>
+    <strong className="text-orange-500">{strong}</strong> {desc}
+  </li>
+);
 
 export default function PrivacySecurity() {
   return (
     <section className="bg-orange-50 min-h-screen py-16">
       <div className="container mx-auto px-4 max-w-4xl">
         <h1 className="text-4xl font-bold mb-4 text-center">
-          Політика конфіденційності
+          {FOOTER_TEXTS.PRIVACY_TEXTS.TITLE}
         </h1>
         <p className="text-center text-gray-600 mb-12">
-          Останнє оновлення: 13 вересня 2025 р.
+          {FOOTER_TEXTS.PRIVACY_TEXTS.LAST_UPDATED}
         </p>
 
         <Card>
           <div className="prose prose-lg mx-auto">
             <h2 className="text-2xl font-bold mt-8 mb-4">
-              1. Загальні положення
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_1.TITLE}
             </h2>
-            <p>
-              Ця Політика конфіденційності описує, як NomTrack збирає,
-              використовує, зберігає та захищає персональні дані користувачів
-              нашого вебсайту та мобільних додатків. Користуючись нашими
-              послугами, ви погоджуєтеся з умовами цієї політики.
-            </p>
-
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_1.CONTENT}</p>
             <h2 className="text-2xl font-bold mt-8 mb-4">
-              2. Збір і використання даних
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_2.TITLE}
             </h2>
-            <p>Ми збираємо такі типи персональних даних:</p>
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_2.PRE_LIST}</p>
             <ul className="list-disc list-inside space-y-2">
-              <li>
-                <strong className="text-orange-500">Реєстраційні дані:</strong>{" "}
-                Електронна пошта, пароль (зберігається у зашифрованому вигляді).
-              </li>
-              <li>
-                <strong className="text-orange-500">Дані профілю:</strong> Ваше
-                ім&apos;я, вага, зріст, вік, стать, рівень активності та цілі
-                щодо здоров&apos;я
-              </li>
-              <li>
-                <strong className="text-orange-500">
-                  Дані про харчування та активність:
-                </strong>{" "}
-                Інформація, яку ви вводите, включаючи записи про їжу, рецепти та
-                тренування.
-              </li>
-              <li>
-                <strong className="text-orange-500">Дані про підписку:</strong>{" "}
-                Інформація про статус вашого преміум-акаунта та кількість
-                AI-токенів.
-              </li>
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_2.ITEMS.map((item, index) => (
+                <PrivacyListItem
+                  key={index}
+                  strong={item.STRONG}
+                  desc={item.DESC}
+                />
+              ))}
             </ul>
-            <p>
-              Ми використовуємо ці дані виключно для надання та покращення наших
-              послуг, персоналізації вашого досвіду, розрахунку цільових
-              показників харчування та аналізу прогресу.
-            </p>
-
-            <h2 className="text-2xl font-bold mt-8 mb-4">3. Захист даних</h2>
-            <p>
-              Ми застосовуємо сучасні технічні та організаційні заходи безпеки
-              для захисту ваших персональних даних від несанкціонованого
-              доступу, зміни, розголошення або знищення. Ваші паролі
-              зберігаються у зашифрованому вигляді.
-            </p>
-
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_2.POST_LIST}</p>
             <h2 className="text-2xl font-bold mt-8 mb-4">
-              4. Розкриття даних третім сторонам
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_3.TITLE}
             </h2>
-            <p>
-              Ми не передаємо ваші персональні дані третім особам, крім
-              випадків, передбачених законодавством, або з вашої згоди. Винятком
-              є анонімізовані дані, що використовуються для статистики та
-              аналітики.
-            </p>
-
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_3.CONTENT}</p>
             <h2 className="text-2xl font-bold mt-8 mb-4">
-              5. Права користувача
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_4.TITLE}
             </h2>
-            <p>Відповідно до законодавства України, ви маєте право:</p>
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_4.CONTENT}</p>
+            <h2 className="text-2xl font-bold mt-8 mb-4">
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_5.TITLE}
+            </h2>
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_5.PRE_LIST}</p>
             <ul className="list-disc list-inside space-y-2">
-              <li>
-                Знати про джерела збору, місцезнаходження, мету обробки та місце
-                зберігання своїх персональних даних.
-              </li>
-              <li>
-                Отримувати інформацію про умови надання доступу до персональних
-                даних, зокрема інформацію про третіх осіб, яким вони
-                передаються.
-              </li>
-              <li>
-                Пред&apos;являти вмотивовані заперечення проти обробки своїх
-                персональних даних.
-              </li>
-              <li>
-                На захист своїх персональних даних від незаконної обробки та
-                випадкової втрати.
-              </li>
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_5.ITEMS.map((item, index) => (
+                <li key={index}>{item}</li>
+              ))}{" "}
             </ul>
 
-            <h2 className="text-2xl font-bold mt-8 mb-4">6. Cookies</h2>
-            <p>
-              Наш сайт використовує файли cookie для покращення користувацького
-              досвіду, аналітики та зберігання сеансу.
-            </p>
-
             <h2 className="text-2xl font-bold mt-8 mb-4">
-              7. Зміни в політиці конфіденційності
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_6.TITLE}
             </h2>
-            <p>
-              Ця Політика конфіденційності може час від часу оновлюватися. Про
-              будь-які значні зміни ми будемо повідомляти на нашому сайті.
-            </p>
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_6.CONTENT}</p>
+            <h2 className="text-2xl font-bold mt-8 mb-4">
+              {FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_7.TITLE}
+            </h2>
+            <p>{FOOTER_TEXTS.PRIVACY_TEXTS.SECTION_7.CONTENT}</p>
           </div>
         </Card>
       </div>
