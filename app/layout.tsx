@@ -55,6 +55,25 @@ export default function RootLayout({
 
   gtag('config', 'AW-11095731932');`}
         </Script>
+        <Script id="google-ads-helper">
+          {`
+    // Helper function to delay opening a URL until a gtag event is sent.
+    // Call it in response to an action that should navigate to a URL.
+    function gtagSendEvent(url) {
+      var callback = function () {
+        if (typeof url === 'string') {
+          window.location = url;
+        }
+      };
+      gtag('event', 'ads_conversion___1', {
+        'event_callback': callback,
+        'event_timeout': 2000,
+        // <event_parameters>
+      });
+      return false;
+    }
+  `}
+        </Script>
       </head>
       <body className={`${poppins.variable} font-sans antialiased`}>
         {children}
