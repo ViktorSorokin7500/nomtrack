@@ -1,6 +1,14 @@
 import { CreateRecipeForm, RecipeList } from "@/components/recipes";
 import { RECIPES_TEXTS } from "@/components/recipes/recipes-text";
 import { createClient } from "@/lib/supabase/server";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: RECIPES_TEXTS.MY_RECIPES,
+    description: RECIPES_TEXTS.CREATE_NEW_RECIPE,
+  };
+}
 
 export default async function RecipesPage() {
   const supabase = createClient();
@@ -8,7 +16,6 @@ export default async function RecipesPage() {
     data: { user },
   } = await (await supabase).auth.getUser();
 
-  // Завантажуємо список вже існуючих рецептів користувача
   const { data: recipes } = await (
     await supabase
   )
@@ -28,14 +35,11 @@ export default async function RecipesPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-8">
-          {/* Ліва колонка для створення нового рецепта */}
           <div className="md:col-span-2">
             <CreateRecipeForm />
           </div>
 
-          {/* Права колонка для відображення списку рецептів */}
           <div className="md:col-span-3">
-            {/* Використовуємо наш новий компонент і передаємо йому дані */}
             <RecipeList recipes={recipes || []} />
           </div>
         </div>

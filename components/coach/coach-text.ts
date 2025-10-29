@@ -4,6 +4,9 @@ import "@/utils/stringExtensions";
 
 export const COACH_TEXTS = {
   COACH_PAGE: {
+    METADATA_TITLE: "Планування тренувань",
+    METADATA_DESCRIPTION:
+      "Ваш персональний AI-тренер NomTrack. Створюйте індивідуальні плани тренувань, отримуйте поради щодо харчування та відстежуйте свій прогрес за допомогою штучного інтелекту.",
     TITLE_START: "Ваш персональний",
     TITLE_END: "ШІ трекер",
     HISTORY: "Історія активності",

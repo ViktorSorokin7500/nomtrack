@@ -7,7 +7,7 @@ export async function getAuthUserOrError() {
   const {
     data: { user },
   } = await (await supabase).auth.getUser();
-  if (!user) throw new Error(LIB_TEXTS.BILLING_TEXT.NOT_AUTHPRIZED);
+  if (!user) throw new Error(LIB_TEXTS.BILLING_TEXT.NOT_AUTHORIZED);
   return { supabase: await supabase, user };
 }
 

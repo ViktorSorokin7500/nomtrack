@@ -15,7 +15,6 @@ export function MonthlySummaryCard({
   days,
   userProfile,
 }: MonthlySummaryCardProps) {
-  // Розраховуємо загальні та середні показники
   const totals = days.reduce(
     (acc, day) => {
       acc.consumedCalories += day.consumed_calories;

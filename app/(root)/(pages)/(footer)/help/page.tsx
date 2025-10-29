@@ -2,7 +2,14 @@ import React from "react";
 import { Card, HelpCopy } from "@/components/shared";
 import { MessageCircle, Bug, HeartHandshake } from "lucide-react";
 import { FOOTER_TEXTS } from "@/components/shared/(texts)/footer-texts";
+import type { Metadata } from "next";
 
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: FOOTER_TEXTS.HELP_PAGE.METADATA_TITLE,
+    description: FOOTER_TEXTS.HELP_PAGE.METADATA_DESCRIPTION,
+  };
+}
 export default function Help() {
   return (
     <section className="bg-orange-50 py-16">

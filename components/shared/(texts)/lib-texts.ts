@@ -7,7 +7,7 @@ export const LIB_TEXTS = {
     ERROR: "Помилка при спробі отримати відповідь від ШІ.",
   },
   BILLING_TEXT: {
-    NOT_AUTHPRIZED: "Ви не авторизовані.",
+    NOT_AUTHORIZED: "Ви не авторизовані.",
     NOT_FOUND_SUBSCRIBE: "Не вдалося перевірити статус підписки.",
     SUBSCRIBE_OFF: "Ваша підписка вичерпана. Будь ласка, оновіть її.",
     NOT_FOUND_TOKENS: "Не вдалося перевірити кількість токенів.",

@@ -1,5 +1,6 @@
 export const COMMON_TEXTS = {
   NOMTRACK: "NomTrack",
+  HOME: "Головна",
   CALORIES: "калорії",
   DAY: "день",
   DAYS: "дні",
@@ -36,4 +37,5 @@ export const COMMON_TEXTS = {
   SUNDAY: "Неділя",
   SUBMIT_BUTTON: "Додати",
   SAVE_BUTTON: "Зберегти",
+  RETURN_HOME: "Повернутися на головну",
 };

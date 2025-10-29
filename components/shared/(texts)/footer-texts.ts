@@ -2,6 +2,9 @@ import { COMMON_TEXTS } from "./app-texts";
 
 export const FOOTER_TEXTS = {
   HELP_PAGE: {
+    METADATA_TITLE: "Наша допомога",
+    METADATA_DESCRIPTION:
+      "Нам важлива ваша думка! Залишайте відгуки, пропонуйте нові функції або повідомляйте про помилки, щоб допомогти нам розвивати ваш особистий трекер харчування та фітнесу.",
     TITLE: "Ми тут, щоб допомогти",
     DESCRIPTION:
       "Ми віримо, що найкрутіший продукт створюється разом із користувачами",
@@ -196,6 +199,7 @@ export const FOOTER_TEXTS = {
     },
   },
   PRICING_PAGE: {
+    METADATA_TITLE: "Преміум доступ",
     TITLE: "Один план. Усі можливості.",
     DESCRIPTION:
       "Спробуйте всі функції NomTrack. Скасуйте підписку в будь-який час.",

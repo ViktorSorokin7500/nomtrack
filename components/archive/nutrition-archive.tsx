@@ -87,8 +87,8 @@ export function NutritionArchive({
   const monthName = getMonthName(targetMonth);
 
   return (
-    <section className="container mx-auto px-4 py-8 max-w-7xl">
-      <header className="mb-8 flex justify-between items-center">
+    <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <div className="mb-8 flex justify-between items-center">
         <button
           onClick={goToPrevMonth}
           className="p-2 rounded-full hover:bg-gray-200 transition-colors"
@@ -112,7 +112,7 @@ export function NutritionArchive({
         >
           <MoveRight size={24} />
         </button>
-      </header>
+      </div>
 
       {nutritionData.length === 0 ? (
         <div className="text-center text-gray-500 py-16">
@@ -130,6 +130,6 @@ export function NutritionArchive({
           ))}
         </div>
       )}
-    </section>
+    </main>
   );
 }

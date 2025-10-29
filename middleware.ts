@@ -45,5 +45,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/signup"], // де ще треба швидкий редірект
+  matcher: ["/", "/sign-in", "/sign-up"], // де ще треба швидкий редірект
 };

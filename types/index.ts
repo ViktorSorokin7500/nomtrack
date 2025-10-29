@@ -8,9 +8,9 @@ export type YearData = { year: number; months: { [key: string]: MonthData } };
 // Повний тип для одного запису з таблиці daily_summaries
 export type DailySummary = {
   id: number;
-  user_id: string;
+  user_id?: string;
   date: string;
-  created_at: string;
+  created_at?: string;
   consumed_calories: number;
   target_calories: number;
   consumed_protein_g: number;
@@ -131,10 +131,10 @@ export interface FoodEntry {
   id: number;
   meal_type: "breakfast" | "lunch" | "dinner" | "snack";
   entry_text: string;
-  calories: number;
-  protein_g: number;
-  fat_g: number;
-  carbs_g: number;
+  calories?: number;
+  protein_g?: number;
+  fat_g?: number;
+  carbs_g?: number;
   sugar_g?: number | null;
 }
 

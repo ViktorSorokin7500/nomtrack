@@ -11,8 +11,14 @@ import {
 } from "@/components/coach";
 import { Dumbbell, Flame } from "lucide-react";
 import { COACH_TEXTS } from "@/components/coach/coach-text";
+import { Metadata } from "next";
 
-// Типи для даних, що будуть завантажуватися з БД
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: COACH_TEXTS.COACH_PAGE.METADATA_TITLE,
+    description: COACH_TEXTS.COACH_PAGE.METADATA_DESCRIPTION,
+  };
+}
 
 export default async function CoachPage() {
   const supabase = createClient();
@@ -24,7 +30,6 @@ export default async function CoachPage() {
     redirect("/sign-in");
   }
 
-  // Завантажуємо ВСІ збережені плани тренувань
   const { data: allPlans, error } = await (await supabase)
     .from("workout_plans")
     .select("id, created_at, plan_data")
@@ -35,7 +40,6 @@ export default async function CoachPage() {
     console.error(error);
   }
 
-  // Завантажуємо збережені тренування
   const { data: savedWorkouts, error: savedWorkoutsError } = await (
     await supabase
   )

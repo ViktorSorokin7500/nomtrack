@@ -13,12 +13,9 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (error) {
-      // Якщо сталася помилка обміну коду, перенаправляємо на сторінку з помилкою
       return NextResponse.redirect(`${origin}/auth/auth-code-error`);
     }
   }
 
-  // Якщо все успішно, перенаправляємо користувача на головну сторінку.
-  // Наша middleware підхопить це і перенаправить на локалізований дашборд.
   return NextResponse.redirect(origin);
 }

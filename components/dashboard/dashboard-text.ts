@@ -3,6 +3,11 @@ import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
 import "@/utils/stringExtensions";
 
 export const DASHBOARD_TEXTS = {
+  METADATA: {
+    TITLE: "Панель керування",
+    DESCRIPTION:
+      "Ваш щоденний огляд харчування та активності. Відстежуйте калорії, макроелементи, воду та досягайте своїх фітнес-цілей у реальному часі",
+  },
   AI_COACH_CARD: {
     Z_ACTIVITY: "Будь ласка, опишіть вашу активність для аналізу.",
     Z_CALORIES: "Будь ласка, вкажіть спалені калорії.",

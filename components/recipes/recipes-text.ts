@@ -4,6 +4,7 @@ import "@/utils/stringExtensions";
 export const RECIPES_TEXTS = {
   MY_RECIPES: "Мої рецепти",
   CREATE_NEW_RECIPE: "Створюйте та керуйте власними рецептами.",
+
   // create-recipe-form.tsx
   Z_NAME_MIN_LENGTH: "Ім'я має бути довшим",
   Z_INGREDIENTS_MIN_LENGTH:

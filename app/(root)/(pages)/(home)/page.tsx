@@ -6,7 +6,7 @@ import {
   PricingSection,
 } from "@/components/home";
 export const dynamic = "force-static";
-export const revalidate = false;
+export const revalidate = 0;
 
 export default async function Home() {
   return (

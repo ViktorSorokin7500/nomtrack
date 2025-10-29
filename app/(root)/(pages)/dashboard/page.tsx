@@ -1,4 +1,13 @@
 import { DashboardContent } from "@/components/dashboard";
+import { DASHBOARD_TEXTS } from "@/components/dashboard/dashboard-text";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: DASHBOARD_TEXTS.METADATA.TITLE,
+    description: DASHBOARD_TEXTS.METADATA.DESCRIPTION,
+  };
+}
 
 export default function Dashboard() {
   return (

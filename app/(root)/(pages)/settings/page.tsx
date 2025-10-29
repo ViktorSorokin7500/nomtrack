@@ -8,6 +8,14 @@ import {
 } from "@/components/settings";
 import { Suspense } from "react";
 import { SETTINGS_TEXTS } from "@/components/settings/settings-text";
+import { Metadata } from "next";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: SETTINGS_TEXTS.TITLE,
+    description: SETTINGS_TEXTS.DESCRIPTION,
+  };
+}
 
 export default async function Settings() {
   const supabase = createClient();

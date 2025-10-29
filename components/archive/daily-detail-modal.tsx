@@ -3,13 +3,14 @@
 import { useEffect } from "react";
 import { Card } from "../shared";
 import { BodyMeasurements } from "./body-measurements";
-import { DayData, Profile } from "@/types";
+import { DayData, FoodEntry, Profile } from "@/types";
 import { ProgressRingArchive } from "./progress-ring-archive";
 import { ARCHIVE_TEXTS } from "./archive-texts";
 
 interface DailyDetailModalProps {
   day: DayData;
   userProfile: Profile | null;
+  foodLog: FoodEntry[];
   onClose: () => void;
 }
 
@@ -17,6 +18,7 @@ export function DailyDetailModal({
   day,
   userProfile,
   onClose,
+  foodLog,
 }: DailyDetailModalProps) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
@@ -40,7 +42,7 @@ export function DailyDetailModal({
       color: "stroke-orange-400",
       scolor: "stroke-red-400",
       type: "calories",
-      unit: "ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_KILOCALORIE",
+      unit: ARCHIVE_TEXTS.DAILY_DETAILS.UNIT_KILOCALORIE,
     },
     {
       label: ARCHIVE_TEXTS.DAILY_DETAILS.PROTEIN,
@@ -114,7 +116,6 @@ export function DailyDetailModal({
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-          {/* Ліва колонка з основними показниками */}
           <div className="p-5 rounded-lg bg-gray-50 lg:col-span-1">
             <h3 className="text-lg font-semibold text-gray-800 mb-4">
               {ARCHIVE_TEXTS.DAILY_DETAILS.GOALS}
@@ -134,12 +135,12 @@ export function DailyDetailModal({
             </div>
           </div>
 
-          {/* Права колонка з замірами тіла */}
           <BodyMeasurements
             gender={userProfile?.gender || "male"}
             weight={day.end_of_day_weight}
-            belly={day.end_of_day_belly}
-            waist={day.end_of_day_waist}
+            foodLog={foodLog}
+            // belly={day.end_of_day_belly}
+            // waist={day.end_of_day_waist}
           />
         </div>
       </Card>

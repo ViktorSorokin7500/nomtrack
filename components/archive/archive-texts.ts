@@ -4,6 +4,9 @@ import { COMMON_TEXTS } from "../shared/(texts)/app-texts";
 export const ARCHIVE_TEXTS = {
   MAIN_PAGE: {
     NO_FOUND: "Не вдалося завантажити дані. Спробуйте пізніше.",
+    TITLE: "Історія харчування",
+    DESCRIPTION:
+      "Перегляд та аналіз історії вашого харчування, активності та замірів тіла.",
   },
   BODY_MEASUREMENTS: {
     TITLE: "Вимірювання тіла",
@@ -14,11 +17,19 @@ export const ARCHIVE_TEXTS = {
     UNIT_KG: COMMON_TEXTS.UNIT_KG,
     UNIT_CM: COMMON_TEXTS.UNIT_CM,
     NOT_AVAILABLE: COMMON_TEXTS.NOT_AVAILABLE,
+    BREAKFAST: capitalize(COMMON_TEXTS.BREAKFAST),
+    LUNCH: capitalize(COMMON_TEXTS.LUNCH),
+    DINNER: capitalize(COMMON_TEXTS.DINNER),
+    SNACK: capitalize(COMMON_TEXTS.SNACK),
+    TITLE_FOOD_LOG: "Журнал харчування",
+    NO_FOOD_LOG: "Записів про їжу за цей день немає",
   },
   DAILY_CARD: {
     CALORIES_CONSUMED: "Калорій (спожито):",
     WEIGHT: capitalize(COMMON_TEXTS.WEIGHT),
     UNIT_KG: COMMON_TEXTS.UNIT_KG,
+    TOAST_ERROR: "Помилка завантаження журналу харчування:",
+    LOADING: "Завантаження",
   },
   DAILY_DETAILS: {
     CALORIES: capitalize(COMMON_TEXTS.CALORIES),

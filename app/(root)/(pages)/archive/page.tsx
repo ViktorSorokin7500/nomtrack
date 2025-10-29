@@ -2,9 +2,18 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { NutritionArchive } from "@/components/archive/nutrition-archive";
 import { DailySummary, YearData } from "@/types";
+import { Metadata } from "next";
 import { ARCHIVE_TEXTS } from "@/components/archive/archive-texts";
 
-// Цю функцію можна залишити без змін
+export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    title: ARCHIVE_TEXTS.MAIN_PAGE.TITLE,
+    description: ARCHIVE_TEXTS.MAIN_PAGE.DESCRIPTION,
+  };
+}
+
 function groupDataByYearAndMonth(summaries: DailySummary[]) {
   const grouped: { [key: number]: YearData } = {};
 
@@ -41,9 +50,8 @@ function groupDataByYearAndMonth(summaries: DailySummary[]) {
   }));
 }
 
-// Оновлюємо основний компонент сторінки
 export default async function ArchivePage({
-  searchParams, // <-- НОВЕ: отримуємо параметри URL
+  searchParams,
 }: {
   searchParams?: Promise<{ year?: string; month?: string }>;
 }) {
@@ -56,16 +64,13 @@ export default async function ArchivePage({
     redirect("/sign-in");
   }
 
-  // Встановлюємо поточний рік та місяць за замовчуванням
   const currentYear = new Date().getUTCFullYear();
-  const currentMonth = new Date().getUTCMonth(); // 0-11
+  const currentMonth = new Date().getUTCMonth();
 
-  // Визначаємо місяць та рік для запиту
   const params = (await searchParams) ?? {};
   const targetYear = params.year ? parseInt(params.year) : currentYear;
   const targetMonth = params.month ? parseInt(params.month) - 1 : currentMonth;
 
-  // Створюємо дати початку та кінця місяця для фільтрації
   const startDate = new Date(Date.UTC(targetYear, targetMonth, 1));
   const endDate = new Date(Date.UTC(targetYear, targetMonth + 1, 1));
 
@@ -76,7 +81,9 @@ export default async function ArchivePage({
     (await supabase).from("profiles").select("*").eq("id", user.id).single(),
     (await supabase)
       .from("daily_summaries")
-      .select("*")
+      .select(
+        "id, date, consumed_calories, target_calories, consumed_protein_g, target_protein_g, consumed_fat_g, target_fat_g, consumed_carbs_g, target_carbs_g, consumed_sugar_g, target_sugar_g, consumed_water_ml, target_water_ml, end_of_day_weight, end_of_day_belly, end_of_day_waist"
+      )
       .eq("user_id", user.id)
       .gte("date", startDate.toISOString().split("T")[0])
       .lt("date", endDate.toISOString().split("T")[0])

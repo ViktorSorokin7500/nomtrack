@@ -1,5 +1,7 @@
+import { COMMON_TEXTS } from "./app-texts";
+
 export const AUTH_TEXTS = {
-  RETURN_HOME: "Повернутися на головну",
+  RETURN_HOME: COMMON_TEXTS.RETURN_HOME,
   Z_EMAIL: "Будь ласка, введіть дійсну електронну адресу.",
   EMAIL: "Email",
   PASSWORD: "Пароль",

@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import { LazyToaster } from "@/components/shared";
+import { LAYOUT_TEXTS } from "@/components/shared/(texts)/layout-text";
+import Script from "next/script";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -13,23 +15,23 @@ const poppins = Poppins({
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: {
-      template: "%s | NomTrack",
-      default: "NomTrack",
+      template: `%s | ${LAYOUT_TEXTS.NOMTRACK}`,
+      default: LAYOUT_TEXTS.NOMTRACK,
     },
-    description: "description",
-    keywords: "keywords",
+    description: LAYOUT_TEXTS.DESCRIPTION,
+    keywords: LAYOUT_TEXTS.KEYWORDS,
     openGraph: {
-      title: "NomTrack",
-      description: "description",
-      url: `https://www.commentpulse.site`,
+      title: LAYOUT_TEXTS.NOMTRACK,
+      description: LAYOUT_TEXTS.DESCRIPTION,
+      url: `https://www.nomtrack.site`,
       type: "website",
       locale: "uk_UA",
-      siteName: "Social Analyzer",
+      siteName: LAYOUT_TEXTS.NOMTRACK,
     },
     twitter: {
       card: "summary_large_image",
-      title: "NomTrack",
-      description: "description",
+      title: LAYOUT_TEXTS.NOMTRACK,
+      description: LAYOUT_TEXTS.DESCRIPTION,
     },
   };
 }
@@ -41,6 +43,19 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="uk">
+      <head>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=AW-11095731932"
+        />
+        <Script id="google-ads-tag">
+          {`window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-11095731932');`}
+        </Script>
+      </head>
       <body className={`${poppins.variable} font-sans antialiased`}>
         {children}
         <LazyToaster />

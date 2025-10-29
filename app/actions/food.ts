@@ -16,6 +16,7 @@ import {
 } from "@/types";
 import { revalidatePath } from "next/cache";
 import { ACTIONS_TEXTS } from "@/components/shared/(texts)/actions-texts";
+import { FoodEntry } from "@/types";
 
 export async function analyzeAndSaveFoodEntry(formData: {
   text: string;
@@ -364,9 +365,23 @@ export async function deleteSavedGlobalFood(foodId: number) {
 }
 
 export async function deleteFoodEntry(entryId: number) {
-  return _deleteUserEntry(
-    "food_entries",
-    "id", // Стандартний ключ 'id'
-    entryId
-  );
+  return _deleteUserEntry("food_entries", "id", entryId);
+}
+
+export async function getFoodEntriesByDate(date: string) {
+  const { supabase, user } = await getAuthUserOrError();
+
+  const { data: foodEntries, error } = await (await supabase)
+    .from("food_entries")
+    .select("id, meal_type, entry_text")
+    .eq("user_id", user.id)
+    .gte("created_at", `${date}T00:00:00Z`)
+    .lt("created_at", `${date}T23:59:59Z`)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    return { error: ACTIONS_TEXTS.FOOD.NO_PRODUCTS_FOUND };
+  }
+
+  return { success: foodEntries as FoodEntry[] };
 }
